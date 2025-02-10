@@ -1,18 +1,15 @@
-import { MapContainer, Marker, Rectangle, useMapEvents } from 'react-leaflet'
+import { MapContainer, Marker, Rectangle } from 'react-leaflet'
 import BoxDrawer from './components/BoxDrawer';
 import 'leaflet/dist/leaflet.css';
 import './App.css';
 import L from 'leaflet';
 import { useEffect, useState } from 'react';
 import DestinyMarker from './components/DestinyMarker';
-import melhorRota from './utils/melhorRota';
 import AntPath from './components/AntPath';
 import MapInfoCollector from './components/MapInfoCollector';
-import { criaGrid, calculaMelhorCaminho, GridConfig } from './utils/grid';
 import { Position } from './interfaces/Position';
-
-const tam: [number, number] = [225, 92]// y, x
-const bounds: L.LatLngBoundsLiteral = [[0, 0], [tam[0], tam[1]]];
+import RouteEditor from './components/RouteEditor';
+import { GridMap } from './models/GridMap';
 
 
 interface MapInfo {
@@ -21,115 +18,78 @@ interface MapInfo {
   zoom: number;
 }
 
-// 0: caminho livre
-// 1: boxe (obstáculo)
 
-
-
-
+const gridMap = new GridMap([225, 92]);
 let counter = 0;
+
 function App() {
   counter++;
   console.warn('render', counter);
 
-  const [grid, setGrid] = useState<number[][]>([]);
   const [marcadorInicio, setMarcadorInicio] = useState<Position>({ y: 0, x: 0 });
-  const [isEditingMarcadorInicio, setIsEditingMarcadorInicio] = useState(false);
 
   const [marcadoresDestino, setMarcadoresDestino] = useState<Position[]>([]);
-  const [marcadoresDestinoMelhorRota, setMarcadoresDestinoMelhorRota] = useState<Position[]>([]);// mesmo tamanho de marcadoresDestino
+  const [marcadoresDestinoMelhorOrdem, setMarcadoresDestinoMelhorOrdem] = useState<Position[]>([]);
 
-  const [melhorCaminho, setMelhorCaminho] = useState<Position[]>([]);// caminho completo, com cada posição na grid a ser percorrida
+  // caminho completo, com cada posição na grid a ser andada.
+  const [melhoresPassos, setMelhoresPassos] = useState<Position[]>([]);
+
   const [mapInfo, setMapInfo] = useState<MapInfo>();
   useEffect(() => { console.log('info', mapInfo) }, [mapInfo]);
 
-
-  const MapEvents = () => {
-    useMapEvents({
-      click(e) {
-        // setState your coords here
-        // coords exist in "e.latlng.lat" and "e.latlng.lng"
-        console.log(e.latlng.lat);
-        console.log(e.latlng.lng);
-      },
-    });
-    return false;
-  }
 
   const positionListToLatLngList = (positions: Position[]) => {
     return positions.map(p => [p.y + 0.5, p.x + 0.5]);
   }
 
   useEffect(() => {
-    const config: GridConfig = {
-      stepX: 3,
-      stepY: 5,
-      boxWidth: 2,
-      boxHeight: 4,
-      tam,
-    }
-    const newGrid = criaGrid(config);
-    setGrid(newGrid);
     setMarcadoresDestino([{ x: 0, y: 3 }, { x: 2, y: 0 }, { x: 3, y: 4 }, { x: 6, y: 2 }]);
   }, [])
 
-  /*useEffect(() => {
-    for (const destino of marcadoresDestino) {
-      grid[destino.y][destino.x] = 0;
-    }
-  }, [marcadoresDestino])*/
+  useEffect(() => {
+    setMarcadoresDestinoMelhorOrdem(gridMap.calculateBestRoute(marcadorInicio, marcadoresDestino).destiniesBestOrder);
+
+  }, [marcadorInicio, marcadoresDestino])
 
   useEffect(() => {
-    setMarcadoresDestinoMelhorRota(melhorRota(grid, marcadorInicio, marcadoresDestino));
-  }, [grid, marcadorInicio, marcadoresDestino])
+    if (marcadoresDestinoMelhorOrdem.length > 1)
+      setMelhoresPassos(gridMap.calculateBestRoute(marcadorInicio, marcadoresDestino).steps);
+  }, [marcadorInicio, marcadoresDestino, marcadoresDestinoMelhorOrdem])
 
   useEffect(() => {
-    if (marcadoresDestinoMelhorRota.length > 1) 
-      setMelhorCaminho(calculaMelhorCaminho({ grid, destinos: marcadoresDestinoMelhorRota }))
-  }, [grid, marcadoresDestinoMelhorRota])
-
-  useEffect(() => {
-    console.log('melhorCaminho: ', melhorCaminho);
-  }, [melhorCaminho])
+    console.log('melhorCaminho: ', melhoresPassos);
+  }, [melhoresPassos])
 
   return (
     <div>
-      <div>
-        Seu local de início é: {marcadorInicio?.x}, {marcadorInicio?.y}
-        <button
-          onClick={() => isEditingMarcadorInicio ? setIsEditingMarcadorInicio(false) : setIsEditingMarcadorInicio(true)}
-          style={{ backgroundColor: isEditingMarcadorInicio ? 'green' : 'white' }}
-        >Editar local de início</button>
-      </div>
-
       <MapContainer
         crs={L.CRS.Simple}
-        bounds={bounds}
+        bounds={gridMap.getBounds()}
         center={[3, 3.5]}
         zoom={5}
         maxZoom={7}
       >
         <MapInfoCollector onUpdateInfo={(newInfo) => setMapInfo(newInfo)} />
         {
-          <AntPath positions={positionListToLatLngList(melhorCaminho)} options={{ color: 'red' }} />
+          <AntPath positions={positionListToLatLngList(melhoresPassos)} options={{ color: 'red' }} />
         }
-        <MapEvents />
+        <RouteEditor />
         <Rectangle
-          bounds={[[0, 0], [tam[0], tam[1]]]}
+          bounds={gridMap.getBounds()}
           color='white'
           fillColor='#ffffff00'
         />
 
         {
-          mapInfo && mapInfo?.zoom > 4 && <BoxDrawer grid={grid} mapBounds={mapInfo?.bounds} />
+          mapInfo && mapInfo?.zoom > 4 && <BoxDrawer grid={gridMap.getGrid()} mapBounds={mapInfo?.bounds} />
         }
 
         {
           marcadorInicio && <Marker position={[marcadorInicio.y + 0.5, marcadorInicio.x + 0.5]}></Marker>
         }
         {
-          marcadoresDestinoMelhorRota?.map((marcador, index) => {
-            if (index < marcadoresDestinoMelhorRota.length - 1 && index > 0)
+          marcadoresDestinoMelhorOrdem?.map((marcador, index) => {
+            if (index < marcadoresDestinoMelhorOrdem.length - 1 && index > 0)
               return <DestinyMarker key={index} x={marcador.x} y={marcador.y} innerText={index.toString()} />
           }
           )
@@ -140,4 +100,4 @@ function App() {
   )
 }
 
-export default App
+export default App;
