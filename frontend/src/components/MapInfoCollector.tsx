@@ -15,7 +15,7 @@ function MapInfoCollector({ onUpdateInfo }: MapInfoCollectorProps) {
     bounds: map.getBounds(),
     zoom: map.getZoom()
   });
-  //onUpdateInfo(info.current);
+  onUpdateInfo(info.current);
 
   const updateInfo = useCallback(() => {
     info.current = {
@@ -26,7 +26,6 @@ function MapInfoCollector({ onUpdateInfo }: MapInfoCollectorProps) {
     onUpdateInfo(info.current);
   }, [map, onUpdateInfo]);
 
-  useEffect(() => { onUpdateInfo(info.current) }, [onUpdateInfo])
 
   useEffect(() => {
     map.on("moveend zoomend", updateInfo);

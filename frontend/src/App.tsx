@@ -1,13 +1,12 @@
 import { MapContainer, Marker, Rectangle, useMapEvents } from 'react-leaflet'
+import BoxDrawer from './components/BoxDrawer';
 import 'leaflet/dist/leaflet.css';
 import './App.css';
 import L from 'leaflet';
 import { useEffect, useState } from 'react';
-import Boxe from './components/Boxe';
 import DestinyMarker from './components/DestinyMarker';
 import melhorRota from './melhorRota';
 import PF from 'pathfinding';
-//import AntPath from "react-leaflet-ant-path";
 import AntPath from './components/AntPath';
 import MapInfoCollector from './components/MapInfoCollector';
 const tam = [225, 92]// y, x
@@ -46,7 +45,10 @@ function criaGrid() {
   }
 }
 
+let counter = 0;
 function App() {
+  counter++;
+  console.warn('render', counter);
   const [marcadorInicio, setMarcadorInicio] = useState<Position>({ y: 0, x: 0 });
   const [isEditingMarcadorInicio, setIsEditingMarcadorInicio] = useState(false);
 
@@ -70,51 +72,6 @@ function App() {
     return false;
   }
 
-  const isElementInArray = (array: Position[], element: Position) => {
-    return array.some(item => item.x == element.x && item.y == element.y);
-  };
-
-  // cria os quadrados do grid. Não eficiente para o mapa grande. TODO: substituir por img overlay e usar a posição do click do mouse para saber qual quadrado foi clicado
-  const drawGridBoxes = () => {
-    if(mapInfo && mapInfo.zoom <= 4) return;
-
-    const components = [];
-
-    for (let i = 0; i < grid.length; i++) {// y (lat)
-      for (let j = 0; j < grid[i].length; j++) {// x (lng)
-        if(!mapInfo) return;
-        const SWLat = mapInfo.bounds.getSouthWest().lat;
-        const NELat = mapInfo.bounds.getNorthEast().lat;
-
-        const SWLng = mapInfo.bounds.getSouthWest().lng;
-        const NELng = mapInfo.bounds.getNorthEast().lng;
-
-        if (i >= SWLat - 1 && i <= NELat + 1 && j >= SWLng - 1 && j <= NELng + 1) {
-          if (grid[i][j] === 1 || isElementInArray(marcadoresDestino, { x: j, y: i })) {
-            components.push(
-  
-              <Boxe 
-              y={i} x={j} 
-                innerText='12'
-                onClick={() => {
-                  if (isEditingMarcadorInicio) {
-                    setMarcadorInicio({ y: i, x: j });
-                    setIsEditingMarcadorInicio(false);
-                  }
-                }}
-              />
-  
-            );
-          }
-        }
-
-
-        
-      }
-    }
-    return components;
-  }
-
   const positionListToLatLngList = (positions: Position[]) => {
     return positions.map(p => [p.y + 0.5, p.x + 0.5]);
   }
@@ -122,27 +79,20 @@ function App() {
 
   useEffect(() => {
     criaGrid();
-    setMarcadorInicio({ x: 0, y: 0 });
     setMarcadoresDestino([{ x: 0, y: 3 }, { x: 2, y: 0 }, { x: 3, y: 4 }, { x: 6, y: 2 }]);
-    //setMarcadoresDestino([{ x: 1, y: 3 }, { x: 4, y: 3 }]);
   }, [])
 
-
-  useEffect(() => {
+  /*useEffect(() => {
     for (const destino of marcadoresDestino) {
       grid[destino.y][destino.x] = 0;
-
     }
-  }, [marcadoresDestino])
+  }, [marcadoresDestino])*/
 
   useEffect(() => {
     setMarcadoresDestinoMelhorRota(melhorRota(grid, marcadorInicio, marcadoresDestino));
-
   }, [marcadorInicio, marcadoresDestino])
 
   useEffect(() => {
-    console.log('rota: ', marcadoresDestinoMelhorRota);
-
     if (marcadoresDestinoMelhorRota.length > 1) {
       const finder = new PF.AStarFinder();
       let caminhos: Position[] = [{ x: marcadoresDestinoMelhorRota[0].x, y: marcadoresDestinoMelhorRota[0].y }];
@@ -155,15 +105,11 @@ function App() {
       }
       setMelhorCaminho(caminhos);
     }
-
-
   }, [marcadoresDestinoMelhorRota])
 
   useEffect(() => {
     console.log('melhorCaminho: ', melhorCaminho);
   }, [melhorCaminho])
-
-
 
 
 
@@ -195,10 +141,10 @@ function App() {
           fillColor='#ffffff00'
         />
 
-
         {
-          drawGridBoxes()
+          mapInfo && mapInfo?.zoom > 4 && <BoxDrawer grid={grid} mapBounds={mapInfo?.bounds} />
         }
+       
         {
           marcadorInicio && <Marker position={[marcadorInicio.y + 0.5, marcadorInicio.x + 0.5]}></Marker>
         }
