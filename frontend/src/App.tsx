@@ -5,18 +5,15 @@ import './App.css';
 import L from 'leaflet';
 import { useEffect, useState } from 'react';
 import DestinyMarker from './components/DestinyMarker';
-import melhorRota from './melhorRota';
+import melhorRota from './utils/melhorRota';
 import AntPath from './components/AntPath';
 import MapInfoCollector from './components/MapInfoCollector';
 import { criaGrid, calculaMelhorCaminho, GridConfig } from './utils/grid';
+import { Position } from './interfaces/Position';
 
 const tam: [number, number] = [225, 92]// y, x
 const bounds: L.LatLngBoundsLiteral = [[0, 0], [tam[0], tam[1]]];
 
-interface Position {
-  y: number;// Lat (vertical, Norte - Sul)
-  x: number;// Lng (horizontal, Leste - Oeste)
-}
 
 interface MapInfo {
   center: L.LatLng;

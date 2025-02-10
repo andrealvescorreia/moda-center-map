@@ -1,9 +1,5 @@
 import PF from 'pathfinding';
-
-interface Position {
-  y: number;// Lat (vertical, Norte - Sul)
-  x: number;// Lng (horizontal, Leste - Oeste)
-}
+import { Position } from '../interfaces/Position';
 
 export interface GridConfig {
   stepX: number;

@@ -43,22 +43,3 @@ export default function melhorRota(matrizGrid: number[][], inicio: { x: number; 
   const caminho = indicesMelhorCaminho.map((i: number) => destinos[i]);
   return caminho;
 }
-
-/*
-function exemplo() {
-  const inicio = { x: 0, y: 0 };
-  const destinos = [{x: 1, y: 3}, { x: 2, y: 0 }, { x: 3, y: 4 }, { x: 4, y: 2 }];
-
-  const matrixGrid = [// representa o 'mapa'
-    [0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0],
-  ];
-  console.log('melhor caminho: ', melhorRota(matrixGrid, inicio, destinos));
-}
-  */
-
