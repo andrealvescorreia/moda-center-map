@@ -9,8 +9,9 @@ import melhorRota from './melhorRota';
 import PF from 'pathfinding';
 import AntPath from './components/AntPath';
 import MapInfoCollector from './components/MapInfoCollector';
-const tam = [225, 92]// y, x
-const grid = Array.from({ length: tam[0] }, () => Array(tam[1]).fill(0));
+import { criaGrid, GridConfig } from './utils/grid';
+
+const tam: [number, number] = [225, 92]// y, x
 const bounds: L.LatLngBoundsLiteral = [[0, 0], [tam[0], tam[1]]];
 
 interface Position {
@@ -28,27 +29,14 @@ interface MapInfo {
 // 1: boxe (obstáculo)
 
 
-function criaGrid() {
-  const stepX = 3;
-  const stepY = 5;
-  const boxWidth = 2;
-  const boxHeight = 4;
 
-  for (let i = 1; i < tam[1]; i += stepX) {
-    for (let j = 1; j < tam[0]; j += stepY) {
-      for (let x = i; x < i + boxWidth && x < tam[1]; x++) {
-        for (let y = j; y < j + boxHeight && y < tam[0]; y++) {
-          grid[y][x] = 1;
-        }
-      }
-    }
-  }
-}
 
 let counter = 0;
 function App() {
   counter++;
   console.warn('render', counter);
+
+  const [grid, setGrid] = useState<number[][]>([]);
   const [marcadorInicio, setMarcadorInicio] = useState<Position>({ y: 0, x: 0 });
   const [isEditingMarcadorInicio, setIsEditingMarcadorInicio] = useState(false);
 
@@ -78,7 +66,15 @@ function App() {
 
 
   useEffect(() => {
-    criaGrid();
+    const config: GridConfig = {
+      stepX: 3,
+      stepY: 5,
+      boxWidth: 2,
+      boxHeight: 4,
+      tam,
+    }
+    const newGrid = criaGrid(config);
+    setGrid(newGrid);
     setMarcadoresDestino([{ x: 0, y: 3 }, { x: 2, y: 0 }, { x: 3, y: 4 }, { x: 6, y: 2 }]);
   }, [])
 
@@ -90,7 +86,7 @@ function App() {
 
   useEffect(() => {
     setMarcadoresDestinoMelhorRota(melhorRota(grid, marcadorInicio, marcadoresDestino));
-  }, [marcadorInicio, marcadoresDestino])
+  }, [grid, marcadorInicio, marcadoresDestino])
 
   useEffect(() => {
     if (marcadoresDestinoMelhorRota.length > 1) {
@@ -105,13 +101,11 @@ function App() {
       }
       setMelhorCaminho(caminhos);
     }
-  }, [marcadoresDestinoMelhorRota])
+  }, [grid, marcadoresDestinoMelhorRota])
 
   useEffect(() => {
     console.log('melhorCaminho: ', melhorCaminho);
   }, [melhorCaminho])
-
-
 
   return (
     <div>
