@@ -1,3 +1,10 @@
+import PF from 'pathfinding';
+
+interface Position {
+  y: number;// Lat (vertical, Norte - Sul)
+  x: number;// Lng (horizontal, Leste - Oeste)
+}
+
 export interface GridConfig {
   stepX: number;
   stepY: number;
@@ -21,4 +28,18 @@ export function criaGrid(config: GridConfig): number[][] {
   }
 
   return grid;
+}
+
+export const calculaMelhorCaminho = ({ grid, destinos }: { grid: number[][], destinos: Position[] }) => {
+  const finder = new PF.AStarFinder();
+  let caminhos: Position[] = [{ x: destinos[0].x, y: destinos[0].y }];
+  for (let i = 0; i < destinos.length - 1; i++) {
+    const path = finder.findPath(destinos[i].x, destinos[i].y, destinos[i + 1].x, destinos[i + 1].y, new PF.Grid(grid));
+
+    path.shift();// remove repetido
+
+    caminhos = [...caminhos, ...(path.map(p => { return { x: p[0], y: p[1] } }))];
+  }
+  return caminhos;
+
 }

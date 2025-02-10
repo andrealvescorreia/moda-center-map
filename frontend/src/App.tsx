@@ -6,10 +6,9 @@ import L from 'leaflet';
 import { useEffect, useState } from 'react';
 import DestinyMarker from './components/DestinyMarker';
 import melhorRota from './melhorRota';
-import PF from 'pathfinding';
 import AntPath from './components/AntPath';
 import MapInfoCollector from './components/MapInfoCollector';
-import { criaGrid, GridConfig } from './utils/grid';
+import { criaGrid, calculaMelhorCaminho, GridConfig } from './utils/grid';
 
 const tam: [number, number] = [225, 92]// y, x
 const bounds: L.LatLngBoundsLiteral = [[0, 0], [tam[0], tam[1]]];
@@ -64,7 +63,6 @@ function App() {
     return positions.map(p => [p.y + 0.5, p.x + 0.5]);
   }
 
-
   useEffect(() => {
     const config: GridConfig = {
       stepX: 3,
@@ -89,18 +87,8 @@ function App() {
   }, [grid, marcadorInicio, marcadoresDestino])
 
   useEffect(() => {
-    if (marcadoresDestinoMelhorRota.length > 1) {
-      const finder = new PF.AStarFinder();
-      let caminhos: Position[] = [{ x: marcadoresDestinoMelhorRota[0].x, y: marcadoresDestinoMelhorRota[0].y }];
-      for (let i = 0; i < marcadoresDestinoMelhorRota.length - 1; i++) {
-        const path = finder.findPath(marcadoresDestinoMelhorRota[i].x, marcadoresDestinoMelhorRota[i].y, marcadoresDestinoMelhorRota[i + 1].x, marcadoresDestinoMelhorRota[i + 1].y, new PF.Grid(grid));
-
-        path.shift();// remove repetido
-
-        caminhos = [...caminhos, ...(path.map(p => { return { x: p[0], y: p[1] } }))];
-      }
-      setMelhorCaminho(caminhos);
-    }
+    if (marcadoresDestinoMelhorRota.length > 1) 
+      setMelhorCaminho(calculaMelhorCaminho({ grid, destinos: marcadoresDestinoMelhorRota }))
   }, [grid, marcadoresDestinoMelhorRota])
 
   useEffect(() => {
@@ -138,7 +126,7 @@ function App() {
         {
           mapInfo && mapInfo?.zoom > 4 && <BoxDrawer grid={grid} mapBounds={mapInfo?.bounds} />
         }
-       
+
         {
           marcadorInicio && <Marker position={[marcadorInicio.y + 0.5, marcadorInicio.x + 0.5]}></Marker>
         }
