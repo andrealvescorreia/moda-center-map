@@ -11,7 +11,6 @@ import { Position } from './interfaces/Position';
 import RouteEditor from './components/RouteEditor';
 import { GridMap } from './models/GridMap';
 
-
 interface MapInfo {
   center: L.LatLng;
   bounds: L.LatLngBounds;
@@ -20,11 +19,12 @@ interface MapInfo {
 
 
 const gridMap = new GridMap([225, 92]);
-let counter = 0;
+//let counter = 0;
+const minZoomLevelToRenderMarkers = 5;
 
 function App() {
-  counter++;
-  console.warn('render', counter);
+  //counter++;
+  //console.warn('render', counter);
 
   const [marcadorInicio, setMarcadorInicio] = useState<Position>({ y: 0, x: 0 });
 
@@ -35,7 +35,7 @@ function App() {
   const [melhoresPassos, setMelhoresPassos] = useState<Position[]>([]);
 
   const [mapInfo, setMapInfo] = useState<MapInfo>();
-  useEffect(() => { console.log('info', mapInfo) }, [mapInfo]);
+  //'useEffect(() => { console.log('info', mapInfo) }, [mapInfo]);
 
 
   const positionListToLatLngList = (positions: Position[]) => {
@@ -43,6 +43,8 @@ function App() {
   }
 
   useEffect(() => {
+    setMarcadorInicio({ x: 0, y: 0 });
+
     setMarcadoresDestino([{ x: 0, y: 3 }, { x: 2, y: 0 }, { x: 3, y: 4 }, { x: 6, y: 2 }]);
   }, [])
 
@@ -68,6 +70,7 @@ function App() {
         center={[3, 3.5]}
         zoom={5}
         maxZoom={7}
+        preferCanvas={true}
       >
         <MapInfoCollector onUpdateInfo={(newInfo) => setMapInfo(newInfo)} />
         {
@@ -80,9 +83,6 @@ function App() {
           fillColor='#ffffff00'
         />
 
-        {
-          mapInfo && mapInfo?.zoom > 4 && <BoxDrawer grid={gridMap.getGrid()} mapBounds={mapInfo?.bounds} />
-        }
 
         {
           marcadorInicio && <Marker position={[marcadorInicio.y + 0.5, marcadorInicio.x + 0.5]}></Marker>
@@ -94,7 +94,10 @@ function App() {
           }
           )
         }
-
+        {
+          mapInfo && mapInfo?.zoom >= minZoomLevelToRenderMarkers && 
+          <BoxDrawer grid={gridMap.getGrid()} mapBounds={mapInfo?.bounds} />
+        }
       </MapContainer>
     </div>
   )
