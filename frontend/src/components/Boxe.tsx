@@ -6,7 +6,6 @@ interface BoxeProps {
   x: number;
   y: number;
   onClick: () => void;
-  innerText: string;
 }
 
 const Boxe = ({ x, y, onClick }: BoxeProps) => {

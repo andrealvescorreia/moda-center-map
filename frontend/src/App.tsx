@@ -1,26 +1,20 @@
-import { MapContainer, Marker, Rectangle } from 'react-leaflet'
-import BoxDrawer from './components/BoxDrawer';
+import { MapContainer, Marker } from 'react-leaflet'
+import GridDrawer from './components/GridDrawer';
 import 'leaflet/dist/leaflet.css';
 import './App.css';
 import L from 'leaflet';
 import { useEffect, useState } from 'react';
 import DestinyMarker from './components/DestinyMarker';
 import AntPath from './components/AntPath';
-import MapInfoCollector from './components/MapInfoCollector';
 import { Position } from './interfaces/Position';
 import RouteEditor from './components/RouteEditor';
 import { GridMap } from './models/GridMap';
 
-interface MapInfo {
-  center: L.LatLng;
-  bounds: L.LatLngBounds;
-  zoom: number;
-}
 
 
-const gridMap = new GridMap([225, 92]);
-//let counter = 0;
+const modaCenterGridMap = new GridMap([225, 92]);
 const minZoomLevelToRenderMarkers = 5;
+//let counter = 0;
 
 function App() {
   //counter++;
@@ -34,7 +28,6 @@ function App() {
   // caminho completo, com cada posição na grid a ser andada.
   const [melhoresPassos, setMelhoresPassos] = useState<Position[]>([]);
 
-  const [mapInfo, setMapInfo] = useState<MapInfo>();
   //'useEffect(() => { console.log('info', mapInfo) }, [mapInfo]);
 
 
@@ -49,13 +42,13 @@ function App() {
   }, [])
 
   useEffect(() => {
-    setMarcadoresDestinoMelhorOrdem(gridMap.calculateBestRoute(marcadorInicio, marcadoresDestino).destiniesBestOrder);
+    setMarcadoresDestinoMelhorOrdem(modaCenterGridMap.calculateBestRoute(marcadorInicio, marcadoresDestino).destiniesBestOrder);
 
   }, [marcadorInicio, marcadoresDestino])
 
   useEffect(() => {
     if (marcadoresDestinoMelhorOrdem.length > 1)
-      setMelhoresPassos(gridMap.calculateBestRoute(marcadorInicio, marcadoresDestino).steps);
+      setMelhoresPassos(modaCenterGridMap.calculateBestRoute(marcadorInicio, marcadoresDestino).steps);
   }, [marcadorInicio, marcadoresDestino, marcadoresDestinoMelhorOrdem])
 
   useEffect(() => {
@@ -66,23 +59,17 @@ function App() {
     <div>
       <MapContainer
         crs={L.CRS.Simple}
-        bounds={gridMap.getBounds()}
+        bounds={modaCenterGridMap.getBounds()}
         center={[3, 3.5]}
         zoom={5}
         maxZoom={7}
         preferCanvas={true}
       >
-        <MapInfoCollector onUpdateInfo={(newInfo) => setMapInfo(newInfo)} />
+
         {
           <AntPath positions={positionListToLatLngList(melhoresPassos)} options={{ color: 'red' }} />
         }
         <RouteEditor />
-        <Rectangle
-          bounds={gridMap.getBounds()}
-          color='white'
-          fillColor='#ffffff00'
-        />
-
 
         {
           marcadorInicio && <Marker position={[marcadorInicio.y + 0.5, marcadorInicio.x + 0.5]}></Marker>
@@ -94,10 +81,11 @@ function App() {
           }
           )
         }
-        {
-          mapInfo && mapInfo?.zoom >= minZoomLevelToRenderMarkers && 
-          <BoxDrawer grid={gridMap.getGrid()} mapBounds={mapInfo?.bounds} />
-        }
+        <GridDrawer
+          gridMap={modaCenterGridMap}
+          minZoomLevelToRenderMarkers={minZoomLevelToRenderMarkers}
+        />
+
       </MapContainer>
     </div>
   )

@@ -1,4 +1,5 @@
 import PF from 'pathfinding';
+// @ts-expect-error a biblioteca não tem typesc
 import { getCycle } from 'held-karp';
 import { Position } from "../interfaces/Position";
 
@@ -45,6 +46,20 @@ export class GridMap {
   getBounds() {
     const bounds: L.LatLngBoundsLiteral = [[0, 0], [this.#yxDimensions[0], this.#yxDimensions[1]]];
     return bounds;
+  }
+
+  #getNumeroDoBoxe = (y: number, x: number) => {
+    const valorY = y * 2 - (parseInt((y / 5).toString()) * 2)
+    const valorX = x - 3 * parseInt((x / 3).toString())
+    return valorY - 2 + valorX
+  }
+
+  getBoxe(y: number, x: number) {
+    return {
+      setor: 'Laranja',
+      rua: 'A',
+      numero: this.#getNumeroDoBoxe(y, x),
+    }
   }
 
   calculateBestRoute(startPos: Position, destinies: Position[]) {
