@@ -33,7 +33,7 @@ interface GridDrawerProps {
 }
 const GridDrawer = ({gridMap, minZoomLevelToRenderMarkers}: GridDrawerProps) => {
   const markers = [];
-  const boxes = [];
+  const components = [];
   const grid = gridMap.getGrid();
 
   const [mapInfo, setMapInfo] = useState<MapInfo>();
@@ -42,27 +42,49 @@ const GridDrawer = ({gridMap, minZoomLevelToRenderMarkers}: GridDrawerProps) => 
   if(mapInfo && mapInfo.zoom >= minZoomLevelToRenderMarkers){
     for (let i = 0; i < grid.length; i++) {// y (lat)
       for (let j = 0; j < grid[i].length; j++) {// x (lng)
-        if (grid[i][j] == 1 && isInsideCameraBounds(mapInfo.bounds, i, j)) {
-          const numDoBoxe = gridMap.getBoxe(i, j).numero;
-  
-          markers.push({
-            id: `${i}-${j}`,
-            position: [i + 0.5, j + 0.5] as [number, number],
-            iconColor: 'red',
-            iconId: `${numDoBoxe}`,
-            customIcon: `
-              <svg height="20" width="50" xmlns="http://www.w3.org/2000/svg">
-                <text x="15" y="20" fill="black">${numDoBoxe}</text>
-                ${numDoBoxe}
-              </svg>
-              `
-          });
-          boxes.push(
-            <Boxe
-              y={i} x={j}
-              onClick={() => { }}
-            />
-          );
+        if(isInsideCameraBounds(mapInfo.bounds, i, j)){
+
+          if (grid[i][j] === GridMap.BOXE) {
+            const numDoBoxe = gridMap.getBoxe(i, j).numero;
+    
+            markers.push({
+              id: `${i}-${j}`,
+              position: [i + 0.5, j + 0.5] as [number, number],
+              iconColor: 'red',
+              iconId: `${numDoBoxe}`,
+              customIcon: `
+                <svg height="20" width="50" xmlns="http://www.w3.org/2000/svg">
+                  <text x="15" y="20" fill="black">${numDoBoxe}</text>
+                  ${numDoBoxe}
+                </svg>
+                `
+            });
+            components.push(
+              <Boxe
+                y={i} x={j}
+                onClick={() => { }}
+                key={`${i}-${j}`}
+              />
+            );
+          }
+          else if (grid[i][j] === GridMap.LOJAS_INTERNAS_E_BANHEIROS) {
+            components.push(
+              <Rectangle
+                key={`${i}-${j}`}
+                bounds={[[i, j], [i + 1, j + 1]]}
+                color='#ffffff00'
+                fillColor='#fff0000' />
+            );
+          }
+          else if (grid[i][j] === GridMap.RESTAURANTES) {
+            components.push(
+              <Rectangle
+                key={`${i}-${j}`}
+                bounds={[[i, j], [i + 1, j + 1]]}
+                color='#ffffff00'
+                fillColor='#fff0000' />
+            );
+          }
         }
       }
     }
@@ -72,11 +94,11 @@ const GridDrawer = ({gridMap, minZoomLevelToRenderMarkers}: GridDrawerProps) => 
     <>
       <MapInfoCollector onUpdateInfo={(newInfo) => setMapInfo(newInfo)} />
       <PixiOverlay markers={markers} />
-      {boxes}
+      {components}
       <Rectangle
           bounds={gridMap.getBounds()}
-          color='white'
-          fillColor='#ffffff00'
+          color='#ffffff00'
+          fillColor='#33b4ff'
         />
     </>
   );

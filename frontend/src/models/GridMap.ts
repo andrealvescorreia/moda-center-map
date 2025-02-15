@@ -11,31 +11,68 @@ export interface GridConfig {
 }
 
 export class GridMap {
-  #grid: number[][];
   #yxDimensions: [number, number];
+  #grid: number[][];
+  // 0: caminho livre
+  // 1: boxe
+  // 2: lojas interna ou banheiro
+  // 3: restaurante
+  static CAMINHO = 0;
+  static BOXE = 1;
+  static LOJAS_INTERNAS_E_BANHEIROS = 2;
+  static RESTAURANTES = 3;
 
-  constructor(yxDimensions: [number, number]) {
-    this.#yxDimensions = yxDimensions;
+  constructor() {
+    this.#yxDimensions = [(15 * 5 + 1), (15 * 3 + 1)];
+
+    this.#grid = Array.from({ length: this.#yxDimensions[0] }, () => Array(this.#yxDimensions[1]).fill(0));
+    this.#fillGridWithBoxes();
+    this.#fillGridWithLojasInternasEBanheiros();
+    this.#fillGridWithPraçasDeAlimentação();
+  }
+
+  #fillGridWithBoxes() {
     const stepX = 3;
     const stepY = 5;
     const boxWidth = 2;
     const boxHeight = 4;
-    const grid = Array.from({ length: yxDimensions[0] }, () => Array(yxDimensions[1]).fill(0));
-
-    // 0: caminho livre
-    // 1: boxe (obstáculo)
-    for (let i = 1; i < yxDimensions[1]; i += stepX) {
-      for (let j = 1; j < yxDimensions[0]; j += stepY) {
-        for (let x = i; x < i + boxWidth && x < yxDimensions[1]; x++) {
-          for (let y = j; y < j + boxHeight && y < yxDimensions[0]; y++) {
-            grid[y][x] = 1;
+    for (let i = 1; i < this.#yxDimensions[1]; i += stepX) {
+      for (let j = 1; j < this.#yxDimensions[0]; j += stepY) {
+        for (let x = i; x < i + boxWidth && x < this.#yxDimensions[1]; x++) {
+          for (let y = j; y < j + boxHeight && y < this.#yxDimensions[0]; y++) {
+            this.#grid[y][x] = GridMap.BOXE;
           }
         }
       }
     }
-    this.#grid = grid;
   }
 
+  #fillGridWithLojasInternasEBanheiros() {
+    const areaHeight = 14;
+    const areaWidth = 14;
+
+    const edgeBtmLeftYX = [(5 * 3 + 1), (4 * 5 + 1)];// vale para setor azul e laranja
+
+    for (let i = 0; i < areaWidth; i++) {
+      for (let j = 0; j < areaHeight; j++) {
+        this.#grid[edgeBtmLeftYX[1] + j][edgeBtmLeftYX[0] + i] = GridMap.LOJAS_INTERNAS_E_BANHEIROS;
+      }
+    }
+  }
+
+  #fillGridWithPraçasDeAlimentação() {
+    const areaHeight = 19;
+    const areaWidth = 11;
+
+    const edgeBtmLeftYX = [(11 * 5 + 1), (11 * 3 + 1)];// setor azul
+
+    for (let i = 0; i < areaHeight; i++) {
+      for (let j = 0; j < areaWidth; j++) {
+        if(j < areaWidth / 2) this.#grid[edgeBtmLeftYX[0] + i][edgeBtmLeftYX[1] + j] = GridMap.CAMINHO;
+        else this.#grid[edgeBtmLeftYX[0] + i][edgeBtmLeftYX[1] + j] = GridMap.RESTAURANTES;
+      }
+    }
+  }
   getGrid() {
     return this.#grid;
   }
@@ -47,12 +84,6 @@ export class GridMap {
     return bounds;
   }
 
-  #getNumeroDoBoxe = (y: number, x: number) => {
-    const valorY = y * 2 - (parseInt((y / 5).toString()) * 2)
-    const valorX = x - 3 * parseInt((x / 3).toString())
-    return valorY - 2 + valorX
-  }
-
   getBoxe(y: number, x: number) {
     return {
       setor: 'Laranja',
@@ -61,13 +92,19 @@ export class GridMap {
     }
   }
 
+  #getNumeroDoBoxe = (y: number, x: number) => {
+    const valorY = y * 2 - (parseInt((y / 5).toString()) * 2)
+    const valorX = x - 3 * parseInt((x / 3).toString())
+    return valorY - 2 + valorX
+  }
+
   calculateBestRoute(startPos: Position, destinies: Position[]) {
-    if (startPos.x < 0 || startPos.y < 0 || startPos.x >= this.#yxDimensions[1] || startPos.y >= this.#yxDimensions[0] || this.#grid[startPos.y][startPos.x] !== 0) {
+    if (startPos.x < 0 || startPos.y < 0 || startPos.x >= this.#yxDimensions[1] || startPos.y >= this.#yxDimensions[0] || this.#grid[startPos.y][startPos.x] !== GridMap.CAMINHO) {
       console.error('Posição inicial inválida x: ', startPos.x, ' y: ', startPos.y);
     }
     const auxGrid = structuredClone(this.#grid);
     for (const dest of destinies) {
-      if (dest.x < 0 || dest.y < 0 || dest.x >= this.#yxDimensions[1] || dest.y >= this.#yxDimensions[0] || this.#grid[dest.y][dest.x] !== 1) {
+      if (dest.x < 0 || dest.y < 0 || dest.x >= this.#yxDimensions[1] || dest.y >= this.#yxDimensions[0] || this.#grid[dest.y][dest.x] !== GridMap.BOXE) {
         console.error(`Posição de destino inválida x: ${dest.x} y: ${dest.y}`);
       }
       auxGrid[dest.y][dest.x] = 0;
@@ -97,7 +134,6 @@ export class GridMap {
         distancias[j][i] = path.length;
       }
     }
-
     const indicesMelhorCaminho = tspSolver(distancias);
     const destiniesBestOrder = indicesMelhorCaminho.map((i: number) => destinos[i]);
     return destiniesBestOrder;
