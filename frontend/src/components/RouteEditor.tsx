@@ -41,7 +41,6 @@ const RouteEditor = ({ gridMap }: RouteEditorProps) => {
     marcadoresDestinoMelhorOrdem = (gridMap.calculateBestRoute(marcadorInicio, marcadoresDestino).destiniesBestOrder);
     melhoresPassos = (gridMap.calculateBestRoute(marcadorInicio, marcadoresDestino).steps);
   }
-
   useEffect(() => {
     setMarcadorInicio({ x: 0, y: 0 });
     setMarcadoresDestino([{ x: 1, y: 3 }, { x: 2, y: 1 }, { x: 8, y: 6 }]);
@@ -77,7 +76,7 @@ const RouteEditor = ({ gridMap }: RouteEditorProps) => {
 
       {
         marcadoresDestinoMelhorOrdem?.map((marcador, index) => {
-          if (index < marcadoresDestinoMelhorOrdem.length - 1 && index > 0)
+          if (index < marcadoresDestinoMelhorOrdem.length && index > 0)
             return <DestinyMarker key={index} x={marcador.x} y={marcador.y} innerText={index.toString()} />
         }
         )
