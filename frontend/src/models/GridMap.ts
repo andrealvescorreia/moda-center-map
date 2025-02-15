@@ -1,7 +1,6 @@
 import PF from 'pathfinding';
-// @ts-expect-error a biblioteca não tem typesc
-import { getCycle } from 'held-karp';
 import { Position } from "../interfaces/Position";
+import { tspSolver } from '../utils/tsp';
 
 export interface GridConfig {
   stepX: number;
@@ -63,12 +62,12 @@ export class GridMap {
   }
 
   calculateBestRoute(startPos: Position, destinies: Position[]) {
-    if(startPos.x < 0 || startPos.y < 0 || startPos.x >= this.#yxDimensions[1] || startPos.y >= this.#yxDimensions[0] || this.#grid[startPos.y][startPos.x] !== 0) {
+    if (startPos.x < 0 || startPos.y < 0 || startPos.x >= this.#yxDimensions[1] || startPos.y >= this.#yxDimensions[0] || this.#grid[startPos.y][startPos.x] !== 0) {
       console.error('Posição inicial inválida x: ', startPos.x, ' y: ', startPos.y);
     }
     const auxGrid = structuredClone(this.#grid);
     for (const dest of destinies) {
-      if(dest.x < 0 || dest.y < 0 || dest.x >= this.#yxDimensions[1] || dest.y >= this.#yxDimensions[0] || this.#grid[dest.y][dest.x] !== 1) {
+      if (dest.x < 0 || dest.y < 0 || dest.x >= this.#yxDimensions[1] || dest.y >= this.#yxDimensions[0] || this.#grid[dest.y][dest.x] !== 1) {
         console.error(`Posição de destino inválida x: ${dest.x} y: ${dest.y}`);
       }
       auxGrid[dest.y][dest.x] = 0;
@@ -99,7 +98,7 @@ export class GridMap {
       }
     }
 
-    const indicesMelhorCaminho = getCycle(distancias).cycle;
+    const indicesMelhorCaminho = tspSolver(distancias);
     const destiniesBestOrder = indicesMelhorCaminho.map((i: number) => destinos[i]);
     return destiniesBestOrder;
   }
