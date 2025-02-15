@@ -2,3 +2,15 @@
   height: 100vh;
   width: 100vw;
 }
+
+html, body{
+  margin: 0;
+  padding: 0;
+}
+
+
+.leaflet-control-container { position: absolute; right: 56px; bottom: 100px; } 
+
+.leaflet-control-attribution { display: none; }
+
+
