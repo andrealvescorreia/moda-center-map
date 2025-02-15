@@ -33,7 +33,7 @@ function MapInfoCollector({ onUpdateInfo }: MapInfoCollectorProps) {
       map.off("moveend zoomend", updateInfo);
     };
   }, [map, updateInfo]);
-
+  return false;
   return (
     <div>
 
