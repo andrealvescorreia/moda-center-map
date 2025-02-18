@@ -1,7 +1,7 @@
 import { Marker } from "react-leaflet";
 import { Position } from "../../interfaces/Position";
 import DestinyMarker from "../DestinyMarker";
-import AntPath from '../../components/AntPath';
+import AntPath from '../AntPath';
 
 
 interface RouteDrawerProps {

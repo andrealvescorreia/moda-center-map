@@ -3,7 +3,7 @@ import GridDrawer from './components/GridDrawer';
 import 'leaflet/dist/leaflet.css';
 import './App.css';
 import L from 'leaflet';
-import RouteEditor from './components/RouteEditor/RouteEditor';
+import RoutingManager from './components/Routing/RoutingManager';
 import { GridMap } from './models/GridMap';
 
 
@@ -22,7 +22,7 @@ function App() {
         maxZoom={7}
         preferCanvas={true}
       >
-        <RouteEditor gridMap={modaCenterGridMap} />
+        <RoutingManager gridMap={modaCenterGridMap} />
         <GridDrawer
           gridMap={modaCenterGridMap}
           minZoomLevelToRenderMarkers={minZoomLevelToRenderMarkers}

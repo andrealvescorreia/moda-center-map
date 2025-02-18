@@ -1,17 +1,17 @@
 import { useState } from 'react';
-import './RouteEditor.scss';
+import './RoutingManager.scss';
 import { GridMap } from '../../models/GridMap';
 import { Position } from '../../interfaces/Position';
 import RouteButton from './RouteButton';
 import RouteDrawer from './RouteDrawer';
-import RouteEditorUI from './RouteEditorUI';
+import RouteEditor from './RouteEditor';
 import { Route } from '../../interfaces/Route';
 
-interface RouteEditorProps {
+interface RoutingManager {
   gridMap: GridMap;
 }
 
-const RouteEditor = ({ gridMap }: RouteEditorProps) => {
+const RoutingManager = ({ gridMap }: RoutingManager) => {
   const [isCreatingRoute, setIsCreatingRoute] = useState(false);
 
   const [route, setRoute] = useState<Route>({
@@ -24,7 +24,7 @@ const RouteEditor = ({ gridMap }: RouteEditorProps) => {
 
   if (route.inicio && route.destinos.length > 0) {
     const bestRoute = gridMap.calculateBestRoute(
-      route.inicio.position, 
+      route.inicio.position,
       route.destinos.map(destino => destino.position)
     );
 
@@ -37,7 +37,7 @@ const RouteEditor = ({ gridMap }: RouteEditorProps) => {
       {
         !isCreatingRoute ? <RouteButton onClick={() => setIsCreatingRoute(true)} />
           :
-          <RouteEditorUI
+          <RouteEditor
             gridMap={gridMap}
             route={route}
             onUpdate={(route) => setRoute(route)}
@@ -58,4 +58,4 @@ const RouteEditor = ({ gridMap }: RouteEditorProps) => {
   );
 };
 
-export default RouteEditor;
+export default RoutingManager;

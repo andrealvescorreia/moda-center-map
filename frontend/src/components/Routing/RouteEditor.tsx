@@ -3,7 +3,7 @@ import { GridMap } from "../../models/GridMap";
 import { useMapEvents } from "react-leaflet";
 import { Route } from "../../interfaces/Route";
 
-interface RouteEditorUIProps {
+interface RouteEditorProps {
   gridMap: GridMap;
   route: Route
   onUpdate: (route: Route) => void;
@@ -21,7 +21,7 @@ const ClickPosition: React.FC<{ onClick: (lat: number, lng: number) => void }> =
   return false;
 }
 
-const RouteEditorUI = ({ gridMap, route, onUpdate, onCancel }: RouteEditorUIProps) => {
+const RouteEditor = ({ gridMap, route, onUpdate, onCancel }: RouteEditorProps) => {
   const [isEditingMarcadorInicio, setIsEditingMarcadorInicio] = useState(true);
   const [isAddingDestiny, setIsAddingDestiny] = useState(false);
 
@@ -91,7 +91,7 @@ const RouteEditorUI = ({ gridMap, route, onUpdate, onCancel }: RouteEditorUIProp
 
       {
         !isAddingDestiny &&
-        <button onClick={() => {
+        <button disabled={isEditingMarcadorInicio} onClick={() => {
           setIsAddingDestiny(true);
           setIsEditingMarcadorInicio(false);
         }}>Adicionar parada</button>
@@ -118,4 +118,4 @@ const RouteEditorUI = ({ gridMap, route, onUpdate, onCancel }: RouteEditorUIProp
   );
 }
 
-export default RouteEditorUI;
+export default RouteEditor;
