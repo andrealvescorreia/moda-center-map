@@ -3,7 +3,7 @@ import GridDrawer from './components/GridDrawer';
 import 'leaflet/dist/leaflet.css';
 import './App.css';
 import L from 'leaflet';
-import RouteEditor from './components/RouteEditor';
+import RouteEditor from './components/RouteEditor/RouteEditor';
 import { GridMap } from './models/GridMap';
 
 
