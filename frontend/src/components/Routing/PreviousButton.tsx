@@ -1,13 +1,9 @@
-import { ButtonHTMLAttributes } from "react";
+import type { ButtonHTMLAttributes } from 'react'
 
-const PreviousButton = ({...rest }: ButtonHTMLAttributes<HTMLButtonElement>) => {
-  return (
-    <button
-      {...rest}
-    >
-      ⬅️
-    </button>
-  )
-};
+const PreviousButton = ({
+  ...rest
+}: ButtonHTMLAttributes<HTMLButtonElement>) => {
+  return <button {...rest}>⬅️</button>
+}
 
-export default PreviousButton;
+export default PreviousButton

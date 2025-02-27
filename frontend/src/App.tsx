@@ -1,17 +1,15 @@
 import { MapContainer } from 'react-leaflet'
-import GridDrawer from './components/GridDrawer';
-import 'leaflet/dist/leaflet.css';
-import './App.css';
-import L from 'leaflet';
-import RoutingManager from './components/Routing/RoutingManager';
-import { GridMap } from './models/GridMap';
+import GridDrawer from './components/GridDrawer'
+import 'leaflet/dist/leaflet.css'
+import './App.css'
+import L from 'leaflet'
+import RoutingManager from './components/Routing/RoutingManager'
+import { GridMap } from './models/GridMap'
 
-
-const modaCenterGridMap = new GridMap();
-const minZoomLevelToRenderMarkers = 1;
+const modaCenterGridMap = new GridMap()
+const minZoomLevelToRenderMarkers = 1
 
 function App() {
-
   return (
     <div>
       <MapContainer
@@ -27,10 +25,9 @@ function App() {
           gridMap={modaCenterGridMap}
           minZoomLevelToRenderMarkers={minZoomLevelToRenderMarkers}
         />
-
       </MapContainer>
     </div>
-  );
-};
+  )
+}
 
-export default App;
+export default App

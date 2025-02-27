@@ -1,13 +1,7 @@
-import { ButtonHTMLAttributes } from "react";
+import type { ButtonHTMLAttributes } from 'react'
 
-const RouteButton = ({...rest }: ButtonHTMLAttributes<HTMLButtonElement>) => {
-  return (
-    <button
-      {...rest}
-    >
-      🚶‍♂️‍➡️ Rota
-    </button>
-  )
-};
+const RouteButton = ({ ...rest }: ButtonHTMLAttributes<HTMLButtonElement>) => {
+  return <button {...rest}>🚶‍♂️‍➡️ Rota</button>
+}
 
-export default RouteButton;
+export default RouteButton

@@ -1,8 +1,8 @@
-import { Position } from "./Position";
+import type { Position } from './Position'
 
 export interface Boxe {
-  setor: string;
-  numero: number;
-  rua: string;
-  position: Position;
+  setor: string
+  numero: number
+  rua: string
+  position: Position
 }

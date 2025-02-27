@@ -1,53 +1,61 @@
-import { Rectangle } from "react-leaflet";
-import { GridMap } from "../models/GridMap";
-import Boxe from "./Boxe";
+import { useState } from 'react'
+import { Rectangle } from 'react-leaflet'
+import type { JSX } from 'react/jsx-runtime'
+import { GridMap } from '../models/GridMap'
+import Boxe from './Boxe'
 //import PixiOverlay from "react-leaflet-pixi-overlay";
-import MapInfoCollector from "./MapInfoCollector";
-import { useState } from "react";
-import { JSX } from "react/jsx-runtime";
+import MapInfoCollector from './MapInfoCollector'
 
 // cria os quadrados do grid. Não eficiente para o mapa grande. TODO: substituir por img overlay e usar a posição do click do mouse para saber qual quadrado foi clicado
 
 interface MapCameraBounds {
-  getSouthWest: () => { lat: number, lng: number };
-  getNorthEast: () => { lat: number, lng: number };
+  getSouthWest: () => { lat: number; lng: number }
+  getNorthEast: () => { lat: number; lng: number }
 }
 
-const isInsideCameraBounds = (cameraBounds: MapCameraBounds, y: number, x: number) => {
-  const SWLat = cameraBounds.getSouthWest().lat;
-  const NELat = cameraBounds.getNorthEast().lat;
-  const SWLng = cameraBounds.getSouthWest().lng;
-  const NELng = cameraBounds.getNorthEast().lng;
-  return y >= SWLat - 1 && y <= NELat + 1 && x >= SWLng - 1 && x <= NELng + 1;
+const isInsideCameraBounds = (
+  cameraBounds: MapCameraBounds,
+  y: number,
+  x: number
+) => {
+  const SWLat = cameraBounds.getSouthWest().lat
+  const NELat = cameraBounds.getNorthEast().lat
+  const SWLng = cameraBounds.getSouthWest().lng
+  const NELng = cameraBounds.getNorthEast().lng
+  return y >= SWLat - 1 && y <= NELat + 1 && x >= SWLng - 1 && x <= NELng + 1
 }
 
 interface MapInfo {
-  center: L.LatLng;
-  bounds: L.LatLngBounds;
-  zoom: number;
+  center: L.LatLng
+  bounds: L.LatLngBounds
+  zoom: number
 }
 
 interface GridDrawerProps {
-  gridMap: GridMap;
-  minZoomLevelToRenderMarkers: number;
+  gridMap: GridMap
+  minZoomLevelToRenderMarkers: number
 }
-const GridDrawer = ({ gridMap, minZoomLevelToRenderMarkers }: GridDrawerProps) => {
-  const markers = [];
-  const components: JSX.Element[] = [];
-  const grid = gridMap.getGrid();
+const GridDrawer = ({
+  gridMap,
+  minZoomLevelToRenderMarkers,
+}: GridDrawerProps) => {
+  const markers = []
+  const components: JSX.Element[] = []
+  const grid = gridMap.getGrid()
 
-  const [mapInfo, setMapInfo] = useState<MapInfo>();
-
+  const [mapInfo, setMapInfo] = useState<MapInfo>()
 
   function drawBoxes() {
-    if (!mapInfo || mapInfo.zoom <= minZoomLevelToRenderMarkers) return;
+    if (!mapInfo || mapInfo.zoom <= minZoomLevelToRenderMarkers) return
 
-    for (let i = 0; i < grid.length; i++) {// y (lat)
-      for (let j = 0; j < grid[i].length; j++) {// x (lng)
-        if (!isInsideCameraBounds(mapInfo.bounds, i, j)) continue;
+    for (let i = 0; i < grid.length; i++) {
+      // y (lat)
+      for (let j = 0; j < grid[i].length; j++) {
+        // x (lng)
+        if (!isInsideCameraBounds(mapInfo.bounds, i, j)) continue
 
         if (grid[i][j] === GridMap.BOXE) {
-          const numDoBoxe = gridMap.getBoxe(i, j).numero;
+          const numDoBoxe = gridMap.getBoxe(i, j).numero
 
           markers.push({
             id: `${i}-${j}`,
@@ -59,15 +67,11 @@ const GridDrawer = ({ gridMap, minZoomLevelToRenderMarkers }: GridDrawerProps) =
                   <text x="15" y="20" fill="black">${numDoBoxe}</text>
                   ${numDoBoxe}
                 </svg>
-                `
-          });
+                `,
+          })
           components.push(
-            <Boxe
-              y={i} x={j}
-              onClick={() => { }}
-              key={`${i}-${j}`}
-            />
-          );
+            <Boxe y={i} x={j} onClick={() => {}} key={`${i}-${j}`} />
+          )
         }
         /*else if (grid[i][j] !== GridMap.CAMINHO) {//!temporário
           components.push(
@@ -78,7 +82,6 @@ const GridDrawer = ({ gridMap, minZoomLevelToRenderMarkers }: GridDrawerProps) =
               fillColor='#fff0000' />
           );
         }*/
-
       }
     }
   }
@@ -89,13 +92,14 @@ const GridDrawer = ({ gridMap, minZoomLevelToRenderMarkers }: GridDrawerProps) =
         <Rectangle
           key={`loja-bloco${lojaExterna.bloco}-${lojaExterna.numLoja}`}
           bounds={lojaExterna.getBounds()}
-          fillColor='#ff0000' />
+          fillColor="#ff0000"
+        />
       )
     }
   }
 
-  drawBoxes();
-  drawLojasExternas();
+  drawBoxes()
+  drawLojasExternas()
 
   return (
     <>
@@ -104,10 +108,10 @@ const GridDrawer = ({ gridMap, minZoomLevelToRenderMarkers }: GridDrawerProps) =
       {components}
       <Rectangle
         bounds={gridMap.getBounds()}
-        color='#ffffff00'
-        fillColor='#33b4ff'
+        color="#ffffff00"
+        fillColor="#33b4ff"
       />
     </>
-  );
+  )
 }
-export default GridDrawer;
+export default GridDrawer
