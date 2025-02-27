@@ -1,10 +1,10 @@
 import { Rectangle } from "react-leaflet";
 import { GridMap } from "../models/GridMap";
 import Boxe from "./Boxe";
-import PixiOverlay from "react-leaflet-pixi-overlay";
+//import PixiOverlay from "react-leaflet-pixi-overlay";
 import MapInfoCollector from "./MapInfoCollector";
 import { useState } from "react";
-//import * as PIXI from 'pixi.js';
+import { JSX } from "react/jsx-runtime";
 
 // cria os quadrados do grid. Não eficiente para o mapa grande. TODO: substituir por img overlay e usar a posição do click do mouse para saber qual quadrado foi clicado
 
@@ -31,75 +31,82 @@ interface GridDrawerProps {
   gridMap: GridMap;
   minZoomLevelToRenderMarkers: number;
 }
-const GridDrawer = ({gridMap, minZoomLevelToRenderMarkers}: GridDrawerProps) => {
+const GridDrawer = ({ gridMap, minZoomLevelToRenderMarkers }: GridDrawerProps) => {
   const markers = [];
-  const components = [];
+  const components: JSX.Element[] = [];
   const grid = gridMap.getGrid();
 
   const [mapInfo, setMapInfo] = useState<MapInfo>();
 
 
-  if(mapInfo && mapInfo.zoom >= minZoomLevelToRenderMarkers){
+  function drawBoxes() {
+    if (!mapInfo || mapInfo.zoom <= minZoomLevelToRenderMarkers) return;
+
     for (let i = 0; i < grid.length; i++) {// y (lat)
       for (let j = 0; j < grid[i].length; j++) {// x (lng)
-        if(isInsideCameraBounds(mapInfo.bounds, i, j)){
+        if (!isInsideCameraBounds(mapInfo.bounds, i, j)) continue;
 
-          if (grid[i][j] === GridMap.BOXE) {
-            const numDoBoxe = gridMap.getBoxe(i, j).numero;
-    
-            markers.push({
-              id: `${i}-${j}`,
-              position: [i + 0.5, j + 0.5] as [number, number],
-              iconColor: 'red',
-              iconId: `${numDoBoxe}`,
-              customIcon: `
+        if (grid[i][j] === GridMap.BOXE) {
+          const numDoBoxe = gridMap.getBoxe(i, j).numero;
+
+          markers.push({
+            id: `${i}-${j}`,
+            position: [i + 0.5, j + 0.5] as [number, number],
+            iconColor: 'red',
+            iconId: `${numDoBoxe}`,
+            customIcon: `
                 <svg height="20" width="50" xmlns="http://www.w3.org/2000/svg">
                   <text x="15" y="20" fill="black">${numDoBoxe}</text>
                   ${numDoBoxe}
                 </svg>
                 `
-            });
-            components.push(
-              <Boxe
-                y={i} x={j}
-                onClick={() => { }}
-                key={`${i}-${j}`}
-              />
-            );
-          }
-          else if (grid[i][j] === GridMap.LOJAS_INTERNAS_E_BANHEIROS) {
-            components.push(
-              <Rectangle
-                key={`${i}-${j}`}
-                bounds={[[i, j], [i + 1, j + 1]]}
-                color='#ffffff00'
-                fillColor='#fff0000' />
-            );
-          }
-          else if (grid[i][j] === GridMap.RESTAURANTES) {
-            components.push(
-              <Rectangle
-                key={`${i}-${j}`}
-                bounds={[[i, j], [i + 1, j + 1]]}
-                color='#ffffff00'
-                fillColor='#fff0000' />
-            );
-          }
+          });
+          components.push(
+            <Boxe
+              y={i} x={j}
+              onClick={() => { }}
+              key={`${i}-${j}`}
+            />
+          );
         }
+        /*else if (grid[i][j] !== GridMap.CAMINHO) {//!temporário
+          components.push(
+            <Rectangle
+              key={`${i}-${j}`}
+              bounds={[[i, j], [i + 1, j + 1]]}
+              //color='#ffffff00'
+              fillColor='#fff0000' />
+          );
+        }*/
+
       }
     }
   }
 
+  function drawLojasExternas() {
+    for (const lojaExterna of gridMap.getLojasExternas()) {
+      components.push(
+        <Rectangle
+          key={`loja-bloco${lojaExterna.bloco}-${lojaExterna.numLoja}`}
+          bounds={lojaExterna.getBounds()}
+          fillColor='#ff0000' />
+      )
+    }
+  }
+
+  drawBoxes();
+  drawLojasExternas();
+
   return (
     <>
       <MapInfoCollector onUpdateInfo={(newInfo) => setMapInfo(newInfo)} />
-      <PixiOverlay markers={markers} />
+      {/*<PixiOverlay markers={markers} />*/}
       {components}
       <Rectangle
-          bounds={gridMap.getBounds()}
-          color='#ffffff00'
-          fillColor='#33b4ff'
-        />
+        bounds={gridMap.getBounds()}
+        color='#ffffff00'
+        fillColor='#33b4ff'
+      />
     </>
   );
 }
