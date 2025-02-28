@@ -4,6 +4,7 @@ import type { Position } from '../../interfaces/Position'
 import type { Route } from '../../interfaces/Route'
 import type { GridMap } from '../../models/GridMap'
 import { RouteCalculator } from '../../models/RouteCalculator'
+import { TSPSolverNN } from '../../models/TSPSolverNN'
 import RouteButton from './RouteButton'
 import RouteDrawer from './RouteDrawer'
 import RouteEditor from './RouteEditor'
@@ -24,7 +25,10 @@ const RoutingManager = ({ gridMap }: RoutingManager) => {
   let melhoresPassos: Position[] = []
 
   if (route.inicio && route.destinos.length > 0) {
-    const routeCalculator = new RouteCalculator({ grid: gridMap.getGrid() })
+    const routeCalculator = new RouteCalculator({
+      grid: gridMap.getGrid(),
+      tspSolver: new TSPSolverNN(),
+    })
 
     const bestRoute = routeCalculator.calculateBestRoute({
       startPos: route.inicio.position,

@@ -1,13 +1,15 @@
 import PF from 'pathfinding'
-import { tspSolverNearestNeighbourhood } from '../functions/tsp'
 import type { Position } from '../interfaces/Position'
+import type { TSPSolver } from '../interfaces/TSPSolver'
 import { GridMap } from './GridMap'
 
 export class RouteCalculator {
   #grid: number[][]
+  #tspSolver: TSPSolver
 
-  constructor({ grid }: { grid: number[][] }) {
+  constructor({ grid, tspSolver }: { grid: number[][]; tspSolver: TSPSolver }) {
     this.#grid = structuredClone(grid)
+    this.#tspSolver = tspSolver
   }
 
   setGrid(grid: number[][]) {
@@ -80,7 +82,7 @@ export class RouteCalculator {
         distancias[j][i] = path.length
       }
     }
-    const indicesMelhorCaminho = tspSolverNearestNeighbourhood(distancias)
+    const indicesMelhorCaminho = this.#tspSolver.solve(distancias)
     const destiniesBestOrder = indicesMelhorCaminho.map(
       (i: number) => destinos[i]
     )
