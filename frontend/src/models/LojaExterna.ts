@@ -19,7 +19,9 @@ export class LojaExterna {
       'Branco',
     ]),
     bloco: z.number().int().nonnegative().max(8),
-    numLoja: z.number().int().nonnegative().max(15), // 1 - 15 (para bloco de 1 a 7) ou 1 - 14 (para bloco 8)
+    // 1 - 15 (para bloco de 1 a 7) ou 1 - 14 (para bloco 8) (setor azul, laranja, vermelho ou verde)
+    // 1 - 18 (para bloco de 1 a 4) (setor amarelo ou branco)
+    numLoja: z.number().int().nonnegative().max(15),
     gridArea: z.array(
       z.object({
         y: z.number().int(),
@@ -70,11 +72,11 @@ export class LojaExterna {
 
     //!para o setor azul
     if (this.numLoja <= 5) {
-      return [findExtreme('x', false).y, findExtreme('x', false).x]
+      return findExtreme('x', false)
     }
     if (this.numLoja <= 10) {
-      return [findExtreme('y', false).y, findExtreme('y', false).x]
+      return findExtreme('y', false)
     }
-    return [findExtreme('y', true).y, findExtreme('y', true).x]
+    return findExtreme('y', true)
   }
 }

@@ -86,7 +86,7 @@ const RouteEditor = ({
           ...route.destinos,
           {
             info: loja,
-            position: { x: entrance[1], y: entrance[0] },
+            position: entrance,
           },
         ],
       }
