@@ -75,13 +75,13 @@ export class GridMap {
       gapBetweenBlocosLojasExternas + this.#widthHeightBlocoLojasExternas[1]
     let yOffset = 0
 
-    for (let i = 0; i < 7; i++) {
+    for (let i = 1; i <= 7; i++) {
       const edgeBtmLeftYX: [number, number] = [
         0 + yOffset,
         this.#boxesAreaAzulLeftBottomCorner.x -
           this.#widthHeightBlocoLojasExternas[0] -
           this.#gapBetweenLojasExternasAndBoxes,
-      ] // setor azul
+      ] // !setor azul
       const bloco1LojasExternas = createBlocoLojasExternas(
         'Azul',
         i,
@@ -106,7 +106,7 @@ export class GridMap {
     const areaHeight = 14
     const areaWidth = 14
 
-    // vale para setor azul e laranja
+    // !vale para setor azul e laranja
     const edgeBtmLeft = {
       y: 4 * 5 + 1,
       x: 5 * 3 + 1 + this.#boxesAreaAzulLeftBottomCorner.x,
@@ -127,7 +127,7 @@ export class GridMap {
     const edgeBtmLeftYX = [
       11 * 5 + 1,
       11 * 3 + 1 + this.#boxesAreaAzulLeftBottomCorner.x,
-    ] // setor azul
+    ] // !setor azul
 
     for (let i = 0; i < areaHeight; i++) {
       for (let j = 0; j < areaWidth; j++) {
@@ -155,11 +155,32 @@ export class GridMap {
   }
 
   getBoxe(y: number, x: number) {
+    if (this.#grid[y][x] !== GridMap.BOXE) {
+      console.error('Posição inválida x: ', x, ' y: ', y)
+      return null
+    }
     return {
-      setor: 'Laranja',
-      rua: 'A',
+      setor: 'Azul',
+      rua: this.#getRuaDoBoxe(y, x),
       numero: this.#getNumeroDoBoxe(y, x),
     }
+  }
+
+  #getRuaDoBoxe = (y: number, x: number) => {
+    //const letterACharCode = 'a'.charCodeAt(0)
+    const letterPCharCode = 'P'.charCodeAt(0)
+
+    const offset = Math.floor(
+      (x - this.#boxesAreaAzulLeftBottomCorner.x - 2) / 3
+    )
+    const ruaCharCode = letterPCharCode - offset - 1
+    return String.fromCharCode(ruaCharCode)
+  }
+
+  getLojaExterna(y: number, x: number) {
+    return this.#lojasExternas.find((loja) => {
+      return loja.gridArea.some((pos) => pos.x === x && pos.y === y)
+    })
   }
 
   #getNumeroDoBoxe = (y: number, x: number) => {
@@ -190,9 +211,11 @@ export class GridMap {
         dest.y < 0 ||
         dest.x >= this.#yxDimensions[1] ||
         dest.y >= this.#yxDimensions[0] ||
-        this.#grid[dest.y][dest.x] !== GridMap.BOXE
+        (this.#grid[dest.y][dest.x] !== GridMap.BOXE &&
+          this.#grid[dest.y][dest.x] !== GridMap.LOJAS_EXTERNAS)
       ) {
         console.error(`Posição de destino inválida x: ${dest.x} y: ${dest.y}`)
+        console.log(this.#grid[dest.y][dest.x])
       }
       auxGrid[dest.y][dest.x] = 0
     }

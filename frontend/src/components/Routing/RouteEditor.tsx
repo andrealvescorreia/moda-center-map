@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useMapEvents } from 'react-leaflet'
 import type { Route } from '../../interfaces/Route'
-import type { GridMap } from '../../models/GridMap'
+import { GridMap } from '../../models/GridMap'
 
 interface RouteEditorProps {
   gridMap: GridMap
@@ -48,25 +48,45 @@ const RouteEditor = ({
       const newRoute = {
         ...route,
         inicio: {
-          setor: 'Laranja',
-          rua: 'A',
-          numero: 1,
           position: { x: lng, y: lat },
+          info: null,
         },
       }
       onUpdate(newRoute)
       setIsEditingMarcadorInicio(false)
     }
-    if (isAddingDestiny && gridMap.getGrid()[lat][lng] === 1) {
+    if (isAddingDestiny && gridMap.getGrid()[lat][lng] === GridMap.BOXE) {
+      const boxe = gridMap.getBoxe(lat, lng)
+
+      if (boxe === null) return
       const newRoute = {
         ...route,
         destinos: [
           ...route.destinos,
           {
-            setor: 'Laranja',
-            rua: 'A',
-            numero: 1,
+            info: boxe,
             position: { x: lng, y: lat },
+          },
+        ],
+      }
+      onUpdate(newRoute)
+      setIsAddingDestiny(false)
+    }
+
+    if (
+      isAddingDestiny &&
+      gridMap.getGrid()[lat][lng] === GridMap.LOJAS_EXTERNAS
+    ) {
+      const loja = gridMap.getLojaExterna(lat, lng)
+      if (!loja) return
+      const entrance = loja.getEntrance()
+      const newRoute = {
+        ...route,
+        destinos: [
+          ...route.destinos,
+          {
+            info: loja,
+            position: { x: entrance[1], y: entrance[0] },
           },
         ],
       }
@@ -103,20 +123,38 @@ const RouteEditor = ({
             setIsAddingDestiny(false)
           }}
         >
-          Posição inicial: {route.inicio.setor} {route.inicio.rua}{' '}
-          {route.inicio.numero}
+          Posição inicial: {route.inicio.position.x} {
+            route.inicio.position.y
+          }{' '}
         </button>
       )}
 
       {route.destinos.map((destiny, index) => {
-        return (
-          <div key={`${destiny.setor}-${destiny.rua}-${destiny.numero}`}>
-            Destino {index + 1}: {destiny.setor} {destiny.rua} {destiny.numero}
-            <button type="button" onClick={() => removeDestiny(index)}>
-              X
-            </button>
-          </div>
-        )
+        if (!destiny.info) return null
+        if ('rua' in destiny.info && 'numero' in destiny.info)
+          return (
+            <div
+              key={`${destiny.info.setor}-${destiny.info.rua}-${destiny.info.numero}`}
+            >
+              Destino {index + 1}: Setor {destiny.info.setor} Rua{' '}
+              {destiny.info.rua} Boxe {destiny.info.numero}
+              <button type="button" onClick={() => removeDestiny(index)}>
+                X
+              </button>
+            </div>
+          )
+        if ('bloco' in destiny.info && 'numLoja' in destiny.info)
+          return (
+            <div
+              key={`${destiny.info.setor}-${destiny.info.bloco}-${destiny.info.numLoja}`}
+            >
+              Destino {index + 1}: Setor {destiny.info.setor} Bloco{' '}
+              {destiny.info.bloco} Loja {destiny.info.numLoja}
+              <button type="button" onClick={() => removeDestiny(index)}>
+                X
+              </button>
+            </div>
+          )
       })}
 
       {!isAddingDestiny && (

@@ -1,6 +1,6 @@
-import type { Boxe } from './Boxe'
+import type { Destiny } from './Boxe'
 
 export interface Route {
-  inicio: Boxe | null
-  destinos: Boxe[]
+  inicio: Destiny | null
+  destinos: Destiny[]
 }

@@ -54,4 +54,27 @@ export class LojaExterna {
     ]
     return [lojaLeftBottom, lojaRightTop]
   }
+
+  getEntrance() {
+    const compare = (
+      a: Position,
+      b: Position,
+      key: 'x' | 'y',
+      isMin: boolean
+    ) => (isMin ? a[key] < b[key] : a[key] > b[key])
+
+    const findExtreme = (key: 'x' | 'y', isMin: boolean) =>
+      this.gridArea.reduce((extreme, pos) =>
+        compare(pos, extreme, key, isMin) ? pos : extreme
+      )
+
+    //!para o setor azul
+    if (this.numLoja <= 5) {
+      return [findExtreme('x', false).y, findExtreme('x', false).x]
+    }
+    if (this.numLoja <= 10) {
+      return [findExtreme('y', false).y, findExtreme('y', false).x]
+    }
+    return [findExtreme('y', true).y, findExtreme('y', true).x]
+  }
 }
