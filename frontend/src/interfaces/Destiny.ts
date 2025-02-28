@@ -1,8 +1,8 @@
-import type { LojaExterna } from '../models/LojaExterna'
+import type { LojaExternaTipoA } from '../models/LojaExternaTipoA'
 import type { Boxe } from './Boxe'
 import type { Position } from './Position'
 
 export interface Destiny {
   position: Position
-  info: Boxe | LojaExterna | null
+  info: Boxe | LojaExternaTipoA | null
 }

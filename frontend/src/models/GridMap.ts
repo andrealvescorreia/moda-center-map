@@ -1,6 +1,6 @@
-import { createBlocoLojasExternas } from '../functions/createBlocoLojasExternas'
+import { createBlocoLojasExternasTipoA } from '../functions/createBlocoLojasExternasTipA'
 import type { Position } from '../interfaces/Position'
-import type { LojaExterna } from './LojaExterna'
+import type { LojaExternaTipoA } from './LojaExternaTipoA'
 
 export class GridMap {
   #yxDimensions: [number, number]
@@ -23,7 +23,7 @@ export class GridMap {
     y: 0,
   }
 
-  #lojasExternas: LojaExterna[] = []
+  #lojasExternas: LojaExternaTipoA[] = []
 
   constructor() {
     this.#yxDimensions = [
@@ -73,21 +73,27 @@ export class GridMap {
       gapBetweenBlocosLojasExternas + this.#widthHeightBlocoLojasExternas[1]
     let yOffset = 0
 
-    for (let i = 1; i <= 7; i++) {
+    for (let iBloco = 1; iBloco <= 8; iBloco++) {
+      if (iBloco === 8) {
+        yOffset -= 2
+      }
       const edgeBtmLeftYX: [number, number] = [
         0 + yOffset,
         this.#boxesAreaAzulLeftBottomCorner.x -
           this.#widthHeightBlocoLojasExternas[0] -
           this.#gapBetweenLojasExternasAndBoxes,
       ] // !setor azul
-      const bloco1LojasExternas = createBlocoLojasExternas(
+      const blocoLojasExternas = createBlocoLojasExternasTipoA(
         'Azul',
-        i,
+        iBloco,
         edgeBtmLeftYX
       )
-      this.#lojasExternas = [...this.#lojasExternas, ...bloco1LojasExternas]
+      if (!blocoLojasExternas) {
+        continue
+      }
+      this.#lojasExternas = [...this.#lojasExternas, ...blocoLojasExternas]
 
-      for (const loja of bloco1LojasExternas) {
+      for (const loja of blocoLojasExternas) {
         for (const pos of loja.gridArea) {
           this.#grid[pos.y][pos.x] = GridMap.LOJAS_EXTERNAS
         }
