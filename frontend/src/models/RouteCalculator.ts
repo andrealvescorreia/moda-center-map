@@ -23,8 +23,8 @@ export class RouteCalculator {
     if (
       startPos.x < 0 ||
       startPos.y < 0 ||
-      startPos.x >= this.#grid[1].length ||
-      startPos.y >= this.#grid[0].length ||
+      startPos.x >= this.#grid[0].length ||
+      startPos.y >= this.#grid.length ||
       this.#grid[startPos.y][startPos.x] !== GridMap.CAMINHO
     ) {
       console.error(
