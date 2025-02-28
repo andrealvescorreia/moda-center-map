@@ -1,9 +1,9 @@
 import { useState } from 'react'
 import { Rectangle } from 'react-leaflet'
+import PixiOverlay from 'react-leaflet-pixi-overlay'
 import type { JSX } from 'react/jsx-runtime'
 import { GridMap } from '../models/GridMap'
 import Boxe from './Boxe'
-//import PixiOverlay from "react-leaflet-pixi-overlay";
 import MapInfoCollector from './MapInfoCollector'
 
 // cria os quadrados do grid. Não eficiente para o mapa grande. TODO: substituir por img overlay e usar a posição do click do mouse para saber qual quadrado foi clicado
@@ -39,7 +39,15 @@ const GridDrawer = ({
   gridMap,
   minZoomLevelToRenderMarkers,
 }: GridDrawerProps) => {
-  const markers = []
+  interface Marker {
+    id: string
+    position: [number, number]
+    iconColor: string
+    iconId: string
+    customIcon: string
+  }
+
+  const markers: Marker[] = []
   const components: JSX.Element[] = []
   const grid = gridMap.getGrid()
 
@@ -55,7 +63,7 @@ const GridDrawer = ({
         if (!isInsideCameraBounds(mapInfo.bounds, i, j)) continue
 
         if (grid[i][j] === GridMap.BOXE) {
-          const numDoBoxe = gridMap.getBoxe(i, j).numero
+          const numDoBoxe = gridMap.getBoxe(i, j)?.numero
 
           markers.push({
             id: `${i}-${j}`,
@@ -104,7 +112,7 @@ const GridDrawer = ({
   return (
     <>
       <MapInfoCollector onUpdateInfo={(newInfo) => setMapInfo(newInfo)} />
-      {/*<PixiOverlay markers={markers} />*/}
+      {<PixiOverlay markers={markers} />}
       {components}
       <Rectangle
         bounds={gridMap.getBounds()}

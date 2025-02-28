@@ -181,8 +181,11 @@ export class GridMap {
   }
 
   #getNumeroDoBoxe = (y: number, x: number) => {
-    const valorY = y * 2 - Number.parseInt((y / 5).toString()) * 2
-    const valorX = x - 3 * Number.parseInt((x / 3).toString())
-    return valorY - 2 + valorX
+    const xOffSet = x - this.#boxesAreaAzulLeftBottomCorner.x - 1
+    const yOffset = y - this.#boxesAreaAzulLeftBottomCorner.y
+
+    const valorY = yOffset * 2 - Number.parseInt((yOffset / 5).toString()) * 2
+    const valorX = xOffSet - 3 * Number.parseInt((xOffSet / 3).toString())
+    return valorY - 1 + valorX
   }
 }
