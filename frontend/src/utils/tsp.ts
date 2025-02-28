@@ -26,7 +26,6 @@ export function tspSolver(distanceMatrix: number[][]): number[] {
   // Refinamento 2-opt
   function twoOpt(route: number[]) {
     let improved = true
-    let improvedRoute = route
     while (improved) {
       improved = false
       for (let i = 1; i < route.length - 2; i++) {
@@ -35,13 +34,13 @@ export function tspSolver(distanceMatrix: number[][]): number[] {
           newRoute.splice(i, k - i + 1, ...route.slice(i, k + 1).reverse())
 
           if (calculateDistance(newRoute) < calculateDistance(route)) {
-            improvedRoute = newRoute
+            route = newRoute
             improved = true
           }
         }
       }
     }
-    return improvedRoute
+    return route
   }
 
   function calculateDistance(route: number[]) {
