@@ -39,8 +39,8 @@ export class RouteCalculator {
       if (
         dest.x < 0 ||
         dest.y < 0 ||
-        dest.x >= this.#grid[1].length ||
-        dest.y >= this.#grid[0].length ||
+        dest.x >= this.#grid[0].length ||
+        dest.y >= this.#grid.length ||
         (this.#grid[dest.y][dest.x] !== GridMap.BOXE &&
           this.#grid[dest.y][dest.x] !== GridMap.LOJAS_EXTERNAS)
       ) {
