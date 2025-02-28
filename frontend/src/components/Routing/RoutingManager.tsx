@@ -3,6 +3,7 @@ import './RoutingManager.scss'
 import type { Position } from '../../interfaces/Position'
 import type { Route } from '../../interfaces/Route'
 import type { GridMap } from '../../models/GridMap'
+import { RouteCalculator } from '../../models/RouteCalculator'
 import RouteButton from './RouteButton'
 import RouteDrawer from './RouteDrawer'
 import RouteEditor from './RouteEditor'
@@ -23,10 +24,12 @@ const RoutingManager = ({ gridMap }: RoutingManager) => {
   let melhoresPassos: Position[] = []
 
   if (route.inicio && route.destinos.length > 0) {
-    const bestRoute = gridMap.calculateBestRoute(
-      route.inicio.position,
-      route.destinos.map((destino) => destino.position)
-    )
+    const routeCalculator = new RouteCalculator({ grid: gridMap.getGrid() })
+
+    const bestRoute = routeCalculator.calculateBestRoute({
+      startPos: route.inicio.position,
+      destinies: route.destinos.map((destino) => destino.position),
+    })
 
     destinosMelhorOrdem = bestRoute.destiniesBestOrder
     melhoresPassos = bestRoute.steps
