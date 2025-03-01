@@ -33,7 +33,7 @@ export class BlocoTipoALojasExternasCreator {
 
   #blocoDe1a7() {
     const qtdLojasFrontais = 5
-    const lojas: LojaExternaTipoA[] = []
+    const lojasFrontal: LojaExternaTipoA[] = []
 
     let yOffset = 0
 
@@ -48,43 +48,14 @@ export class BlocoTipoALojasExternasCreator {
           gridArea.push({ y, x })
         }
       }
-      lojas.push(this.#createLoja(k, gridArea))
+      lojasFrontal.push(this.#createLoja(k, gridArea))
       yOffset += heightLoja
     }
 
-    const createLateralLojas = (
-      start: number,
-      end: number,
-      xOffsetStart: number,
-      yOffsetStart: number,
-      xOffsetStep: number
-    ) => {
-      let xOffset = xOffsetStart
-      yOffset = yOffsetStart
-      for (let k = start; k <= end; k++) {
-        const gridArea = [
-          {
-            y: this.#edgeBtmLeftYX[0] + yOffset,
-            x: this.#edgeBtmLeftYX[1] + xOffset,
-          },
-          {
-            y: this.#edgeBtmLeftYX[0] + yOffset + 1,
-            x: this.#edgeBtmLeftYX[1] + xOffset,
-          },
-          {
-            y: this.#edgeBtmLeftYX[0] + yOffset + 2,
-            x: this.#edgeBtmLeftYX[1] + xOffset,
-          },
-        ]
-        lojas.push(this.#createLoja(k, gridArea))
-        xOffset += xOffsetStep
-      }
-    }
+    const lojasLateralEsq = this.#createLateralLojas(6, 10, 4, 4, -1) // 6 a 10
+    const lojasLateralDir = this.#createLateralLojas(11, 15, 0, 1, 1) // 11 a 15
 
-    createLateralLojas(6, 10, 4, 4, -1) // 6 a 10
-    createLateralLojas(11, 15, 0, 1, 1) // 11 a 15
-
-    return lojas
+    return [...lojasFrontal, ...lojasLateralEsq, ...lojasLateralDir]
   }
 
   #createLoja = (numLoja: number, gridArea: { y: number; x: number }[]) => {
