@@ -1,5 +1,5 @@
-import { createBlocoLojasExternasTipoA } from '../functions/createBlocoLojasExternasTipA'
 import type { Position } from '../interfaces/Position'
+import { BlocoTipoALojasExternasCreator } from './BlocoTipoALojasExternasCreator'
 import type { LojaExternaTipoA } from './LojaExternaTipoA'
 
 export class GridMap {
@@ -83,12 +83,15 @@ export class GridMap {
           this.#widthHeightBlocoLojasExternas[0] -
           this.#gapBetweenLojasExternasAndBoxes,
       ] // !setor azul
-      const blocoLojasExternas = createBlocoLojasExternasTipoA(
-        'Azul',
-        iBloco,
-        edgeBtmLeftYX
-      )
+
+      const blocoLojasExternas = new BlocoTipoALojasExternasCreator()
+        .setBloco(iBloco)
+        .setSetor('Azul')
+        .setEdgeBtmLeftYX(edgeBtmLeftYX)
+        .create()
+
       if (!blocoLojasExternas) {
+        console.error('Não foi possível criar o Bloco: ', iBloco)
         continue
       }
       this.#lojasExternas = [...this.#lojasExternas, ...blocoLojasExternas]
