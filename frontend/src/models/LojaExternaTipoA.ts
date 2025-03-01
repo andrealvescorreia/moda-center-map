@@ -84,16 +84,23 @@ export class LojaExternaTipoA implements Loja {
     return this.#getEntranceRightSetor()
   }
 
+  //para o setor azul e vermelho
   #getEntranceLeftSetor() {
-    //para o setor azul e vermelho
-    if (this.numLoja <= 5) return this.#findExtreme('x', false)
-    if (this.numLoja <= 10) return this.#findExtreme('y', false)
+    let offset = 0
+    if (this.bloco === 8) offset = -1
+
+    if (this.numLoja <= 5 + offset) return this.#findExtreme('x', false)
+    if (this.numLoja <= 10 + offset) return this.#findExtreme('y', false)
     return this.#findExtreme('y', true)
   }
+
+  //para o setor laranja e verde
   #getEntranceRightSetor() {
-    //para o setor laranja e verde
-    if (this.numLoja <= 5) return this.#findExtreme('x', true)
-    if (this.numLoja <= 10) return this.#findExtreme('y', false)
+    let offset = 0
+    if (this.bloco === 8) offset = -1
+
+    if (this.numLoja <= 5 + offset) return this.#findExtreme('x', true)
+    if (this.numLoja <= 10 + offset) return this.#findExtreme('y', false)
     return this.#findExtreme('y', true)
   }
 }
