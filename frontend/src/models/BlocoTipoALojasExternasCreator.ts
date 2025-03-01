@@ -32,10 +32,33 @@ export class BlocoTipoALojasExternasCreator {
   }
 
   #blocoDe1a7() {
-    const qtdLojasFrontais = 5
-    const lojasFrontal: LojaExternaTipoA[] = []
+    const lojasFrontal = this.#createLojasFrontais(5, 0)
 
-    let yOffset = 0
+    const lojasLateralEsq = this.#createLateralLojas(6, 10, 4, 4, -1) // 6 a 10
+    const lojasLateralDir = this.#createLateralLojas(11, 15, 0, 1, 1) // 11 a 15
+
+    return [...lojasFrontal, ...lojasLateralEsq, ...lojasLateralDir]
+  }
+
+  #bloco8SetorAzulELaranja() {
+    const lojasFrontal = this.#createLojasFrontais(4, 1)
+
+    const lojasLateralEsq = this.#createLateralLojas(5, 9, 4, 4, -1) // 5 a 9
+    const lojasLateralDir = this.#createLateralLojas(10, 14, 0, 1, 1) // 10 a 14
+    return [...lojasFrontal, ...lojasLateralEsq, ...lojasLateralDir]
+  }
+
+  #createLoja = (numLoja: number, gridArea: { y: number; x: number }[]) => {
+    return new LojaExternaTipoA({
+      setor: this.#setor,
+      bloco: this.#bloco,
+      numLoja,
+      gridArea,
+    })
+  }
+
+  #createLojasFrontais(qtdLojasFrontais: number, yOffset = 0) {
+    const lojasFrontal = []
 
     for (let k = 1; k <= qtdLojasFrontais; k++) {
       const heightLoja = k % 2 === 0 ? 1 : 2
@@ -51,20 +74,7 @@ export class BlocoTipoALojasExternasCreator {
       lojasFrontal.push(this.#createLoja(k, gridArea))
       yOffset += heightLoja
     }
-
-    const lojasLateralEsq = this.#createLateralLojas(6, 10, 4, 4, -1) // 6 a 10
-    const lojasLateralDir = this.#createLateralLojas(11, 15, 0, 1, 1) // 11 a 15
-
-    return [...lojasFrontal, ...lojasLateralEsq, ...lojasLateralDir]
-  }
-
-  #createLoja = (numLoja: number, gridArea: { y: number; x: number }[]) => {
-    return new LojaExternaTipoA({
-      setor: this.#setor,
-      bloco: this.#bloco,
-      numLoja,
-      gridArea,
-    })
+    return lojasFrontal
   }
 
   #createLateralLojas(
@@ -96,31 +106,5 @@ export class BlocoTipoALojasExternasCreator {
       xOffset += xOffsetStep
     }
     return lojas
-  }
-
-  #bloco8SetorAzulELaranja() {
-    const qtdLojasFrontais = 4
-    let yOffset = 0
-
-    const lojasFrontal = []
-    yOffset = 1
-    for (let k = 1; k <= qtdLojasFrontais; k++) {
-      const heightLoja = k % 2 === 0 ? 1 : 2
-      const gridArea = []
-
-      for (let i = 0; i < this.#widthLoja; i++) {
-        for (let j = 0; j < heightLoja; j++) {
-          const y = this.#edgeBtmLeftYX[0] + j + yOffset
-          const x = this.#edgeBtmLeftYX[1] + this.#widthBloco - 1 - i
-          gridArea.push({ y, x })
-        }
-      }
-      lojasFrontal.push(this.#createLoja(k, gridArea))
-      yOffset += heightLoja
-    }
-
-    const lojasLateralEsq = this.#createLateralLojas(5, 9, 4, 4, -1) // 5 a 9
-    const lojasLateralDir = this.#createLateralLojas(10, 14, 0, 1, 1) // 10 a 14
-    return [...lojasFrontal, ...lojasLateralEsq, ...lojasLateralDir]
   }
 }
