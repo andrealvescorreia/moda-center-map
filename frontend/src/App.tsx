@@ -7,7 +7,7 @@ import RoutingManager from './components/Routing/RoutingManager'
 import { GridMap } from './models/GridMap'
 
 const modaCenterGridMap = new GridMap()
-const minZoomLevelToRenderMarkers = 1
+const minZoomLevelToRenderMarkers = 5
 
 function App() {
   return (

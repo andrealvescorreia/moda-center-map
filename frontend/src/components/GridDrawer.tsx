@@ -33,11 +33,13 @@ interface MapInfo {
 
 interface GridDrawerProps {
   gridMap: GridMap
-  minZoomLevelToRenderMarkers: number
+  minZoomLevelToRenderMarkers?: number
+  minZoomLevelToRenderBoxes?: number
 }
 const GridDrawer = ({
   gridMap,
-  minZoomLevelToRenderMarkers,
+  minZoomLevelToRenderMarkers = 5,
+  minZoomLevelToRenderBoxes = 2,
 }: GridDrawerProps) => {
   interface Marker {
     id: string
@@ -54,7 +56,7 @@ const GridDrawer = ({
   const [mapInfo, setMapInfo] = useState<MapInfo>()
 
   function drawBoxes() {
-    if (!mapInfo || mapInfo.zoom <= minZoomLevelToRenderMarkers) return
+    if (!mapInfo || mapInfo.zoom <= minZoomLevelToRenderBoxes) return
 
     for (let i = 0; i < grid.length; i++) {
       // y (lat)
@@ -112,7 +114,15 @@ const GridDrawer = ({
   return (
     <>
       <MapInfoCollector onUpdateInfo={(newInfo) => setMapInfo(newInfo)} />
-      {<PixiOverlay markers={markers} />}
+      {
+        <PixiOverlay
+          markers={
+            mapInfo && mapInfo.zoom >= minZoomLevelToRenderMarkers
+              ? markers
+              : []
+          }
+        />
+      }
       {components}
       <Rectangle
         bounds={gridMap.getBounds()}
