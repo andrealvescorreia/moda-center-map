@@ -1,152 +1,125 @@
+import type { Boxe } from '../interfaces/Boxe'
+import type { Loja } from '../interfaces/Loja'
 import type { Position } from '../interfaces/Position'
-import { BlocoTipoALojasExternasCreator } from './BlocoTipoALojasExternasCreator'
-import type { LojaExternaTipoA } from './LojaExternaTipoA'
+import { AreaExternaSetorLojasCreator } from './AreaExternaSetorLojasCreator'
+import { AreaInternaSetorBoxesCreator } from './AreaInternaSetorBoxesCreator'
 
 export class GridMap {
-  #yxDimensions: [number, number]
-  #grid: number[][]
-
   static CAMINHO = 0
   static BOXE = 1
-  static LOJAS_INTERNAS = 2
-  static RESTAURANTES = 3
-  static LOJAS_EXTERNAS = 4
-  static BANHEIROS = 5
+  static LOJA_INTERNA = 2
+  static RESTAURANTE = 3
+  static LOJA_EXTERNA = 4
+  static BANHEIRO = 5
 
-  #widthHeightBlocoLojasExternas = [8, 8]
-  #gapBetweenLojasExternasAndBoxes = 1
+  #yxDimensions: [number, number] = [0, 0]
+  #grid: number[][] = []
 
-  #boxesAreaAzulLeftBottomCorner: Position = {
-    x:
-      this.#widthHeightBlocoLojasExternas[0] +
-      this.#gapBetweenLojasExternasAndBoxes * 2,
-    y: 0,
+  #lojasExternas: Loja[] = []
+  #boxes: Boxe[] = []
+
+  #areaInternaBounds: { bottomLeft: Position; topRight: Position } = {
+    bottomLeft: { x: 0, y: 0 },
+    topRight: { x: 0, y: 0 },
   }
 
-  #lojasExternas: LojaExternaTipoA[] = []
+  #areaExternaBounds: { bottomLeft: Position; topRight: Position } = {
+    bottomLeft: { x: 0, y: 0 },
+    topRight: { x: 0, y: 0 },
+  }
 
   constructor() {
+    this.#createLojasExternas()
+    this.#createBoxes()
+    //this.#fillGridWithLojasInternasEBanheiros()
+    //this.#fillGridWithPraçasDeAlimentação()
+    this.#generateGrid()
+  }
+
+  #generateGrid() {
     this.#yxDimensions = [
-      15 * 5 + 1,
-      15 * 3 +
-        1 +
-        this.#widthHeightBlocoLojasExternas[0] +
-        this.#gapBetweenLojasExternasAndBoxes * 2,
+      this.#areaInternaBounds.topRight.y,
+      this.#areaInternaBounds.topRight.x,
     ]
+    console.log('yxDimensions: ', this.#yxDimensions)
 
     this.#grid = Array.from({ length: this.#yxDimensions[0] }, () =>
       Array(this.#yxDimensions[1]).fill(0)
     )
-    this.#fillGridWithBoxes()
-    this.#fillGridWithLojasInternasEBanheiros()
-    this.#fillGridWithPraçasDeAlimentação()
-    this.#fillGridWithLojasExternas()
-  }
 
-  #fillGridWithBoxes() {
-    const stepX = 3
-    const stepY = 5
-    const boxWidth = 2
-    const boxHeight = 4
-    for (
-      let i = this.#boxesAreaAzulLeftBottomCorner.x + 1;
-      i < this.#yxDimensions[1];
-      i += stepX
-    ) {
-      for (
-        let j = this.#boxesAreaAzulLeftBottomCorner.y + 1;
-        j < this.#yxDimensions[0];
-        j += stepY
-      ) {
-        for (let x = i; x < i + boxWidth && x < this.#yxDimensions[1]; x++) {
-          for (let y = j; y < j + boxHeight && y < this.#yxDimensions[0]; y++) {
-            this.#grid[y][x] = GridMap.BOXE
-          }
-        }
+    for (const loja of this.#lojasExternas) {
+      for (const pos of loja.gridArea) {
+        this.#grid[pos.y][pos.x] = GridMap.LOJA_EXTERNA
       }
+    }
+    for (const box of this.#boxes) {
+      this.#grid[box.positionInGrid.y][box.positionInGrid.x] = GridMap.BOXE
     }
   }
 
-  #fillGridWithLojasExternas() {
-    const gapBetweenBlocosLojasExternas = 2
-    const stepY =
-      gapBetweenBlocosLojasExternas + this.#widthHeightBlocoLojasExternas[1]
-    let yOffset = 0
+  #createLojasExternas() {
+    const areaExternaCreator = new AreaExternaSetorLojasCreator()
+      .setSetor('Azul')
+      .setBttmLeft({ x: 0, y: 0 })
+      .setQtdBlocos(8)
+      .setPaddingLeftRight(2)
 
-    for (let iBloco = 1; iBloco <= 8; iBloco++) {
-      if (iBloco === 8) {
-        yOffset -= 2
-      }
-      const edgeBtmLeftYX: [number, number] = [
-        0 + yOffset,
-        this.#boxesAreaAzulLeftBottomCorner.x -
-          this.#widthHeightBlocoLojasExternas[0] -
-          this.#gapBetweenLojasExternasAndBoxes,
-      ] // !setor azul
+    const { lojas } = areaExternaCreator.create()
+    this.#lojasExternas = [...this.#lojasExternas, ...lojas]
 
-      const blocoLojasExternas = new BlocoTipoALojasExternasCreator()
-        .setBloco(iBloco)
-        .setSetor('Azul')
-        .setEdgeBtmLeftYX(edgeBtmLeftYX)
-        .create()
+    this.#areaExternaBounds = areaExternaCreator.getBounds()
 
-      if (!blocoLojasExternas) {
-        console.error('Não foi possível criar o Bloco: ', iBloco)
-        continue
-      }
-      this.#lojasExternas = [...this.#lojasExternas, ...blocoLojasExternas]
-
-      for (const loja of blocoLojasExternas) {
-        for (const pos of loja.gridArea) {
-          this.#grid[pos.y][pos.x] = GridMap.LOJAS_EXTERNAS
-        }
-      }
-      yOffset += stepY
+    this.#areaInternaBounds.bottomLeft = {
+      x: this.#areaExternaBounds.topRight.x,
+      y: 0,
     }
+  }
+
+  #createBoxes() {
+    const btmLeftAreaLojasInternas = {
+      y: 4 * 5 + 1,
+      x: 5 * 3 + 1 + this.#areaInternaBounds.bottomLeft.x,
+    }
+
+    const topRightAreaLojasInternas = {
+      y: btmLeftAreaLojasInternas.y + 14,
+      x: btmLeftAreaLojasInternas.x + 14,
+    }
+
+    const bttmLeftAreaPraçaAlimentação = {
+      y: 11 * 5 + 1,
+      x: 11 * 3 + 1 + this.#areaInternaBounds.bottomLeft.x,
+    }
+
+    const topRightAreaPraçaAlimentação = {
+      y: bttmLeftAreaPraçaAlimentação.y + 19,
+      x: bttmLeftAreaPraçaAlimentação.x + 11,
+    }
+
+    const setorCreator = new AreaInternaSetorBoxesCreator()
+      .setSetor('Azul')
+      .setBttmLeft(this.#areaInternaBounds.bottomLeft)
+      .addIgnoredArea({
+        bttmLeft: btmLeftAreaLojasInternas,
+        topRight: topRightAreaLojasInternas,
+      })
+      .addIgnoredArea({
+        bttmLeft: bttmLeftAreaPraçaAlimentação,
+        topRight: topRightAreaPraçaAlimentação,
+      })
+
+    const { boxes } = setorCreator.create()
+    const bounds = setorCreator.getBounds()
+
+    this.#areaInternaBounds.topRight = bounds.topRight
+
+    this.#boxes = boxes
   }
 
   getLojasExternas() {
     return this.#lojasExternas
   }
 
-  #fillGridWithLojasInternasEBanheiros() {
-    const areaHeight = 14
-    const areaWidth = 14
-
-    // !vale para setor azul e laranja
-    const edgeBtmLeft = {
-      y: 4 * 5 + 1,
-      x: 5 * 3 + 1 + this.#boxesAreaAzulLeftBottomCorner.x,
-    }
-
-    for (let i = 0; i < areaWidth; i++) {
-      for (let j = 0; j < areaHeight; j++) {
-        this.#grid[edgeBtmLeft.y + j][edgeBtmLeft.x + i] =
-          GridMap.LOJAS_INTERNAS
-      }
-    }
-  }
-
-  #fillGridWithPraçasDeAlimentação() {
-    const areaHeight = 19
-    const areaWidth = 11
-
-    const edgeBtmLeftYX = [
-      11 * 5 + 1,
-      11 * 3 + 1 + this.#boxesAreaAzulLeftBottomCorner.x,
-    ] // !setor azul
-
-    for (let i = 0; i < areaHeight; i++) {
-      for (let j = 0; j < areaWidth; j++) {
-        if (j < areaWidth / 2)
-          this.#grid[edgeBtmLeftYX[0] + i][edgeBtmLeftYX[1] + j] =
-            GridMap.CAMINHO
-        else
-          this.#grid[edgeBtmLeftYX[0] + i][edgeBtmLeftYX[1] + j] =
-            GridMap.RESTAURANTES
-      }
-    }
-  }
   getGrid() {
     return structuredClone(this.#grid)
   }
@@ -166,35 +139,14 @@ export class GridMap {
       console.error('Posição inválida x: ', x, ' y: ', y)
       return null
     }
-    return {
-      setor: 'Azul',
-      rua: this.#getRuaDoBoxe(y, x),
-      numero: this.#getNumeroDoBoxe(y, x),
-    }
-  }
-
-  #getRuaDoBoxe = (y: number, x: number) => {
-    const letterPCharCode = 'P'.charCodeAt(0)
-
-    const offset = Math.floor(
-      (x - this.#boxesAreaAzulLeftBottomCorner.x - 2) / 3
-    )
-    const ruaCharCode = letterPCharCode - offset - 1
-    return String.fromCharCode(ruaCharCode)
+    return this.#boxes.find((boxe) => {
+      return boxe.positionInGrid.x === x && boxe.positionInGrid.y === y
+    })
   }
 
   getLojaExterna(y: number, x: number) {
     return this.#lojasExternas.find((loja) => {
       return loja.gridArea.some((pos) => pos.x === x && pos.y === y)
     })
-  }
-
-  #getNumeroDoBoxe = (y: number, x: number) => {
-    const xOffSet = x - this.#boxesAreaAzulLeftBottomCorner.x - 1
-    const yOffset = y - this.#boxesAreaAzulLeftBottomCorner.y
-
-    const valorY = yOffset * 2 - Number.parseInt((yOffset / 5).toString()) * 2
-    const valorX = xOffSet - 3 * Number.parseInt((xOffSet / 3).toString())
-    return valorY - 1 + valorX
   }
 }
