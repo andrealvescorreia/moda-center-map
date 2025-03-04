@@ -77,7 +77,7 @@ const RouteEditor = ({
       isAddingDestiny &&
       gridMap.getGrid()[lat][lng] === GridMap.LOJA_EXTERNA
     ) {
-      const loja = gridMap.getLojaExterna(lat, lng)
+      const loja = gridMap.getLoja(lat, lng)
       if (!loja) return
       const entrance = loja.getEntrance()
       const newRoute = {
