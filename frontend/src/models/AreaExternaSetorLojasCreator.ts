@@ -46,12 +46,12 @@ export class AreaExternaSetorLojasCreator {
         yOffset -= 2
       }
       const edgeBtmLeftYX: [number, number] = [
-        0 + yOffset,
+        bounds.bottomLeft.y + yOffset,
         bounds.topRight.x -
           this.#widthBlocoLojasExternas -
           this.#paddingLeftRight,
       ] // !setor azul
-
+      console.log(edgeBtmLeftYX)
       const blocoLojasExternas = new BlocoTipoALojasExternasCreator()
         .setBloco(iBloco)
         .setSetor(this.#setor)
@@ -73,8 +73,12 @@ export class AreaExternaSetorLojasCreator {
     return {
       bottomLeft: this.#bttmLeft,
       topRight: {
-        x: this.#widthBlocoLojasExternas + this.#paddingLeftRight * 2,
+        x:
+          this.#bttmLeft.x +
+          this.#widthBlocoLojasExternas +
+          this.#paddingLeftRight * 2,
         y:
+          this.#bttmLeft.y +
           this.#heightBlocoLojasExternas * this.#qtdBlocos +
           this.#gapBetweenLojas * (this.#qtdBlocos - 1) -
           2,

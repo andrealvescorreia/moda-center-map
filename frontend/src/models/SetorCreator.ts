@@ -77,7 +77,7 @@ export class SetorCreator {
 
     this.#areaInternaBounds.bottomLeft = {
       x: this.#areaExternaBounds.topRight.x,
-      y: 0,
+      y: this.#bottomLeft.y,
     }
 
     return { lojasExternas: lojas, banheirosExternos: [] } //TODO: add banheiros
@@ -85,13 +85,13 @@ export class SetorCreator {
 
   #createLojasInternas() {
     const bottomLeft = {
-      y: 4 * 5 + 1,
+      y: 4 * 5 + 1 + this.#areaInternaBounds.bottomLeft.y,
       x: 5 * 3 + 1 + this.#areaInternaBounds.bottomLeft.x,
     }
     this.#areaLojasInternas = {
       bottomLeft,
       topRight: {
-        y: 4 * 5 + 1 + 14,
+        y: 4 * 5 + 1 + this.#areaInternaBounds.bottomLeft.y + 14,
         x: 5 * 3 + 1 + this.#areaInternaBounds.bottomLeft.x + 14,
       },
     }
@@ -110,11 +110,11 @@ export class SetorCreator {
       {
         //praça de alimentação
         bottomLeft: {
-          y: 11 * 5 + 1,
+          y: 11 * 5 + 1 + this.#areaInternaBounds.bottomLeft.y,
           x: 11 * 3 + 1 + this.#areaInternaBounds.bottomLeft.x,
         },
         topRight: {
-          y: 11 * 5 + 1 + 19,
+          y: 11 * 5 + 1 + 19 + this.#areaInternaBounds.bottomLeft.y,
           x: 11 * 3 + 1 + this.#areaInternaBounds.bottomLeft.x + 11,
         },
       },
