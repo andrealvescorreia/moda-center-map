@@ -3,6 +3,7 @@ import type { Loja } from '../interfaces/Loja'
 import type { Position } from '../interfaces/Position'
 import { AreaExternaSetorLojasCreator } from './AreaExternaSetorLojasCreator'
 import { AreaInternaSetorBoxesCreator } from './AreaInternaSetorBoxesCreator'
+import { BlocoLojasInternasCreator } from './BlocoLojasInternasCreator'
 
 export class GridMap {
   static CAMINHO = 0
@@ -15,10 +16,20 @@ export class GridMap {
   #yxDimensions: [number, number] = [0, 0]
   #grid: number[][] = []
 
-  #lojasExternas: Loja[] = []
+  #lojas: Loja[] = []
   #boxes: Boxe[] = []
 
   #areaInternaBounds: { bottomLeft: Position; topRight: Position } = {
+    bottomLeft: { x: 0, y: 0 },
+    topRight: { x: 0, y: 0 },
+  }
+
+  #areaLojasInternas: { bottomLeft: Position; topRight: Position } = {
+    bottomLeft: { x: 0, y: 0 },
+    topRight: { x: 0, y: 0 },
+  }
+
+  #areaPraçasDeAlimentação: { bottomLeft: Position; topRight: Position } = {
     bottomLeft: { x: 0, y: 0 },
     topRight: { x: 0, y: 0 },
   }
@@ -30,31 +41,11 @@ export class GridMap {
 
   constructor() {
     this.#createLojasExternas()
+    this.#createLojasInternas()
     this.#createBoxes()
     //this.#fillGridWithLojasInternasEBanheiros()
     //this.#fillGridWithPraçasDeAlimentação()
     this.#generateGrid()
-  }
-
-  #generateGrid() {
-    this.#yxDimensions = [
-      this.#areaInternaBounds.topRight.y,
-      this.#areaInternaBounds.topRight.x,
-    ]
-    console.log('yxDimensions: ', this.#yxDimensions)
-
-    this.#grid = Array.from({ length: this.#yxDimensions[0] }, () =>
-      Array(this.#yxDimensions[1]).fill(0)
-    )
-
-    for (const loja of this.#lojasExternas) {
-      for (const pos of loja.gridArea) {
-        this.#grid[pos.y][pos.x] = GridMap.LOJA_EXTERNA
-      }
-    }
-    for (const box of this.#boxes) {
-      this.#grid[box.positionInGrid.y][box.positionInGrid.x] = GridMap.BOXE
-    }
   }
 
   #createLojasExternas() {
@@ -65,7 +56,7 @@ export class GridMap {
       .setPaddingLeftRight(2)
 
     const { lojas } = areaExternaCreator.create()
-    this.#lojasExternas = [...this.#lojasExternas, ...lojas]
+    this.#lojas = [...this.#lojas, ...lojas]
 
     this.#areaExternaBounds = areaExternaCreator.getBounds()
 
@@ -75,49 +66,76 @@ export class GridMap {
     }
   }
 
-  #createBoxes() {
-    const btmLeftAreaLojasInternas = {
+  #createLojasInternas() {
+    const bottomLeft = {
       y: 4 * 5 + 1,
       x: 5 * 3 + 1 + this.#areaInternaBounds.bottomLeft.x,
     }
-
-    const topRightAreaLojasInternas = {
-      y: btmLeftAreaLojasInternas.y + 14,
-      x: btmLeftAreaLojasInternas.x + 14,
+    this.#areaLojasInternas = {
+      bottomLeft,
+      topRight: {
+        y: 4 * 5 + 1 + 14,
+        x: 5 * 3 + 1 + this.#areaInternaBounds.bottomLeft.x + 14,
+      },
     }
 
-    const bttmLeftAreaPraçaAlimentação = {
-      y: 11 * 5 + 1,
-      x: 11 * 3 + 1 + this.#areaInternaBounds.bottomLeft.x,
-    }
+    const blocoLojasInternasCreator = new BlocoLojasInternasCreator()
+      .setSetor('Azul')
+      .setBottomLeft(this.#areaLojasInternas.bottomLeft)
 
-    const topRightAreaPraçaAlimentação = {
-      y: bttmLeftAreaPraçaAlimentação.y + 19,
-      x: bttmLeftAreaPraçaAlimentação.x + 11,
-    }
+    const { lojas } = blocoLojasInternasCreator.create()
+    this.#lojas = [...this.#lojas, ...lojas]
+  }
+
+  #createBoxes() {
+    const ignoredAreas = [
+      this.#areaLojasInternas,
+      {
+        bottomLeft: {
+          y: 11 * 5 + 1,
+          x: 11 * 3 + 1 + this.#areaInternaBounds.bottomLeft.x,
+        },
+        topRight: {
+          y: 11 * 5 + 1 + 19,
+          x: 11 * 3 + 1 + this.#areaInternaBounds.bottomLeft.x + 11,
+        },
+      },
+    ]
 
     const setorCreator = new AreaInternaSetorBoxesCreator()
       .setSetor('Azul')
       .setBttmLeft(this.#areaInternaBounds.bottomLeft)
-      .addIgnoredArea({
-        bttmLeft: btmLeftAreaLojasInternas,
-        topRight: topRightAreaLojasInternas,
-      })
-      .addIgnoredArea({
-        bttmLeft: bttmLeftAreaPraçaAlimentação,
-        topRight: topRightAreaPraçaAlimentação,
-      })
+      .setIgnoredAreas(ignoredAreas)
 
     const { boxes } = setorCreator.create()
     const bounds = setorCreator.getBounds()
 
     this.#areaInternaBounds.topRight = bounds.topRight
-
     this.#boxes = boxes
   }
 
+  #generateGrid() {
+    this.#yxDimensions = [
+      this.#areaInternaBounds.topRight.y,
+      this.#areaInternaBounds.topRight.x,
+    ]
+
+    this.#grid = Array.from({ length: this.#yxDimensions[0] }, () =>
+      Array(this.#yxDimensions[1]).fill(0)
+    )
+
+    for (const loja of this.#lojas) {
+      for (const pos of loja.gridArea) {
+        this.#grid[pos.y][pos.x] = GridMap.LOJA_EXTERNA
+      }
+    }
+    for (const box of this.#boxes) {
+      this.#grid[box.positionInGrid.y][box.positionInGrid.x] = GridMap.BOXE
+    }
+  }
+
   getLojasExternas() {
-    return this.#lojasExternas
+    return this.#lojas
   }
 
   getGrid() {
@@ -145,7 +163,7 @@ export class GridMap {
   }
 
   getLojaExterna(y: number, x: number) {
-    return this.#lojasExternas.find((loja) => {
+    return this.#lojas.find((loja) => {
       return loja.gridArea.some((pos) => pos.x === x && pos.y === y)
     })
   }

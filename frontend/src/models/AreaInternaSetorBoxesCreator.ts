@@ -6,7 +6,7 @@ export class AreaInternaSetorBoxesCreator {
   #bttmLeft = { y: 0, x: 0 }
   #qtdBoxesHorizontal = 120
   #qtdRuas = 16 // A-P
-  #ignoredAreas: { bttmLeft: Position; topRight: Position }[] = []
+  #ignoredAreas: { bottomLeft: Position; topRight: Position }[] = []
 
   setSetor(
     setor: 'Laranja' | 'Azul' | 'Vermelho' | 'Verde' | 'Amarelo' | 'Branco'
@@ -26,7 +26,9 @@ export class AreaInternaSetorBoxesCreator {
     this.#qtdRuas = qtdRuas
     return this
   }
-  setIgnoredAreas(ignoredAreas: { bttmLeft: Position; topRight: Position }[]) {
+  setIgnoredAreas(
+    ignoredAreas: { bottomLeft: Position; topRight: Position }[]
+  ) {
     this.#ignoredAreas = ignoredAreas
     return this
   }
@@ -34,13 +36,13 @@ export class AreaInternaSetorBoxesCreator {
     bttmLeft,
     topRight,
   }: { bttmLeft: Position; topRight: Position }) {
-    this.#ignoredAreas.push({ bttmLeft, topRight })
+    this.#ignoredAreas.push({ bottomLeft: bttmLeft, topRight })
     return this
   }
 
   #isInIgnoredArea = (y: number, x: number) => {
     return this.#ignoredAreas.some(
-      ({ bttmLeft, topRight }) =>
+      ({ bottomLeft: bttmLeft, topRight }) =>
         y >= bttmLeft.y && y <= topRight.y && x >= bttmLeft.x && x <= topRight.x
     )
   }
