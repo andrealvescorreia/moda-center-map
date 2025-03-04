@@ -22,6 +22,20 @@ export class BlocoLojasInternasCreator {
   create() {
     const { lojas, banheiros } = this.#createBloco9()
 
+    const width = 3
+    const height = 3
+    const obstaculos: Position[] = []
+    const bounds = this.getBounds()
+    for (let i = bounds.bottomLeft.y + 1; i < bounds.topRight.y - height; i++) {
+      for (
+        let j = bounds.bottomLeft.x + 1;
+        j < bounds.topRight.x - width;
+        j++
+      ) {
+        obstaculos.push({ y: i + 1, x: j + 1 })
+      }
+    }
+
     const reflector = new StructureReflector()
       .setObjs([...lojas, ...banheiros])
       .setBounds(this.getBounds())
@@ -68,7 +82,7 @@ export class BlocoLojasInternasCreator {
         console.error(`Setor inválido: ${this.#setor}`)
         break
     }
-    return { lojas, banheiros }
+    return { lojas, banheiros, obstaculos }
   }
 
   #createBloco9() {
@@ -97,6 +111,7 @@ export class BlocoLojasInternasCreator {
           gridArea.push({ y: y + i, x: x + j })
         }
       }
+
       return new LojaInterna({ setor: this.#setor, numLoja, gridArea })
     }
 

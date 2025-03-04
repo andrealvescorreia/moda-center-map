@@ -1,5 +1,4 @@
 import type { IBanheiro } from '../interfaces/IBanheiro'
-import type { Loja } from '../interfaces/Loja'
 import type { Position } from '../interfaces/Position'
 import { Banheiro } from './Banheiro'
 import { LojaExternaTipoA } from './LojaExternaTipoA'
@@ -35,10 +34,8 @@ export class BlocoTipoALojasExternasCreator {
       case 'Verde':
         return this.#createBlocoSetorVerde()
       default: {
-        const lojas: Loja[] = []
-        const banheiros: IBanheiro[] = []
         console.error(`Setor ${this.#setor} não é válido`)
-        return { lojas, banheiros }
+        return { lojas: [], banheiros: [] }
       }
     }
   }

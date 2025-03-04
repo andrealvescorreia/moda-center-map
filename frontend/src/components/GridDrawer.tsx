@@ -121,9 +121,25 @@ const GridDrawer = ({
     }
   }
 
+  function drawObstaculos() {
+    for (const obstaculo of gridMap.getObstaculos()) {
+      components.push(
+        <Rectangle
+          key={`obstaculo-${obstaculo.x}-${obstaculo.y}`}
+          bounds={[
+            [obstaculo.y, obstaculo.x],
+            [obstaculo.y + 1, obstaculo.x + 1],
+          ]}
+          fillColor="#0000ff"
+        />
+      )
+    }
+  }
+
   drawBoxes()
   drawLojasExternas()
   drawBanheiros()
+  drawObstaculos()
 
   return (
     <>

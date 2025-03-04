@@ -35,22 +35,12 @@ export class SetorCreator {
   }
 
   create() {
-    //!setor azul
-    if (this.#setor !== 'Azul') {
-      console.error(`setor ${this.#setor} ainda não suportado`)
-      return {
-        lojas: [],
-        banheiros: [],
-        boxes: [],
-        bounds: { bottomLeft: { x: 0, y: 0 }, topRight: { x: 0, y: 0 } },
-      }
-    }
-
     const lojas: Loja[] = []
     const banheiros: IBanheiro[] = []
 
     const { lojasExternas, banheirosExternos } = this.#createLojasExternas()
-    const { lojasInternas, banheirosInternos } = this.#createLojasInternas()
+    const { lojasInternas, banheirosInternos, obstaculos } =
+      this.#createLojasInternas()
     const boxes: Boxe[] = this.#createBoxes()
 
     lojas.push(...lojasExternas, ...lojasInternas)
@@ -61,7 +51,7 @@ export class SetorCreator {
       topRight: this.#areaInternaBounds.topRight,
     }
 
-    return { boxes, lojas, banheiros, bounds }
+    return { boxes, lojas, banheiros, obstaculos, bounds }
   }
 
   #createLojasExternas() {
@@ -100,8 +90,8 @@ export class SetorCreator {
       .setSetor(this.#setor)
       .setBottomLeft(this.#areaLojasInternas.bottomLeft)
 
-    const { lojas, banheiros } = blocoLojasInternasCreator.create()
-    return { lojasInternas: lojas, banheirosInternos: banheiros }
+    const { lojas, banheiros, obstaculos } = blocoLojasInternasCreator.create()
+    return { lojasInternas: lojas, banheirosInternos: banheiros, obstaculos }
   }
 
   #createBoxes() {

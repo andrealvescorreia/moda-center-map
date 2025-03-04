@@ -1,13 +1,14 @@
 import type { Boxe } from '../interfaces/Boxe'
 import type { IBanheiro } from '../interfaces/IBanheiro'
 import type { Loja } from '../interfaces/Loja'
+import type { Position } from '../interfaces/Position'
 import { SetorCreator } from './SetorCreator'
 
 export class GridMap {
   static CAMINHO = 0
   static BOXE = 1
   static LOJA_INTERNA = 2
-  static RESTAURANTE = 3
+  static OBSTACULO = 3
   static LOJA_EXTERNA = 4
   static BANHEIRO = 5
 
@@ -17,16 +18,18 @@ export class GridMap {
   #lojas: Loja[] = []
   #boxes: Boxe[] = []
   #banheiros: IBanheiro[] = []
+  #obstaculos: Position[] = []
 
   constructor() {
-    const { lojas, boxes, bounds, banheiros } = new SetorCreator()
+    const { lojas, boxes, bounds, banheiros, obstaculos } = new SetorCreator()
       .setSetor('Azul')
       .setBottomLeft({ y: 0, x: 0 })
       .create()
     this.#lojas = lojas
     this.#boxes = boxes
-    this.#yxDimensions = [bounds.topRight.y, bounds.topRight.x]
     this.#banheiros = banheiros
+    this.#obstaculos = obstaculos
+    this.#yxDimensions = [bounds.topRight.y, bounds.topRight.x]
 
     this.#generateGrid()
   }
@@ -44,10 +47,22 @@ export class GridMap {
     for (const box of this.#boxes) {
       this.#grid[box.positionInGrid.y][box.positionInGrid.x] = GridMap.BOXE
     }
+    for (const banheiro of this.#banheiros) {
+      for (const pos of banheiro.gridArea) {
+        this.#grid[pos.y][pos.x] = GridMap.LOJA_EXTERNA
+      }
+    }
+    for (const obstaculo of this.#obstaculos) {
+      this.#grid[obstaculo.y][obstaculo.x] = GridMap.OBSTACULO
+    }
   }
 
   getLojas() {
     return this.#lojas
+  }
+
+  getObstaculos() {
+    return this.#obstaculos
   }
 
   getGrid() {
