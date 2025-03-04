@@ -28,36 +28,47 @@ export class BlocoLojasInternasCreator {
 
     switch (this.#setor) {
       case 'Azul':
-        return { lojas, banheiros }
+        break
       case 'Laranja':
-        return reflector.reflect({
+        reflector.reflect({
           reflectX: true,
           reflectY: false,
         })
+        break
+
       case 'Vermelho':
-        return reflector.reflect({
+        reflector.reflect({
           reflectX: false,
           reflectY: true,
         })
+        break
+
       case 'Verde':
-        return reflector.reflect({
+        reflector.reflect({
           reflectX: true,
           reflectY: true,
         })
+        break
+
       case 'Amarelo':
-        return reflector.reflect({
+        reflector.reflect({
           reflectX: false,
           reflectY: true,
         })
+        break
+
       case 'Branco':
-        return reflector.reflect({
+        reflector.reflect({
           reflectX: true,
           reflectY: true,
         })
+        break
+
       default:
         console.error(`Setor inválido: ${this.#setor}`)
-        return { lojas, banheiros }
+        break
     }
+    return { lojas, banheiros }
   }
 
   #createBloco9() {

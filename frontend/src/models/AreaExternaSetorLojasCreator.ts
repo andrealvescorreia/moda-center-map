@@ -1,3 +1,4 @@
+import type { IBanheiro } from '../interfaces/IBanheiro'
 import type { Loja } from '../interfaces/Loja'
 import type { Position } from '../interfaces/Position'
 import { BlocoTipoALojasExternasCreator } from './BlocoTipoALojasExternasCreator'
@@ -32,10 +33,11 @@ export class AreaExternaSetorLojasCreator {
     if (this.#setor === 'Branco' || this.#setor === 'Amarelo') {
       //!temp
       console.error(`setor ${this.#setor} ainda não suportado`)
-      return { lojas: [] }
+      return { lojas: [], banheiros: [] }
     }
 
     let lojas: Loja[] = []
+    let banheiros: IBanheiro[] = []
     const bounds = this.getBounds()
 
     const stepY = this.#gapBetweenLojas + this.#heightBlocoLojasExternas
@@ -51,21 +53,18 @@ export class AreaExternaSetorLojasCreator {
           this.#widthBlocoLojasExternas -
           this.#paddingLeftRight,
       ] // !setor azul
-      const blocoLojasExternas = new BlocoTipoALojasExternasCreator()
+      const bloco = new BlocoTipoALojasExternasCreator()
         .setBloco(iBloco)
         .setSetor(this.#setor)
         .setEdgeBtmLeftYX(edgeBtmLeftYX)
         .create()
 
-      if (!blocoLojasExternas) {
-        console.error('Não foi possível criar o Bloco: ', iBloco)
-        continue
-      }
-      lojas = [...lojas, ...blocoLojasExternas]
+      lojas = [...lojas, ...bloco.lojas]
+      banheiros = [...banheiros, ...bloco.banheiros]
 
       yOffset += stepY
     }
-    return { lojas }
+    return { lojas, banheiros }
   }
 
   getBounds() {

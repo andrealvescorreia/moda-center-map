@@ -1,4 +1,9 @@
+import type { IBanheiro } from '../interfaces/IBanheiro'
+import type { Loja } from '../interfaces/Loja'
+import type { Position } from '../interfaces/Position'
+import { Banheiro } from './Banheiro'
 import { LojaExternaTipoA } from './LojaExternaTipoA'
+import { StructureReflector } from './StructureReflector'
 
 export class BlocoTipoALojasExternasCreator {
   #setor: 'Laranja' | 'Azul' | 'Vermelho' | 'Verde' = 'Azul'
@@ -22,52 +27,65 @@ export class BlocoTipoALojasExternasCreator {
   create() {
     switch (this.#setor) {
       case 'Azul':
-        return this.#createBlocoSetorAzul() //temp
+        return this.#createBlocoSetorAzul()
       case 'Laranja':
         return this.#createBlocoSetorLaranja()
       case 'Vermelho':
         return this.#createBlocoSetorVermelho()
       case 'Verde':
         return this.#createBlocoSetorVerde()
-      default:
+      default: {
+        const lojas: Loja[] = []
+        const banheiros: IBanheiro[] = []
         console.error(`Setor ${this.#setor} não é válido`)
-        return []
+        return { lojas, banheiros }
+      }
     }
   }
 
   #createBlocoSetorAzul() {
-    if (this.#bloco < 8) {
-      return this.#blocoDe1a7()
-    }
-    if (this.#bloco === 8) {
-      return this.#bloco8()
-    }
+    return this.#bloco === 8 ? this.#bloco8() : this.#blocoDe1a7()
   }
 
   #createBlocoSetorVermelho() {
-    if (this.#bloco < 8) {
-      return this.#blocoDe1a7()
-    }
-    if (this.#bloco === 8) {
-      return this.#bloco8Reduzido()
-    }
+    return this.#bloco === 8 ? this.#bloco8Reduzido() : this.#blocoDe1a7()
   }
 
   #createBlocoSetorLaranja() {
-    if (this.#bloco < 8) {
-      return this.#reflectAroundXAxis(this.#blocoDe1a7())
-    }
-    if (this.#bloco === 8) {
-      return this.#reflectAroundXAxis(this.#bloco8())
-    }
+    const { lojas, banheiros } =
+      this.#bloco === 8 ? this.#bloco8() : this.#blocoDe1a7()
+
+    const reflector = new StructureReflector()
+      .setObjs([...lojas, ...banheiros])
+      .setBounds(this.getBounds())
+    reflector.reflect({
+      reflectX: true,
+      reflectY: false,
+    })
+    return { lojas, banheiros }
   }
 
   #createBlocoSetorVerde() {
-    if (this.#bloco < 8) {
-      return this.#reflectAroundXAxis(this.#blocoDe1a7())
-    }
-    if (this.#bloco === 8) {
-      return this.#reflectAroundXAxis(this.#bloco8Reduzido())
+    const { lojas, banheiros } =
+      this.#bloco === 8 ? this.#bloco8Reduzido() : this.#blocoDe1a7()
+
+    const reflector = new StructureReflector()
+      .setObjs([...lojas, ...banheiros])
+      .setBounds(this.getBounds())
+    reflector.reflect({
+      reflectX: true,
+      reflectY: true,
+    })
+    return { lojas, banheiros }
+  }
+
+  getBounds() {
+    return {
+      bottomLeft: { y: this.#edgeBtmLeftYX[0], x: this.#edgeBtmLeftYX[1] },
+      topRight: {
+        y: this.#edgeBtmLeftYX[0] + this.#widthBloco,
+        x: this.#edgeBtmLeftYX[1] + this.#widthBloco,
+      },
     }
   }
 
@@ -77,15 +95,22 @@ export class BlocoTipoALojasExternasCreator {
     const lojasLateralEsq = this.#createLateralLojas(6, 10, 4, 4, -1) // 6 a 10
     const lojasLateralDir = this.#createLateralLojas(11, 15, 0, 1, 1) // 11 a 15
 
-    return [...lojasFrontal, ...lojasLateralEsq, ...lojasLateralDir]
+    return {
+      lojas: [...lojasFrontal, ...lojasLateralEsq, ...lojasLateralDir],
+      banheiros: [],
+    }
   }
 
   #bloco8() {
+    const banheiros: IBanheiro[] = []
     const lojasFrontal = this.#createLojasFrontais(4, 1)
 
     const lojasLateralEsq = this.#createLateralLojas(5, 9, 4, 4, -1) // 5 a 9
     const lojasLateralDir = this.#createLateralLojas(10, 14, 0, 1, 1) // 10 a 14
-    return [...lojasFrontal, ...lojasLateralEsq, ...lojasLateralDir]
+    return {
+      lojas: [...lojasFrontal, ...lojasLateralEsq, ...lojasLateralDir],
+      banheiros,
+    }
   }
 
   #bloco8Reduzido() {
@@ -93,7 +118,46 @@ export class BlocoTipoALojasExternasCreator {
 
     const lojasLateralEsq = this.#createLateralLojas(5, 5, 4, 4, -1)
     const lojasLateralDir = this.#createLateralLojas(6, 6, 4, 1, 1)
-    return [...lojasFrontal, ...lojasLateralEsq, ...lojasLateralDir]
+
+    const createBanheiroGridArea = (bottomLeft: Position) => {
+      const gridArea = []
+      const width = 3
+      const height = 3
+      for (let i = 0; i < height; i++) {
+        for (let j = 0; j < width; j++) {
+          gridArea.push({ y: bottomLeft.y + i, x: bottomLeft.x + j })
+        }
+      }
+      return gridArea
+    }
+
+    const gridAreaBanheiroM = createBanheiroGridArea({
+      y: this.#edgeBtmLeftYX[0] + 1,
+      x: this.#edgeBtmLeftYX[1],
+    })
+
+    const gridAreaBanheiroF = createBanheiroGridArea({
+      y: this.#edgeBtmLeftYX[0] + 4,
+      x: this.#edgeBtmLeftYX[1],
+    })
+
+    const banheiroM = new Banheiro({
+      setor: this.#setor,
+      genero: 'M',
+      area: 'Externa',
+      gridArea: gridAreaBanheiroM,
+    })
+    const banheiroF = new Banheiro({
+      setor: this.#setor,
+      genero: 'F',
+      area: 'Externa',
+      gridArea: gridAreaBanheiroF,
+    })
+
+    return {
+      lojas: [...lojasFrontal, ...lojasLateralEsq, ...lojasLateralDir],
+      banheiros: [banheiroM, banheiroF],
+    }
   }
 
   #createLoja = (numLoja: number, gridArea: { y: number; x: number }[]) => {
@@ -152,26 +216,6 @@ export class BlocoTipoALojasExternasCreator {
       ]
       lojas.push(this.#createLoja(k, gridArea))
       xOffset += xOffsetStep
-    }
-    return lojas
-  }
-
-  //TODO: refactor to use reflect method from StructureReflector
-  #reflectAroundXAxis(lojas: LojaExternaTipoA[]) {
-    const center = {
-      y: this.#edgeBtmLeftYX[0] + Math.floor(this.#widthBloco / 2),
-      x: this.#edgeBtmLeftYX[1] + Math.floor(this.#widthBloco / 2),
-    }
-
-    for (let i = 0; i < lojas.length; i++) {
-      const loja = lojas[i]
-      const gridArea = loja.gridArea.map(({ y, x }) => {
-        return {
-          y,
-          x: center.x - (x - center.x) - 1,
-        }
-      })
-      loja.gridArea = gridArea
     }
     return lojas
   }

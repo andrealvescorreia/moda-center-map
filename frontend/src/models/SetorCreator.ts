@@ -71,7 +71,7 @@ export class SetorCreator {
       .setQtdBlocos(8)
       .setPaddingLeftRight(2)
 
-    const { lojas } = areaExternaCreator.create()
+    const { lojas, banheiros } = areaExternaCreator.create()
 
     this.#areaExternaBounds = areaExternaCreator.getBounds()
 
@@ -80,7 +80,7 @@ export class SetorCreator {
       y: this.#bottomLeft.y,
     }
 
-    return { lojasExternas: lojas, banheirosExternos: [] } //TODO: add banheiros
+    return { lojasExternas: lojas, banheirosExternos: banheiros }
   }
 
   #createLojasInternas() {
@@ -101,7 +101,7 @@ export class SetorCreator {
       .setBottomLeft(this.#areaLojasInternas.bottomLeft)
 
     const { lojas, banheiros } = blocoLojasInternasCreator.create()
-    return { lojasInternas: lojas, banheirosInternos: banheiros } //TODO: add banheiros
+    return { lojasInternas: lojas, banheirosInternos: banheiros }
   }
 
   #createBoxes() {
