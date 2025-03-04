@@ -1,3 +1,4 @@
+import L from 'leaflet'
 import { useState } from 'react'
 import { Rectangle } from 'react-leaflet'
 import PixiOverlay from 'react-leaflet-pixi-overlay'
@@ -6,7 +7,7 @@ import { GridMap } from '../models/GridMap'
 import Boxe from './Boxe'
 import MapInfoCollector from './MapInfoCollector'
 
-// cria os quadrados do grid. Não eficiente para o mapa grande. TODO: substituir por img overlay e usar a posição do click do mouse para saber qual quadrado foi clicado
+// cria os quadrados do grid. Não eficiente para o mapa grande. TODO: substituir por img overlay quando zoom out
 
 interface MapCameraBounds {
   getSouthWest: () => { lat: number; lng: number }
@@ -97,11 +98,11 @@ const GridDrawer = ({
   }
 
   function drawLojasExternas() {
-    for (const lojaExterna of gridMap.getLojasExternas()) {
+    for (const loja of gridMap.getLojas()) {
       components.push(
         <Rectangle
-          key={`loja-bloco${lojaExterna.bloco}-${lojaExterna.numLoja}`}
-          bounds={lojaExterna.getBounds()}
+          key={`setor${loja.setor}-loja${loja.numLoja}-bloco${loja.bloco}-${loja.gridArea[0].y}-${loja.gridArea[0].x}`}
+          bounds={L.latLngBounds(loja.getBounds() as [number, number][])}
           fillColor="#ff0000"
         />
       )

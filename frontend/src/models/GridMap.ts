@@ -17,8 +17,9 @@ export class GridMap {
   #boxes: Boxe[] = []
 
   constructor() {
-    const { lojas, boxes, banheiros, bounds } = new SetorCreator()
+    const { lojas, boxes, bounds, banheiros } = new SetorCreator()
       .setSetor('Azul')
+      .setBottomLeft({ y: 0, x: 0 })
       .create()
     this.#lojas = lojas
     this.#boxes = boxes
@@ -43,7 +44,7 @@ export class GridMap {
     }
   }
 
-  getLojasExternas() {
+  getLojas() {
     return this.#lojas
   }
 
