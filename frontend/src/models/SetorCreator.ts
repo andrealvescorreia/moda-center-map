@@ -1,5 +1,5 @@
-import type { Banheiro } from '../interfaces/Banheiro'
 import type { Boxe } from '../interfaces/Boxe'
+import type { IBanheiro } from '../interfaces/IBanheiro'
 import type { Loja } from '../interfaces/Loja'
 import type { Position } from '../interfaces/Position'
 import { AreaExternaSetorLojasCreator } from './AreaExternaSetorLojasCreator'
@@ -47,7 +47,7 @@ export class SetorCreator {
     }
 
     const lojas: Loja[] = []
-    const banheiros: Banheiro[] = []
+    const banheiros: IBanheiro[] = []
 
     const { lojasExternas, banheirosExternos } = this.#createLojasExternas()
     const { lojasInternas, banheirosInternos } = this.#createLojasInternas()
@@ -100,8 +100,8 @@ export class SetorCreator {
       .setSetor(this.#setor)
       .setBottomLeft(this.#areaLojasInternas.bottomLeft)
 
-    const { lojas } = blocoLojasInternasCreator.create()
-    return { lojasInternas: lojas, banheirosInternos: [] } //TODO: add banheiros
+    const { lojas, banheiros } = blocoLojasInternasCreator.create()
+    return { lojasInternas: lojas, banheirosInternos: banheiros } //TODO: add banheiros
   }
 
   #createBoxes() {

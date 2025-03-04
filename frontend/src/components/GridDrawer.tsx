@@ -109,8 +109,21 @@ const GridDrawer = ({
     }
   }
 
+  function drawBanheiros() {
+    for (const banheiro of gridMap.getBanheiros()) {
+      components.push(
+        <Rectangle
+          key={`banheiro-${banheiro.genero}-setor${banheiro.setor}-area${banheiro.area}`}
+          bounds={L.latLngBounds(banheiro.getBounds() as [number, number][])}
+          fillColor={banheiro.genero === 'M' ? '#0000ff' : '#ff00ff'}
+        />
+      )
+    }
+  }
+
   drawBoxes()
   drawLojasExternas()
+  drawBanheiros()
 
   return (
     <>

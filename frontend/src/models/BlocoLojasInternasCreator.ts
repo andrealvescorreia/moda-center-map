@@ -1,7 +1,9 @@
-import type { Banheiro } from '../interfaces/Banheiro'
+import type { IBanheiro } from '../interfaces/IBanheiro'
 import type { Loja } from '../interfaces/Loja'
 import type { Position } from '../interfaces/Position'
+import { Banheiro } from './Banheiro'
 import { LojaInterna } from './LojaInterna'
+import { StructureReflector } from './StructureReflector'
 
 export class BlocoLojasInternasCreator {
   #setor: Loja['setor'] = 'Azul'
@@ -18,9 +20,50 @@ export class BlocoLojasInternasCreator {
   }
 
   create() {
+    const { lojas, banheiros } = this.#createBloco9()
+
+    const reflector = new StructureReflector()
+      .setObjs([...lojas, ...banheiros])
+      .setBounds(this.getBounds())
+
+    switch (this.#setor) {
+      case 'Azul':
+        return { lojas, banheiros }
+      case 'Laranja':
+        return reflector.reflect({
+          reflectX: true,
+          reflectY: false,
+        })
+      case 'Vermelho':
+        return reflector.reflect({
+          reflectX: false,
+          reflectY: true,
+        })
+      case 'Verde':
+        return reflector.reflect({
+          reflectX: true,
+          reflectY: true,
+        })
+      case 'Amarelo':
+        return reflector.reflect({
+          reflectX: false,
+          reflectY: true,
+        })
+      case 'Branco':
+        return reflector.reflect({
+          reflectX: true,
+          reflectY: true,
+        })
+      default:
+        console.error(`Setor inválido: ${this.#setor}`)
+        return { lojas, banheiros }
+    }
+  }
+
+  #createBloco9() {
     //bloco 9 setor azul
     const lojas: Loja[] = []
-    const banheiros: Banheiro[] = []
+    const banheiros: IBanheiro[] = []
     const bounds = this.getBounds()
 
     const qtdLojasLateralDireita = 5
@@ -44,6 +87,30 @@ export class BlocoLojasInternasCreator {
         }
       }
       return new LojaInterna({ setor: this.#setor, numLoja, gridArea })
+    }
+
+    const createBanheiro = (
+      genero: Banheiro['genero'],
+      bottomLeft: Position,
+      width = 4,
+      height = 2
+    ) => {
+      const area = 'Interna'
+      const { y, x } = bottomLeft
+
+      const gridArea = []
+
+      for (let i = 0; i < height; i++) {
+        for (let j = 0; j < width; j++) {
+          gridArea.push({ y: y + i, x: x + j })
+        }
+      }
+      return new Banheiro({
+        setor: this.#setor,
+        genero,
+        area,
+        gridArea,
+      })
     }
 
     for (let i = 1; i <= qtdLojasLateralDireita; i++) {
@@ -78,25 +145,23 @@ export class BlocoLojasInternasCreator {
       lojas.push(createLoja(i + 15, { y, x }, width))
     }
 
+    banheiros.push(
+      //baixo
+      createBanheiro('F', {
+        y: bounds.bottomLeft.y,
+        x: bounds.bottomLeft.x + 6,
+      })
+    )
+    banheiros.push(
+      //cima
+      createBanheiro('M', {
+        y: bounds.topRight.y - 2,
+        x: bounds.bottomLeft.x + 6,
+      })
+    )
+
     return { lojas, banheiros }
   }
-
-  /*#rotateAroundCenter(lojas: Loja[]) {
-    const center = {
-      y: this.#bottomLeft.y + 7,
-      x: this.#bottomLeft.x + 7,
-    }
-
-    return lojas.map((loja) => {
-      const gridArea = loja.gridArea.map(({ y, x }) => {
-        const yDiff = y - center.y
-        const xDiff = x - center.x
-        return { y: center.y - xDiff, x: center.x + yDiff }
-      })
-
-      return new LojaInterna({ ...loja, gridArea })
-    })
-  }*/
 
   getBounds() {
     return {

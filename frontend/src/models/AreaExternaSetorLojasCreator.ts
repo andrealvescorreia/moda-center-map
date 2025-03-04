@@ -51,7 +51,6 @@ export class AreaExternaSetorLojasCreator {
           this.#widthBlocoLojasExternas -
           this.#paddingLeftRight,
       ] // !setor azul
-      console.log(edgeBtmLeftYX)
       const blocoLojasExternas = new BlocoTipoALojasExternasCreator()
         .setBloco(iBloco)
         .setSetor(this.#setor)

@@ -1,4 +1,5 @@
 import type { Boxe } from '../interfaces/Boxe'
+import type { IBanheiro } from '../interfaces/IBanheiro'
 import type { Loja } from '../interfaces/Loja'
 import { SetorCreator } from './SetorCreator'
 
@@ -15,6 +16,7 @@ export class GridMap {
 
   #lojas: Loja[] = []
   #boxes: Boxe[] = []
+  #banheiros: IBanheiro[] = []
 
   constructor() {
     const { lojas, boxes, bounds, banheiros } = new SetorCreator()
@@ -24,7 +26,7 @@ export class GridMap {
     this.#lojas = lojas
     this.#boxes = boxes
     this.#yxDimensions = [bounds.topRight.y, bounds.topRight.x]
-    //this.#banheiros = banheiros
+    this.#banheiros = banheiros
 
     this.#generateGrid()
   }
@@ -70,6 +72,10 @@ export class GridMap {
     return this.#boxes.find((boxe) => {
       return boxe.positionInGrid.x === x && boxe.positionInGrid.y === y
     })
+  }
+
+  getBanheiros() {
+    return this.#banheiros
   }
 
   getLoja(y: number, x: number) {

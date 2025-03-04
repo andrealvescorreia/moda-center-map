@@ -1,4 +1,4 @@
-export interface Banheiro {
+export interface IBanheiro {
   setor: 'Laranja' | 'Azul' | 'Vermelho' | 'Verde' | 'Amarelo' | 'Branco'
   genero: 'M' | 'F'
   area: 'Interna' | 'Externa'
