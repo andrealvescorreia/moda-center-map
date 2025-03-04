@@ -2,8 +2,8 @@ import type { Boxe } from '../interfaces/Boxe'
 import type { Loja } from '../interfaces/Loja'
 import type { Position } from '../interfaces/Position'
 import { AreaExternaSetorLojasCreator } from './AreaExternaSetorLojasCreator'
-import { AreaInternaSetorBoxesCreator } from './AreaInternaSetorBoxesCreator'
 import { BlocoLojasInternasCreator } from './BlocoLojasInternasCreator'
+import { SetorBoxesCreator } from './SetorBoxesCreator'
 
 export class GridMap {
   static CAMINHO = 0
@@ -102,13 +102,15 @@ export class GridMap {
       },
     ]
 
-    const setorCreator = new AreaInternaSetorBoxesCreator()
+    const boxesCreator = new SetorBoxesCreator()
       .setSetor('Azul')
+      .setQtdBoxesHorizontal(120)
+      .setQtdRuas(16)
       .setBttmLeft(this.#areaInternaBounds.bottomLeft)
       .setIgnoredAreas(ignoredAreas)
 
-    const { boxes } = setorCreator.create()
-    const bounds = setorCreator.getBounds()
+    const { boxes } = boxesCreator.create()
+    const bounds = boxesCreator.getBounds()
 
     this.#areaInternaBounds.topRight = bounds.topRight
     this.#boxes = boxes

@@ -1,7 +1,7 @@
 import type { Boxe } from '../interfaces/Boxe'
 import type { Position } from '../interfaces/Position'
 
-export class AreaInternaSetorBoxesCreator {
+export class SetorBoxesCreator {
   #setor: Boxe['setor'] = 'Azul'
   #bttmLeft = { y: 0, x: 0 }
   #qtdBoxesHorizontal = 120
