@@ -123,13 +123,14 @@ const GridDrawer = ({
 
   function drawObstaculos() {
     for (const obstaculo of gridMap.getObstaculos()) {
+      const bounds = L.latLngBounds(
+        [obstaculo.bounds.bottomLeft.y, obstaculo.bounds.bottomLeft.x],
+        [obstaculo.bounds.topRight.y, obstaculo.bounds.topRight.x]
+      )
       components.push(
         <Rectangle
-          key={`obstaculo-${obstaculo.x}-${obstaculo.y}`}
-          bounds={[
-            [obstaculo.y, obstaculo.x],
-            [obstaculo.y + 1, obstaculo.x + 1],
-          ]}
+          key={`obstaculo-${obstaculo.bounds.bottomLeft.x}-${obstaculo.bounds.bottomLeft.y}`}
+          bounds={bounds}
           fillColor="#0000ff"
         />
       )

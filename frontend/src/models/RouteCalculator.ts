@@ -42,8 +42,7 @@ export class RouteCalculator {
         dest.x >= this.#grid[0].length ||
         dest.y >= this.#grid.length ||
         (this.#grid[dest.y][dest.x] !== GridMap.BOXE &&
-          this.#grid[dest.y][dest.x] !== GridMap.LOJA_EXTERNA &&
-          this.#grid[dest.y][dest.x] !== GridMap.LOJA_INTERNA)
+          this.#grid[dest.y][dest.x] !== GridMap.LOJA)
       ) {
         console.error(`Posição de destino inválida x: ${dest.x} y: ${dest.y}`)
         console.log(this.#grid[dest.y][dest.x])

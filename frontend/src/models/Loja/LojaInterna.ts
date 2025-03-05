@@ -1,6 +1,6 @@
 import { z } from 'zod'
-import type { Loja } from '../interfaces/Loja'
-import type { Position } from '../interfaces/Position'
+import type { Loja } from '../../interfaces/Loja'
+import type { Position } from '../../interfaces/Position'
 
 export class LojaInterna implements Loja {
   setor: Loja['setor'] = 'Azul'
@@ -92,7 +92,38 @@ export class LojaInterna implements Loja {
       if (this.numLoja <= 15) return this.#farLeft()
       return this.#farDown()
     }
-    //TODO: implementar para os outros setores
+    if (this.setor === 'Laranja') {
+      if (this.numLoja <= 5) return this.#farLeft()
+      if (this.numLoja <= 10) return this.#farUp()
+      if (this.numLoja <= 15) return this.#farRight()
+      return this.#farDown()
+    }
+    if (this.setor === 'Vermelho') {
+      if (this.numLoja <= 5) return this.#farRight()
+      if (this.numLoja <= 10) return this.#farDown()
+      if (this.numLoja <= 15) return this.#farLeft()
+      return this.#farUp()
+    }
+    if (this.setor === 'Verde') {
+      if (this.numLoja <= 5) return this.#farLeft()
+      if (this.numLoja <= 10) return this.#farDown()
+      if (this.numLoja <= 15) return this.#farRight()
+      return this.#farUp()
+    }
+    if (this.setor === 'Branco') {
+      //igual o Azul
+      if (this.numLoja <= 5) return this.#farRight()
+      if (this.numLoja <= 10) return this.#farUp()
+      if (this.numLoja <= 15) return this.#farLeft()
+      return this.#farDown()
+    }
+    if (this.setor === 'Amarelo') {
+      //igual o Laranja
+      if (this.numLoja <= 5) return this.#farLeft()
+      if (this.numLoja <= 10) return this.#farUp()
+      if (this.numLoja <= 15) return this.#farRight()
+      return this.#farDown()
+    }
     console.error('Entrance not implemented for this setor ', this.setor)
     return { y: 0, x: 0 }
   }

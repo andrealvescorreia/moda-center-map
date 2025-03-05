@@ -1,6 +1,6 @@
 import { z } from 'zod'
-import type { Loja } from '../interfaces/Loja'
-import type { Position } from '../interfaces/Position'
+import type { Loja } from '../../interfaces/Loja'
+import type { Position } from '../../interfaces/Position'
 
 // lojas externas de estrutura utilizada nos setores azul, laranja, vermelho e verde
 export class LojaExternaTipoA implements Loja {

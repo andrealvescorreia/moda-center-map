@@ -1,15 +1,14 @@
 import type { Boxe } from '../interfaces/Boxe'
 import type { IBanheiro } from '../interfaces/IBanheiro'
+import type { IObstaculo } from '../interfaces/IObstaculo'
 import type { Loja } from '../interfaces/Loja'
-import type { Position } from '../interfaces/Position'
 import { SetorCreator } from './SetorCreator'
 
 export class GridMap {
   static CAMINHO = 0
   static BOXE = 1
-  static LOJA_INTERNA = 2
+  static LOJA = 2
   static OBSTACULO = 3
-  static LOJA_EXTERNA = 4
   static BANHEIRO = 5
 
   #yxDimensions: [number, number] = [0, 0]
@@ -18,7 +17,7 @@ export class GridMap {
   #lojas: Loja[] = []
   #boxes: Boxe[] = []
   #banheiros: IBanheiro[] = []
-  #obstaculos: Position[] = []
+  #obstaculos: IObstaculo[] = []
 
   constructor() {
     const { lojas, boxes, bounds, banheiros, obstaculos } = new SetorCreator()
@@ -41,7 +40,7 @@ export class GridMap {
 
     for (const loja of this.#lojas) {
       for (const pos of loja.gridArea) {
-        this.#grid[pos.y][pos.x] = GridMap.LOJA_EXTERNA
+        this.#grid[pos.y][pos.x] = GridMap.LOJA
       }
     }
     for (const box of this.#boxes) {
@@ -49,11 +48,13 @@ export class GridMap {
     }
     for (const banheiro of this.#banheiros) {
       for (const pos of banheiro.gridArea) {
-        this.#grid[pos.y][pos.x] = GridMap.LOJA_EXTERNA
+        this.#grid[pos.y][pos.x] = GridMap.BANHEIRO
       }
     }
     for (const obstaculo of this.#obstaculos) {
-      this.#grid[obstaculo.y][obstaculo.x] = GridMap.OBSTACULO
+      for (const pos of obstaculo.gridArea) {
+        this.#grid[pos.y][pos.x] = GridMap.OBSTACULO
+      }
     }
   }
 
@@ -94,10 +95,7 @@ export class GridMap {
   }
 
   getLoja(y: number, x: number) {
-    if (
-      this.#grid[y][x] !== GridMap.LOJA_EXTERNA &&
-      this.#grid[y][x] !== GridMap.LOJA_INTERNA
-    ) {
+    if (this.#grid[y][x] !== GridMap.LOJA) {
       console.error('Posição inválida x: ', x, ' y: ', y)
       return null
     }

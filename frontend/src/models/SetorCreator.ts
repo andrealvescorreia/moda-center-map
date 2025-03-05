@@ -3,7 +3,7 @@ import type { IBanheiro } from '../interfaces/IBanheiro'
 import type { Loja } from '../interfaces/Loja'
 import type { Position } from '../interfaces/Position'
 import { AreaExternaSetorLojasCreator } from './AreaExternaSetorLojasCreator'
-import { BlocoLojasInternasCreator } from './BlocoLojasInternasCreator'
+import BlocoFacade from './BlocoLojas/Facade'
 import { SetorBoxesCreator } from './SetorBoxesCreator'
 
 export class SetorCreator {
@@ -86,12 +86,17 @@ export class SetorCreator {
       },
     }
 
-    const blocoLojasInternasCreator = new BlocoLojasInternasCreator()
-      .setSetor(this.#setor)
-      .setBottomLeft(this.#areaLojasInternas.bottomLeft)
+    const bloco = new BlocoFacade().make(this.#setor, 9, bottomLeft)
+    if (!bloco) {
+      console.error('bloco não criado!')
+      return { lojasInternas: [], banheirosInternos: [], obstaculos: [] }
+    }
 
-    const { lojas, banheiros, obstaculos } = blocoLojasInternasCreator.create()
-    return { lojasInternas: lojas, banheirosInternos: banheiros, obstaculos }
+    return {
+      lojasInternas: bloco.lojas,
+      banheirosInternos: bloco.banheiros,
+      obstaculos: bloco.obstaculos,
+    }
   }
 
   #createBoxes() {

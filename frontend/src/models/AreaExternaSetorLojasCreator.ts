@@ -1,15 +1,15 @@
 import type { IBanheiro } from '../interfaces/IBanheiro'
 import type { Loja } from '../interfaces/Loja'
 import type { Position } from '../interfaces/Position'
-import { BlocoTipoALojasExternasCreator } from './BlocoTipoALojasExternasCreator'
+import BlocoFacade from './BlocoLojas/Facade'
 
 export class AreaExternaSetorLojasCreator {
   #bttmLeft: Position = { y: 0, x: 0 }
   #setor: Loja['setor'] = 'Azul'
   #qtdBlocos: Loja['bloco'] = 8
   #paddingLeftRight = 2
-  #heightBlocoLojasExternas = 8
-  #widthBlocoLojasExternas = 8
+  #heightBlocoLojas = 8
+  #widthBlocoLojas = 8
   #gapBetweenLojas = 2
 
   setSetor(setor: Loja['setor']) {
@@ -40,25 +40,24 @@ export class AreaExternaSetorLojasCreator {
     let banheiros: IBanheiro[] = []
     const bounds = this.getBounds()
 
-    const stepY = this.#gapBetweenLojas + this.#heightBlocoLojasExternas
+    const stepY = this.#gapBetweenLojas + this.#heightBlocoLojas
     let yOffset = 0
 
     for (let iBloco = 1; iBloco <= this.#qtdBlocos; iBloco++) {
       if (iBloco === 8) {
         yOffset -= 2
       }
-      const edgeBtmLeftYX: [number, number] = [
-        bounds.bottomLeft.y + yOffset,
-        bounds.topRight.x -
-          this.#widthBlocoLojasExternas -
-          this.#paddingLeftRight,
-      ] // !setor azul
-      const bloco = new BlocoTipoALojasExternasCreator()
-        .setBloco(iBloco)
-        .setSetor(this.#setor)
-        .setEdgeBtmLeftYX(edgeBtmLeftYX)
-        .create()
 
+      const blocoBottomLeft = {
+        y: bounds.bottomLeft.y + yOffset,
+        x: bounds.topRight.x - this.#widthBlocoLojas - this.#paddingLeftRight,
+      }
+      const bloco = new BlocoFacade().make(this.#setor, iBloco, blocoBottomLeft)
+
+      if (!bloco) {
+        console.error('bloco não criado!')
+        return { lojas: [], banheiros: [] }
+      }
       lojas = [...lojas, ...bloco.lojas]
       banheiros = [...banheiros, ...bloco.banheiros]
 
@@ -72,12 +71,10 @@ export class AreaExternaSetorLojasCreator {
       bottomLeft: this.#bttmLeft,
       topRight: {
         x:
-          this.#bttmLeft.x +
-          this.#widthBlocoLojasExternas +
-          this.#paddingLeftRight * 2,
+          this.#bttmLeft.x + this.#widthBlocoLojas + this.#paddingLeftRight * 2,
         y:
           this.#bttmLeft.y +
-          this.#heightBlocoLojasExternas * this.#qtdBlocos +
+          this.#heightBlocoLojas * this.#qtdBlocos +
           this.#gapBetweenLojas * (this.#qtdBlocos - 1) -
           2,
       },
