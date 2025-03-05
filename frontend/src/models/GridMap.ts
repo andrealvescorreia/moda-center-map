@@ -20,7 +20,7 @@ export class GridMap {
   #obstaculos: IObstaculo[] = []
 
   constructor() {
-    const { lojas, boxes, bounds, banheiros, obstaculos } = new SetorCreator()
+    const { lojas, boxes, banheiros, obstaculos, topRight } = new SetorCreator()
       .setSetor('Azul')
       .setBottomLeft({ y: 0, x: 0 })
       .create()
@@ -28,7 +28,7 @@ export class GridMap {
     this.#boxes = boxes
     this.#banheiros = banheiros
     this.#obstaculos = obstaculos
-    this.#yxDimensions = [bounds.topRight.y, bounds.topRight.x]
+    this.#yxDimensions = [topRight.y, topRight.x]
 
     this.#generateGrid()
   }

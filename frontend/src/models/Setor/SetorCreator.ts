@@ -5,6 +5,7 @@ import type { Position } from '../../interfaces/Position'
 import BlocoFacade from '../BlocoLojas/Facade'
 import { AreaExternaCreator } from './AreaExternaCreator'
 import { BoxesCreator } from './BoxesCreator'
+import Setor from './Setor'
 
 export class SetorCreator {
   #setor!: Loja['setor']
@@ -40,7 +41,18 @@ export class SetorCreator {
       topRight: this.#areaInternaBounds.topRight,
     }
 
-    return { boxes, lojas, banheiros, obstaculos, bounds }
+    const setor = new Setor()
+    Object.assign(setor, {
+      cor: this.#setor,
+      lojas,
+      boxes,
+      banheiros,
+      obstaculos,
+      leftBottom: bounds.bottomLeft,
+      topRight: bounds.topRight,
+    })
+
+    return setor
   }
 
   #createLojasExternas() {
