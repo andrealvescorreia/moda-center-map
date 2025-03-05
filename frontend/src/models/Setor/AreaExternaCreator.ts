@@ -1,9 +1,9 @@
-import type { IBanheiro } from '../interfaces/IBanheiro'
-import type { Loja } from '../interfaces/Loja'
-import type { Position } from '../interfaces/Position'
-import BlocoFacade from './BlocoLojas/Facade'
+import type { IBanheiro } from '../../interfaces/IBanheiro'
+import type { Loja } from '../../interfaces/Loja'
+import type { Position } from '../../interfaces/Position'
+import BlocoFacade from '../BlocoLojas/Facade'
 
-export class AreaExternaSetorLojasCreator {
+export class AreaExternaCreator {
   #bttmLeft: Position = { y: 0, x: 0 }
   #setor: Loja['setor'] = 'Azul'
   #qtdBlocos: Loja['bloco'] = 8

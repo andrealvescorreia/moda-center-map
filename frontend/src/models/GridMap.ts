@@ -2,7 +2,7 @@ import type { Boxe } from '../interfaces/Boxe'
 import type { IBanheiro } from '../interfaces/IBanheiro'
 import type { IObstaculo } from '../interfaces/IObstaculo'
 import type { Loja } from '../interfaces/Loja'
-import { SetorCreator } from './SetorCreator'
+import { SetorCreator } from './Setor/SetorCreator'
 
 export class GridMap {
   static CAMINHO = 0

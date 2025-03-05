@@ -1,29 +1,18 @@
-import type { Boxe } from '../interfaces/Boxe'
-import type { IBanheiro } from '../interfaces/IBanheiro'
-import type { Loja } from '../interfaces/Loja'
-import type { Position } from '../interfaces/Position'
-import { AreaExternaSetorLojasCreator } from './AreaExternaSetorLojasCreator'
-import BlocoFacade from './BlocoLojas/Facade'
-import { SetorBoxesCreator } from './SetorBoxesCreator'
+import type { Boxe } from '../../interfaces/Boxe'
+import type { IBanheiro } from '../../interfaces/IBanheiro'
+import type { Loja } from '../../interfaces/Loja'
+import type { Position } from '../../interfaces/Position'
+import BlocoFacade from '../BlocoLojas/Facade'
+import { AreaExternaCreator } from './AreaExternaCreator'
+import { BoxesCreator } from './BoxesCreator'
 
 export class SetorCreator {
-  #setor: Loja['setor'] = 'Azul'
-  #bottomLeft: { y: number; x: number } = { y: 0, x: 0 }
+  #setor!: Loja['setor']
+  #bottomLeft!: { y: number; x: number }
 
-  #areaInternaBounds: { bottomLeft: Position; topRight: Position } = {
-    bottomLeft: { x: 0, y: 0 },
-    topRight: { x: 0, y: 0 },
-  }
-
-  #areaLojasInternas: { bottomLeft: Position; topRight: Position } = {
-    bottomLeft: { x: 0, y: 0 },
-    topRight: { x: 0, y: 0 },
-  }
-
-  #areaExternaBounds: { bottomLeft: Position; topRight: Position } = {
-    bottomLeft: { x: 0, y: 0 },
-    topRight: { x: 0, y: 0 },
-  }
+  #areaExternaBounds!: { bottomLeft: Position; topRight: Position }
+  #areaInternaBounds!: { bottomLeft: Position; topRight: Position }
+  #areaLojasInternas!: { bottomLeft: Position; topRight: Position }
 
   setSetor(setor: Loja['setor']) {
     this.#setor = setor
@@ -55,7 +44,7 @@ export class SetorCreator {
   }
 
   #createLojasExternas() {
-    const areaExternaCreator = new AreaExternaSetorLojasCreator()
+    const areaExternaCreator = new AreaExternaCreator()
       .setSetor(this.#setor)
       .setBttmLeft(this.#bottomLeft)
       .setQtdBlocos(8)
@@ -65,11 +54,16 @@ export class SetorCreator {
 
     this.#areaExternaBounds = areaExternaCreator.getBounds()
 
-    this.#areaInternaBounds.bottomLeft = {
-      x: this.#areaExternaBounds.topRight.x,
-      y: this.#bottomLeft.y,
+    this.#areaInternaBounds = {
+      bottomLeft: {
+        x: this.#areaExternaBounds.topRight.x,
+        y: this.#bottomLeft.y,
+      },
+      topRight: {
+        x: 0,
+        y: 0,
+      },
     }
-
     return { lojasExternas: lojas, banheirosExternos: banheiros }
   }
 
@@ -78,20 +72,15 @@ export class SetorCreator {
       y: 4 * 5 + 1 + this.#areaInternaBounds.bottomLeft.y,
       x: 5 * 3 + 1 + this.#areaInternaBounds.bottomLeft.x,
     }
-    this.#areaLojasInternas = {
-      bottomLeft,
-      topRight: {
-        y: 4 * 5 + 1 + this.#areaInternaBounds.bottomLeft.y + 14,
-        x: 5 * 3 + 1 + this.#areaInternaBounds.bottomLeft.x + 14,
-      },
-    }
-
     const bloco = new BlocoFacade().make(this.#setor, 9, bottomLeft)
     if (!bloco) {
       console.error('bloco não criado!')
       return { lojasInternas: [], banheirosInternos: [], obstaculos: [] }
     }
-
+    this.#areaLojasInternas = {
+      bottomLeft,
+      topRight: bloco.topRight,
+    }
     return {
       lojasInternas: bloco.lojas,
       banheirosInternos: bloco.banheiros,
@@ -115,7 +104,7 @@ export class SetorCreator {
       },
     ]
 
-    const boxesCreator = new SetorBoxesCreator()
+    const boxesCreator = new BoxesCreator()
       .setSetor(this.#setor)
       .setQtdBoxesHorizontal(120)
       .setQtdRuas(16)
