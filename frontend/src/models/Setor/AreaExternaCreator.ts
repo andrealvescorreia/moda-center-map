@@ -4,9 +4,9 @@ import type { Position } from '../../interfaces/Position'
 import BlocoFacade from '../BlocoLojas/Facade'
 
 export class AreaExternaCreator {
-  #bttmLeft: Position = { y: 0, x: 0 }
-  #setor: Loja['setor'] = 'Azul'
-  #qtdBlocos: Loja['bloco'] = 8
+  #bttmLeft!: Position
+  #setor!: Loja['setor']
+  #qtdBlocos!: Loja['bloco']
   #paddingLeftRight = 2
   #heightBlocoLojas!: number
   #widthBlocoLojas!: number
@@ -39,6 +39,14 @@ export class AreaExternaCreator {
     this.#widthBlocoLojas = bloco.topRight.x
   }
 
+  #calculateQtdBlocos() {
+    if (this.#setor === 'Amarelo' || this.#setor === 'Branco') {
+      this.#qtdBlocos = 4
+      return
+    }
+    this.#qtdBlocos = 8
+  }
+
   create() {
     if (this.#setor === 'Branco' || this.#setor === 'Amarelo') {
       //!temp
@@ -46,16 +54,32 @@ export class AreaExternaCreator {
       return { lojas: [], banheiros: [] }
     }
     this.#calculateBlocoDimensions()
+    this.#calculateQtdBlocos()
+    if (this.#setor === 'Azul' || this.#setor === 'Laranja') {
+      return this.#createAzulLaranja()
+    }
+    if (this.#setor === 'Verde' || this.#setor === 'Vermelho') {
+      return this.#createVerdeVermelho()
+    }
+    return this.#createAzulLaranja()
+  }
 
+  #createBlocos({ reverse }: { reverse: boolean }) {
     let lojas: Loja[] = []
     let banheiros: IBanheiro[] = []
     const bounds = this.getBounds()
-
     const stepY = this.#gapBetweenLojas + this.#heightBlocoLojas
     let yOffset = 0
+    const start = reverse ? this.#qtdBlocos : 1
+    const end = reverse ? 1 : this.#qtdBlocos
+    const step = reverse ? -1 : 1
 
-    for (let iBloco = 1; iBloco <= this.#qtdBlocos; iBloco++) {
-      if (iBloco === 8) {
+    for (
+      let iBloco = start;
+      reverse ? iBloco >= end : iBloco <= end;
+      iBloco += step
+    ) {
+      if ((reverse && iBloco === 7) || (!reverse && iBloco === 8)) {
         yOffset -= 2
       }
 
@@ -75,6 +99,14 @@ export class AreaExternaCreator {
       yOffset += stepY
     }
     return { lojas, banheiros }
+  }
+
+  #createAzulLaranja() {
+    return this.#createBlocos({ reverse: false })
+  }
+
+  #createVerdeVermelho() {
+    return this.#createBlocos({ reverse: true })
   }
 
   getBounds() {
