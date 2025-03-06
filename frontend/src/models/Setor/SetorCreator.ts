@@ -3,17 +3,20 @@ import type { IBanheiro } from '../../interfaces/IBanheiro'
 import type { Loja } from '../../interfaces/Loja'
 import type { Position } from '../../interfaces/Position'
 import BlocoFacade from '../BlocoLojas/Facade'
+import BoxesSetorFacade from '../BoxesSetor/Facade'
 import { AreaExternaCreator } from './AreaExternaCreator'
-import { BoxesCreator } from './BoxesCreator'
+import { PracaDeAlimentacaoCreator } from './PracaDeAlimentacaoCreator'
 import Setor from './Setor'
 
 export class SetorCreator {
   #setor!: Loja['setor']
+
   #bottomLeft!: { y: number; x: number }
 
   #areaExternaBounds!: { bottomLeft: Position; topRight: Position }
   #areaInternaBounds!: { bottomLeft: Position; topRight: Position }
-  #areaLojasInternas!: { bottomLeft: Position; topRight: Position }
+  #areaBlocoInterno!: { bottomLeft: Position; topRight: Position }
+  #areaPracaDeAlimentacao!: { bottomLeft: Position; topRight: Position }
 
   setSetor(setor: Loja['setor']) {
     this.#setor = setor
@@ -29,9 +32,14 @@ export class SetorCreator {
     const banheiros: IBanheiro[] = []
 
     const { lojasExternas, banheirosExternos } = this.#createLojasExternas()
-    const { lojasInternas, banheirosInternos, obstaculos } =
+    const restaurantes = this.#createPracaDeAlimentacao()
+
+    // eslint-disable-next-line prefer-const
+    let { lojasInternas, banheirosInternos, obstaculos } =
       this.#createLojasInternas()
     const boxes: Boxe[] = this.#createBoxes()
+
+    obstaculos = obstaculos.concat(restaurantes)
 
     lojas.push(...lojasExternas, ...lojasInternas)
     banheiros.push(...banheirosExternos, ...banheirosInternos)
@@ -89,7 +97,7 @@ export class SetorCreator {
       console.error('bloco não criado!')
       return { lojasInternas: [], banheirosInternos: [], obstaculos: [] }
     }
-    this.#areaLojasInternas = {
+    this.#areaBlocoInterno = {
       bottomLeft,
       topRight: bloco.topRight,
     }
@@ -100,33 +108,32 @@ export class SetorCreator {
     }
   }
 
-  #createBoxes() {
-    const ignoredAreas = [
-      this.#areaLojasInternas,
-      {
-        //praça de alimentação
-        bottomLeft: {
-          y: 11 * 5 + 1 + this.#areaInternaBounds.bottomLeft.y,
-          x: 11 * 3 + 1 + this.#areaInternaBounds.bottomLeft.x,
-        },
-        topRight: {
-          y: 11 * 5 + 1 + 19 + this.#areaInternaBounds.bottomLeft.y,
-          x: 11 * 3 + 1 + this.#areaInternaBounds.bottomLeft.x + 11,
-        },
-      },
-    ]
-
-    const boxesCreator = new BoxesCreator()
+  #createPracaDeAlimentacao() {
+    const pracaDeAlimentacao = new PracaDeAlimentacaoCreator()
+      .setLeftBottom({
+        y: 11 * 5 + 1 + this.#areaInternaBounds.bottomLeft.y,
+        x: 11 * 3 + 1 + this.#areaInternaBounds.bottomLeft.x,
+      })
       .setSetor(this.#setor)
-      .setQtdBoxesHorizontal(120)
-      .setQtdRuas(16)
-      .setBttmLeft(this.#areaInternaBounds.bottomLeft)
-      .setIgnoredAreas(ignoredAreas)
+      .create()
 
-    const { boxes } = boxesCreator.create()
-    const bounds = boxesCreator.getBounds()
+    this.#areaPracaDeAlimentacao = {
+      bottomLeft: pracaDeAlimentacao.leftBottom,
+      topRight: pracaDeAlimentacao.topRight,
+    }
 
-    this.#areaInternaBounds.topRight = bounds.topRight
-    return boxes
+    return pracaDeAlimentacao.restaurantes
+  }
+
+  #createBoxes() {
+    const ignoredAreas = [this.#areaBlocoInterno, this.#areaPracaDeAlimentacao]
+
+    const boxesSetor = new BoxesSetorFacade().make(
+      this.#setor,
+      this.#areaInternaBounds.bottomLeft,
+      ignoredAreas
+    )
+    this.#areaInternaBounds.topRight = boxesSetor.topRight
+    return boxesSetor.boxes
   }
 }
