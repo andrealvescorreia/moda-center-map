@@ -2,7 +2,7 @@ import type { Boxe } from '../interfaces/Boxe'
 import type { IBanheiro } from '../interfaces/IBanheiro'
 import type { IObstaculo } from '../interfaces/IObstaculo'
 import type { Loja } from '../interfaces/Loja'
-import { SetorCreator } from './Setor/SetorCreator'
+import SetorFacade from './Setor/Facade'
 
 export class GridMap {
   static CAMINHO = 0
@@ -20,15 +20,23 @@ export class GridMap {
   #obstaculos: IObstaculo[] = []
 
   constructor() {
-    const { lojas, boxes, banheiros, obstaculos, topRight } = new SetorCreator()
-      .setSetor('Azul')
-      .setBottomLeft({ y: 0, x: 0 })
-      .create()
-    this.#lojas = lojas
-    this.#boxes = boxes
-    this.#banheiros = banheiros
-    this.#obstaculos = obstaculos
-    this.#yxDimensions = [topRight.y, topRight.x]
+    //exemplo
+    const setorAzul = new SetorFacade().make('Vermelho', { x: 0, y: 0 })
+    this.#banheiros = setorAzul.banheiros
+    this.#lojas = setorAzul.lojas
+    this.#obstaculos = setorAzul.obstaculos
+    this.#boxes = setorAzul.boxes
+
+    const setorLaranja = new SetorFacade().make('Verde', {
+      x: setorAzul.topRight.x,
+      y: 0,
+    })
+    this.#banheiros = this.#banheiros.concat(setorLaranja.banheiros)
+    this.#lojas = this.#lojas.concat(setorLaranja.lojas)
+    this.#obstaculos = this.#obstaculos.concat(setorLaranja.obstaculos)
+    this.#boxes = this.#boxes.concat(setorLaranja.boxes)
+
+    this.#yxDimensions = [setorLaranja.topRight.y, setorLaranja.topRight.x]
 
     this.#generateGrid()
   }

@@ -51,7 +51,11 @@ export class AreaExternaCreator {
     if (this.#setor === 'Branco' || this.#setor === 'Amarelo') {
       //!temp
       console.error(`setor ${this.#setor} ainda não suportado`)
-      return { lojas: [], banheiros: [] }
+      return {
+        lojas: [],
+        banheiros: [],
+        bounds: { bottomLeft: { x: 0, y: 0 }, topRight: { x: 0, y: 0 } },
+      }
     }
     this.#calculateBlocoDimensions()
     this.#calculateQtdBlocos()
@@ -98,7 +102,11 @@ export class AreaExternaCreator {
 
       yOffset += stepY
     }
-    return { lojas, banheiros }
+    return {
+      lojas,
+      banheiros,
+      bounds,
+    }
   }
 
   #createAzulLaranja() {
@@ -110,17 +118,18 @@ export class AreaExternaCreator {
   }
 
   getBounds() {
+    const topRight: Position = {
+      x: this.#bttmLeft.x + this.#widthBlocoLojas + this.#paddingLeftRight * 2,
+      y:
+        this.#bttmLeft.y +
+        this.#heightBlocoLojas * this.#qtdBlocos +
+        this.#gapBetweenLojas * (this.#qtdBlocos - 1) -
+        2,
+    }
+
     return {
       bottomLeft: this.#bttmLeft,
-      topRight: {
-        x:
-          this.#bttmLeft.x + this.#widthBlocoLojas + this.#paddingLeftRight * 2,
-        y:
-          this.#bttmLeft.y +
-          this.#heightBlocoLojas * this.#qtdBlocos +
-          this.#gapBetweenLojas * (this.#qtdBlocos - 1) -
-          2,
-      },
+      topRight,
     }
   }
 }
