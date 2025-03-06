@@ -19,10 +19,4 @@ export default abstract class BlocoBuilder {
   public getResult() {
     return this._bloco
   }
-
-  protected updateSetor(items: { setor: string }[], setor: string) {
-    for (const item of items) {
-      item.setor = setor
-    }
-  }
 }
