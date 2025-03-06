@@ -8,8 +8,8 @@ export class AreaExternaCreator {
   #setor: Loja['setor'] = 'Azul'
   #qtdBlocos: Loja['bloco'] = 8
   #paddingLeftRight = 2
-  #heightBlocoLojas = 8
-  #widthBlocoLojas = 8
+  #heightBlocoLojas!: number
+  #widthBlocoLojas!: number
   #gapBetweenLojas = 2
 
   setSetor(setor: Loja['setor']) {
@@ -29,12 +29,23 @@ export class AreaExternaCreator {
     return this
   }
 
+  #calculateBlocoDimensions() {
+    const bloco = new BlocoFacade().make(this.#setor, 1, { x: 0, y: 0 })
+    if (!bloco) {
+      console.error('bloco não criado!')
+      return
+    }
+    this.#heightBlocoLojas = bloco.topRight.y
+    this.#widthBlocoLojas = bloco.topRight.x
+  }
+
   create() {
     if (this.#setor === 'Branco' || this.#setor === 'Amarelo') {
       //!temp
       console.error(`setor ${this.#setor} ainda não suportado`)
       return { lojas: [], banheiros: [] }
     }
+    this.#calculateBlocoDimensions()
 
     let lojas: Loja[] = []
     let banheiros: IBanheiro[] = []
