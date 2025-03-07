@@ -111,18 +111,16 @@ export class LojaInterna implements Loja {
       return this.#farUp()
     }
     if (this.setor === 'Branco') {
-      //igual o Azul
       if (this.numLoja <= 5) return this.#farRight()
-      if (this.numLoja <= 10) return this.#farUp()
+      if (this.numLoja <= 10) return this.#farDown()
       if (this.numLoja <= 15) return this.#farLeft()
-      return this.#farDown()
+      return this.#farUp()
     }
     if (this.setor === 'Amarelo') {
-      //igual o Laranja
       if (this.numLoja <= 5) return this.#farLeft()
-      if (this.numLoja <= 10) return this.#farUp()
+      if (this.numLoja <= 10) return this.#farDown()
       if (this.numLoja <= 15) return this.#farRight()
-      return this.#farDown()
+      return this.#farUp()
     }
     console.error('Entrance not implemented for this setor ', this.setor)
     return { y: 0, x: 0 }
