@@ -18,7 +18,7 @@ export default class BlocoInternoBrancoBuilder extends BlocoInternoBuilder {
 
     reflector.reflect({
       reflectX: true,
-      reflectY: false,
+      reflectY: true,
     })
 
     this._bloco.lojas = lojas
