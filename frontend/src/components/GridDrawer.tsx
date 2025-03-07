@@ -1,13 +1,11 @@
 import L from 'leaflet'
 import { useState } from 'react'
-import { Rectangle } from 'react-leaflet'
+import { ImageOverlay, Rectangle } from 'react-leaflet'
 import PixiOverlay from 'react-leaflet-pixi-overlay'
 import type { JSX } from 'react/jsx-runtime'
 import { ModaCenterGridMap } from '../models/ModaCenterGridMap'
 import Boxe from './Boxe'
 import MapInfoCollector from './MapInfoCollector'
-
-// cria os quadrados do grid. Não eficiente para o mapa grande. TODO: substituir por img overlay quando zoom out
 
 interface MapCameraBounds {
   getSouthWest: () => { lat: number; lng: number }
@@ -56,7 +54,26 @@ const GridDrawer = ({
 
   const [mapInfo, setMapInfo] = useState<MapInfo>()
 
+  const debug = false
+
   function drawBoxes() {
+    if (!mapInfo || mapInfo.zoom <= minZoomLevelToRenderBoxes) return
+    for (let i = 0; i < grid.length; i++) {
+      // y (lat)
+      for (let j = 0; j < grid[i].length; j++) {
+        // x (lng)
+        if (!isInsideCameraBounds(mapInfo.bounds, i, j)) continue
+
+        if (grid[i][j] === ModaCenterGridMap.BOXE) {
+          components.push(
+            <Boxe y={i} x={j} onClick={() => {}} key={`${i}-${j}`} />
+          )
+        }
+      }
+    }
+  }
+
+  function drawMarkers() {
     if (!mapInfo || mapInfo.zoom <= minZoomLevelToRenderBoxes) return
 
     for (let i = 0; i < grid.length; i++) {
@@ -80,19 +97,7 @@ const GridDrawer = ({
                 </svg>
                 `,
           })
-          components.push(
-            <Boxe y={i} x={j} onClick={() => {}} key={`${i}-${j}`} />
-          )
         }
-        /*else if (grid[i][j] !== GridMap.CAMINHO) {//!temporário
-          components.push(
-            <Rectangle
-              key={`${i}-${j}`}
-              bounds={[[i, j], [i + 1, j + 1]]}
-              //color='#ffffff00'
-              fillColor='#fff0000' />
-          );
-        }*/
       }
     }
   }
@@ -137,14 +142,23 @@ const GridDrawer = ({
     }
   }
 
-  drawBoxes()
-  drawLojasExternas()
-  drawBanheiros()
-  drawObstaculos()
+  drawMarkers()
+  if (debug) {
+    drawBoxes()
+    drawLojasExternas()
+    drawBanheiros()
+    drawObstaculos()
+  }
 
   return (
     <>
       <MapInfoCollector onUpdateInfo={(newInfo) => setMapInfo(newInfo)} />
+      <ImageOverlay
+        url="src\components\grid.png"
+        bounds={gridMap.getBounds()}
+        alt="deu ruim"
+        zIndex={-1}
+      />
       {
         <PixiOverlay
           markers={
@@ -155,11 +169,6 @@ const GridDrawer = ({
         />
       }
       {components}
-      <Rectangle
-        bounds={gridMap.getBounds()}
-        color="#ffffff00"
-        fillColor="#33b4ff"
-      />
     </>
   )
 }
