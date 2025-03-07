@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useMapEvents } from 'react-leaflet'
+import type { Loja } from '../../interfaces/Loja'
 import type { Route } from '../../interfaces/Route'
 import { ModaCenterGridMap } from '../../models/ModaCenterGridMap'
 
@@ -67,7 +68,7 @@ const RouteEditor = ({
         destinos: [
           ...route.destinos,
           {
-            info: boxe,
+            info: boxe || null,
             position: { x: lng, y: lat },
           },
         ],
@@ -88,7 +89,7 @@ const RouteEditor = ({
         destinos: [
           ...route.destinos,
           {
-            info: loja,
+            info: loja as Loja,
             position: entrance,
           },
         ],
