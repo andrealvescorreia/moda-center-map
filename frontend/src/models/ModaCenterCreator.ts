@@ -2,31 +2,35 @@ import ModaCenter from './ModaCenter'
 import SetorFacade from './Setor/Facade'
 
 export default class ModaCenterCreator {
-  #gapBetweenStores = 2
-  setGapBetweenStores(gap: number) {
-    this.#gapBetweenStores = gap
+  #gapBetweenStoresHorizontal = 4
+  #gapBetweenStoresVertical = 1
+  setGapBetweenStoresVertical(gap: number) {
+    this.#gapBetweenStoresVertical = gap
+  }
+  setGapBetweenStoresHorizontal(gap: number) {
+    this.#gapBetweenStoresHorizontal = gap
   }
   create() {
     const setorAzul = new SetorFacade().make('Azul', { x: 0, y: 0 })
     const setorLaranja = new SetorFacade().make('Laranja', {
-      x: setorAzul.topRight.x + this.#gapBetweenStores,
+      x: setorAzul.topRight.x + this.#gapBetweenStoresHorizontal,
       y: 0,
     })
     const setorVermelho = new SetorFacade().make('Vermelho', {
       x: setorAzul.leftBottom.x,
-      y: setorAzul.topRight.y + this.#gapBetweenStores,
+      y: setorAzul.topRight.y + this.#gapBetweenStoresVertical,
     })
     const setorVerde = new SetorFacade().make('Verde', {
       x: setorLaranja.leftBottom.x,
-      y: setorLaranja.topRight.y + this.#gapBetweenStores,
+      y: setorLaranja.topRight.y + this.#gapBetweenStoresVertical,
     })
     const setorAmarelo = new SetorFacade().make('Amarelo', {
       x: setorVermelho.leftBottom.x,
-      y: setorVermelho.topRight.y + this.#gapBetweenStores,
+      y: setorVermelho.topRight.y + this.#gapBetweenStoresVertical,
     })
     const setorBranco = new SetorFacade().make('Branco', {
       x: setorVerde.leftBottom.x,
-      y: setorVerde.topRight.y + this.#gapBetweenStores,
+      y: setorVerde.topRight.y + this.#gapBetweenStoresVertical,
     })
 
     const modaCenter = new ModaCenter()
