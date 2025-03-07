@@ -11,6 +11,7 @@ export class AreaExternaCreator {
   #heightBlocoLojas!: number
   #widthBlocoLojas!: number
   #gapBetweenLojas = 2
+  #paddingDown = 0
 
   setSetor(setor: Loja['setor']) {
     this.#setor = setor
@@ -48,15 +49,6 @@ export class AreaExternaCreator {
   }
 
   create() {
-    if (this.#setor === 'Branco' || this.#setor === 'Amarelo') {
-      //!temp
-      console.error(`setor ${this.#setor} ainda não suportado`)
-      return {
-        lojas: [],
-        banheiros: [],
-        bounds: { bottomLeft: { x: 0, y: 0 }, topRight: { x: 0, y: 0 } },
-      }
-    }
     this.#calculateBlocoDimensions()
     this.#calculateQtdBlocos()
     if (this.#setor === 'Azul' || this.#setor === 'Laranja') {
@@ -65,7 +57,7 @@ export class AreaExternaCreator {
     if (this.#setor === 'Verde' || this.#setor === 'Vermelho') {
       return this.#createVerdeVermelho()
     }
-    return this.#createAzulLaranja()
+    return this.#createAmareloBranco()
   }
 
   #createBlocos({ reverse }: { reverse: boolean }) {
@@ -88,7 +80,7 @@ export class AreaExternaCreator {
       }
 
       const blocoBottomLeft = {
-        y: bounds.bottomLeft.y + yOffset,
+        y: bounds.bottomLeft.y + yOffset + this.#paddingDown,
         x: bounds.topRight.x - this.#widthBlocoLojas - this.#paddingLeftRight,
       }
       const bloco = new BlocoFacade().make(this.#setor, iBloco, blocoBottomLeft)
@@ -110,6 +102,14 @@ export class AreaExternaCreator {
   }
 
   #createAzulLaranja() {
+    return this.#createBlocos({ reverse: false })
+  }
+
+  #createAmareloBranco() {
+    this.#qtdBlocos = 4
+    this.#gapBetweenLojas = 8
+    this.#paddingDown = 6
+    this.#paddingLeftRight -= 1
     return this.#createBlocos({ reverse: false })
   }
 

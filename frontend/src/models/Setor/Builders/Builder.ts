@@ -84,8 +84,12 @@ export default abstract class SetorBuilder {
     }
   }
 
-  protected buildBlocoInterno(bottomLeft: Position) {
-    const blocoInterno = new BlocoFacade().make(this._setor.cor, 9, bottomLeft)
+  protected buildBlocoInterno(bottomLeft: Position, numBloco: number) {
+    const blocoInterno = new BlocoFacade().make(
+      this._setor.cor,
+      numBloco,
+      bottomLeft
+    )
 
     this._setor.lojas.push(...blocoInterno.lojas)
     this._setor.banheiros.push(...blocoInterno.banheiros)

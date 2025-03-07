@@ -1,7 +1,7 @@
 import PF from 'pathfinding'
 import type { Position } from '../interfaces/Position'
 import type { TSPSolver } from '../interfaces/TSPSolver'
-import { GridMap } from './GridMap'
+import { ModaCenterGridMap } from './ModaCenterGridMap'
 
 export class RouteCalculator {
   #grid: number[][]
@@ -25,7 +25,7 @@ export class RouteCalculator {
       startPos.y < 0 ||
       startPos.x >= this.#grid[0].length ||
       startPos.y >= this.#grid.length ||
-      this.#grid[startPos.y][startPos.x] !== GridMap.CAMINHO
+      this.#grid[startPos.y][startPos.x] !== ModaCenterGridMap.CAMINHO
     ) {
       console.error(
         'Posição inicial inválida x: ',
@@ -41,8 +41,8 @@ export class RouteCalculator {
         dest.y < 0 ||
         dest.x >= this.#grid[0].length ||
         dest.y >= this.#grid.length ||
-        (this.#grid[dest.y][dest.x] !== GridMap.BOXE &&
-          this.#grid[dest.y][dest.x] !== GridMap.LOJA)
+        (this.#grid[dest.y][dest.x] !== ModaCenterGridMap.BOXE &&
+          this.#grid[dest.y][dest.x] !== ModaCenterGridMap.LOJA)
       ) {
         console.error(`Posição de destino inválida x: ${dest.x} y: ${dest.y}`)
         console.log(this.#grid[dest.y][dest.x])

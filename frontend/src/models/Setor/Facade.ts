@@ -1,6 +1,8 @@
 import type { Position } from '../../interfaces/Position'
 import type Setor from '../Setor/Setor'
+import SetorAmareloBuilder from './Builders/AmareloBuilder'
 import SetorAzulBuilder from './Builders/AzulBuilder'
+import SetorBrancoBuilder from './Builders/BrancoBuilder'
 import type SetorBuilder from './Builders/Builder'
 import SetorLaranjaBuilder from './Builders/LaranjaBuilder'
 import SetorVerdeBuilder from './Builders/VerdeBuilder'
@@ -34,13 +36,11 @@ export default class SetorFacade {
   }
 
   public getSetorAmarelo(bottomLeft: Position) {
-    //TODO
     this._builder = new SetorAmareloBuilder()
     return this.getSetor(bottomLeft)
   }
 
   public getSetorBranco(bottomLeft: Position) {
-    //TODO
     this._builder = new SetorBrancoBuilder()
     return this.getSetor(bottomLeft)
   }

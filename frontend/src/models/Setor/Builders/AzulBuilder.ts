@@ -20,7 +20,7 @@ export default class SetorAzulBuilder extends SetorBuilder {
       x: 5 * 3 + 1 + this.areaInternaBounds.bottomLeft.x,
       y: 4 * 5 + 1 + this.areaInternaBounds.bottomLeft.y,
     }
-    this.buildBlocoInterno(blocoInternoBottomLeft)
+    this.buildBlocoInterno(blocoInternoBottomLeft, 9)
 
     this.buildBoxes(this.areaInternaBounds.bottomLeft)
 

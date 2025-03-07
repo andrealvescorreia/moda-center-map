@@ -2,7 +2,7 @@ import { useState } from 'react'
 import './RoutingManager.scss'
 import type { Position } from '../../interfaces/Position'
 import type { Route } from '../../interfaces/Route'
-import type { GridMap } from '../../models/GridMap'
+import type { ModaCenterGridMap } from '../../models/ModaCenterGridMap'
 import { RouteCalculator } from '../../models/RouteCalculator'
 import { TSPSolverNN } from '../../models/TSPSolverNN'
 import RouteButton from './RouteButton'
@@ -10,7 +10,7 @@ import RouteDrawer from './RouteDrawer'
 import RouteEditor from './RouteEditor'
 
 interface RoutingManager {
-  gridMap: GridMap
+  gridMap: ModaCenterGridMap
 }
 
 const RoutingManager = ({ gridMap }: RoutingManager) => {

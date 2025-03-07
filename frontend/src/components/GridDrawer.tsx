@@ -3,7 +3,7 @@ import { useState } from 'react'
 import { Rectangle } from 'react-leaflet'
 import PixiOverlay from 'react-leaflet-pixi-overlay'
 import type { JSX } from 'react/jsx-runtime'
-import { GridMap } from '../models/GridMap'
+import { ModaCenterGridMap } from '../models/ModaCenterGridMap'
 import Boxe from './Boxe'
 import MapInfoCollector from './MapInfoCollector'
 
@@ -33,7 +33,7 @@ interface MapInfo {
 }
 
 interface GridDrawerProps {
-  gridMap: GridMap
+  gridMap: ModaCenterGridMap
   minZoomLevelToRenderMarkers?: number
   minZoomLevelToRenderBoxes?: number
 }
@@ -65,7 +65,7 @@ const GridDrawer = ({
         // x (lng)
         if (!isInsideCameraBounds(mapInfo.bounds, i, j)) continue
 
-        if (grid[i][j] === GridMap.BOXE) {
+        if (grid[i][j] === ModaCenterGridMap.BOXE) {
           const numDoBoxe = gridMap.getBoxe(i, j)?.numero
 
           markers.push({

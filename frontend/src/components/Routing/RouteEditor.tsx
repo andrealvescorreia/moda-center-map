@@ -1,10 +1,10 @@
 import { useState } from 'react'
 import { useMapEvents } from 'react-leaflet'
 import type { Route } from '../../interfaces/Route'
-import { GridMap } from '../../models/GridMap'
+import { ModaCenterGridMap } from '../../models/ModaCenterGridMap'
 
 interface RouteEditorProps {
-  gridMap: GridMap
+  gridMap: ModaCenterGridMap
   route: Route
   onUpdate: (route: Route) => void
   onCancel: () => void
@@ -55,7 +55,10 @@ const RouteEditor = ({
       onUpdate(newRoute)
       setIsEditingMarcadorInicio(false)
     }
-    if (isAddingDestiny && gridMap.getGrid()[lat][lng] === GridMap.BOXE) {
+    if (
+      isAddingDestiny &&
+      gridMap.getGrid()[lat][lng] === ModaCenterGridMap.BOXE
+    ) {
       const boxe = gridMap.getBoxe(lat, lng)
 
       if (boxe === null) return
@@ -73,7 +76,10 @@ const RouteEditor = ({
       setIsAddingDestiny(false)
     }
 
-    if (isAddingDestiny && gridMap.getGrid()[lat][lng] === GridMap.LOJA) {
+    if (
+      isAddingDestiny &&
+      gridMap.getGrid()[lat][lng] === ModaCenterGridMap.LOJA
+    ) {
       const loja = gridMap.getLoja(lat, lng)
       if (!loja) return
       const entrance = loja.getEntrance()
