@@ -7,7 +7,7 @@ export class AreaExternaCreator {
   #bttmLeft!: Position
   #setor!: Loja['setor']
   #qtdBlocos!: Loja['bloco']
-  #paddingLeftRight = 2
+  #paddingLeftRight = 3
   #heightBlocoLojas!: number
   #widthBlocoLojas!: number
   #gapBetweenLojas = 2
@@ -107,7 +107,7 @@ export class AreaExternaCreator {
 
   #createAmareloBranco() {
     this.#qtdBlocos = 4
-    this.#gapBetweenLojas = 8
+    this.#gapBetweenLojas = 9
     this.#paddingDown = 6
     this.#paddingLeftRight -= 1
     return this.#createBlocos({ reverse: false })
