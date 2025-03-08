@@ -1,7 +1,9 @@
 import L from 'leaflet'
 import { useState } from 'react'
 import { ImageOverlay, Rectangle } from 'react-leaflet'
-import PixiOverlay from 'react-leaflet-pixi-overlay'
+import PixiOverlay, {
+  type MarkerPropsPixiOverlay,
+} from 'react-leaflet-pixi-overlay'
 import type { JSX } from 'react/jsx-runtime'
 import { ModaCenterGridMap } from '../models/ModaCenterGridMap'
 import Boxe from './Boxe'
@@ -40,15 +42,7 @@ const GridDrawer = ({
   minZoomLevelToRenderMarkers = 5,
   minZoomLevelToRenderBoxes = 2,
 }: GridDrawerProps) => {
-  interface Marker {
-    id: string
-    position: [number, number]
-    iconColor: string
-    iconId: string
-    customIcon: string
-  }
-
-  const markers: Marker[] = []
+  const markers: MarkerPropsPixiOverlay[] = []
   const components: JSX.Element[] = []
   const grid = gridMap.getGrid()
 
