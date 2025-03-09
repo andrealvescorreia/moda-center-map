@@ -5,6 +5,7 @@ import './App.css'
 import L from 'leaflet'
 import RoutingManager from './components/Routing/RoutingManager'
 import { ModaCenterGridMap } from './models/ModaCenterGridMap'
+import './globals.css'
 
 const modaCenterGridMap = new ModaCenterGridMap()
 const minZoomLevelToRenderMarkers = 5
