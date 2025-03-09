@@ -1,6 +1,6 @@
 .leaflet-container {
-  height: 100vh;
-  width: 100vw;
+  height: 100dvh;
+  width: 100dvw;
 }
 
 html, body{
@@ -8,8 +8,26 @@ html, body{
   padding: 0;
 }
 
+.ui {
+  position: absolute;
+  z-index: 501;
+  height: 100dvh;
+  width: 100dvw;
+}
 
-.leaflet-control-container { position: absolute; right: 56px; bottom: 100px; } 
+.leaflet-control-container { position: absolute; left: 5px; bottom: 100px; padding: 10px;} 
+
+.leaflet-control-container {
+  display: none;
+}
+
+@media (min-width: 500px) {
+  body {
+    .leaflet-control-container {
+      display: inline;
+    }
+  }
+}
 
 .leaflet-control-attribution { display: none; }
 

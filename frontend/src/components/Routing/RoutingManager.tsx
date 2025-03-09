@@ -1,5 +1,4 @@
 import { useState } from 'react'
-import './RoutingManager.scss'
 import type { Position } from '../../interfaces/Position'
 import type { Route } from '../../interfaces/Route'
 import type { ModaCenterGridMap } from '../../models/ModaCenterGridMap'
@@ -40,9 +39,12 @@ const RoutingManager = ({ gridMap }: RoutingManager) => {
   }
 
   return (
-    <div className="route-manager">
+    <div className="ui">
       {!isCreatingRoute ? (
-        <RouteButton onClick={() => setIsCreatingRoute(true)} />
+        <RouteButton
+          onClick={() => setIsCreatingRoute(true)}
+          className="absolute bottom-30 right-7"
+        />
       ) : (
         <RouteEditor
           gridMap={gridMap}
