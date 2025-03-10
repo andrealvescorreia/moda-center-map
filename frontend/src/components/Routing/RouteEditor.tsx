@@ -22,8 +22,8 @@ const RouteEditor = ({
   const [isAddingDestiny, setIsAddingDestiny] = useState(false)
   const { clickLocation } = useClickContext()
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
   useEffect(() => {
-    console.log('mouseClickPos AAAA: ', clickLocation)
     const isInsideGridMap = (lat: number, lng: number) => {
       return (
         lat >= 0 &&
@@ -91,7 +91,14 @@ const RouteEditor = ({
       onUpdate(newRoute)
       setIsAddingDestiny(false)
     }
-  }, [onUpdate, clickLocation])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    onUpdate,
+    clickLocation,
+    isEditingMarcadorInicio,
+    gridMap,
+    isAddingDestiny,
+  ])
 
   const removeDestiny = (index: number) => {
     const newRoute = {

@@ -25,6 +25,7 @@ const ClickProvider = ({ children }: { children: ReactNode }) => {
   )
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const useClickContext = () => React.useContext(ClickContext)
 
 export default ClickProvider
