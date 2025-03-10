@@ -35,14 +35,31 @@ const RouteEditor = ({
     if (!clickLocation) return
     if (!isInsideGridMap(clickLocation.lat, clickLocation.lng)) return
 
+    const y = clickLocation.lat
+    let x = clickLocation.lng
     if (
       isEditingMarcadorInicio &&
-      gridMap.getGrid()[clickLocation.lat][clickLocation.lng] === 0
+      gridMap.getGrid()[clickLocation.lat][clickLocation.lng] ===
+        ModaCenterGridMap.BOXE
     ) {
+      if (
+        gridMap.getGrid()[clickLocation.lat][clickLocation.lng + 1] ===
+        ModaCenterGridMap.CAMINHO
+      ) {
+        x = clickLocation.lng + 1
+      } else if (
+        gridMap.getGrid()[clickLocation.lat][clickLocation.lng - 1] ===
+        ModaCenterGridMap.CAMINHO
+      ) {
+        x = clickLocation.lng - 1
+      }
+    }
+
+    if (isEditingMarcadorInicio && gridMap.getGrid()[y][x] === 0) {
       const newRoute = {
         ...route,
         inicio: {
-          position: { x: clickLocation.lng, y: clickLocation.lat },
+          position: { x, y },
           info: null,
         },
       }
