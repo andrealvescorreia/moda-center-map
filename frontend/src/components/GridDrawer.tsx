@@ -1,9 +1,6 @@
 import L from 'leaflet'
 import { useState } from 'react'
-import { ImageOverlay, Rectangle } from 'react-leaflet'
-import PixiOverlay, {
-  type MarkerPropsPixiOverlay,
-} from 'react-leaflet-pixi-overlay'
+import { ImageOverlay, Marker, Rectangle } from 'react-leaflet'
 import type { JSX } from 'react/jsx-runtime'
 import { ModaCenterGridMap } from '../models/ModaCenterGridMap'
 import Boxe from './Boxe'
@@ -39,10 +36,10 @@ interface GridDrawerProps {
 }
 const GridDrawer = ({
   gridMap,
-  minZoomLevelToRenderMarkers = 5,
+  //minZoomLevelToRenderMarkers = 5,
   minZoomLevelToRenderBoxes = 2,
 }: GridDrawerProps) => {
-  const markers: MarkerPropsPixiOverlay[] = []
+  const markers: JSX.Element[] = []
   const components: JSX.Element[] = []
   const grid = gridMap.getGrid()
 
@@ -78,19 +75,18 @@ const GridDrawer = ({
 
         if (grid[i][j] === ModaCenterGridMap.BOXE) {
           const numDoBoxe = gridMap.getBoxe(i, j)?.numero
-
-          markers.push({
-            id: `${i}-${j}`,
-            position: [i + 0.5, j + 0.5] as [number, number],
-            iconColor: 'red',
-            iconId: `${numDoBoxe}`,
-            customIcon: `
-                <svg height="20" width="50" xmlns="http://www.w3.org/2000/svg">
-                  <text x="15" y="20" fill="black">${numDoBoxe}</text>
-                  ${numDoBoxe}
-                </svg>
-                `,
-          })
+          markers.push(
+            <Marker
+              key={`${i}-${j}`}
+              position={[i + 0.5, j + 0.5]}
+              icon={
+                new L.DivIcon({
+                  className: 'boxe-marker',
+                  html: `<div>${numDoBoxe}</div>`,
+                })
+              }
+            />
+          )
         }
       }
     }
@@ -148,20 +144,12 @@ const GridDrawer = ({
     <>
       <MapInfoCollector onUpdateInfo={(newInfo) => setMapInfo(newInfo)} />
       <ImageOverlay
-        url="src\components\grid.png"
+        url="grid.png"
         bounds={gridMap.getBounds()}
-        alt="deu ruim"
+        alt="mapa moda center"
         zIndex={-1}
       />
-      {
-        <PixiOverlay
-          markers={
-            mapInfo && mapInfo.zoom >= minZoomLevelToRenderMarkers
-              ? markers
-              : []
-          }
-        />
-      }
+      {/*mapInfo && mapInfo.zoom >= minZoomLevelToRenderMarkers ? markers : []*/}
       {components}
     </>
   )
