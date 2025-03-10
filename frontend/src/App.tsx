@@ -37,9 +37,20 @@ function App() {
       <MapContainer
         crs={L.CRS.Simple}
         bounds={modaCenterGridMap.getBounds()}
+        maxBounds={[
+          [
+            modaCenterGridMap.getBounds()[0][0] - 10,
+            modaCenterGridMap.getBounds()[0][1] - 10,
+          ],
+          [
+            modaCenterGridMap.getBounds()[1][0] + 10,
+            modaCenterGridMap.getBounds()[1][1] + 10,
+          ],
+        ]}
         center={[3, 3.5]}
         zoom={5}
-        maxZoom={7}
+        maxZoom={6}
+        minZoom={1}
         preferCanvas={true}
       >
         <GridDrawer
