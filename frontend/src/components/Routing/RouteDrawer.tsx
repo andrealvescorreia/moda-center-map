@@ -1,11 +1,12 @@
 import { Marker } from 'react-leaflet'
+import type { Destiny } from '../../interfaces/Destiny'
 import type { Position } from '../../interfaces/Position'
 import AntPath from '../AntPath'
 import DestinyMarker from '../DestinyMarker'
 
 interface RouteDrawerProps {
   inicio: Position
-  destinos: Position[]
+  destinos: Destiny[]
   passos: Position[]
 }
 
@@ -17,13 +18,13 @@ const RouteDrawer = ({ inicio, destinos, passos }: RouteDrawerProps) => {
   return (
     <>
       {inicio && <Marker position={[inicio.y + 0.5, inicio.x + 0.5]} />}
-      {destinos?.map((marcador, index) => {
+      {destinos?.map((destino, index) => {
         if (index < destinos.length && index > 0)
           return (
             <DestinyMarker
-              key={`${marcador.x}-${marcador.y}`}
-              x={marcador.x}
-              y={marcador.y}
+              key={`${destino.position.x}-${destino.position.y}`}
+              x={destino.position.x}
+              y={destino.position.y}
               innerText={index.toString()}
             />
           )

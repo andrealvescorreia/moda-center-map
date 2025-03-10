@@ -1,27 +1,15 @@
-import { useState } from 'react'
-import { useMapEvents } from 'react-leaflet'
+import { useEffect, useState } from 'react'
 import type { Loja } from '../../interfaces/Loja'
 import type { Route } from '../../interfaces/Route'
 import { ModaCenterGridMap } from '../../models/ModaCenterGridMap'
+import { useClickContext } from '../../providers/ClickProvider'
+import { DialogAction } from './dialog-action'
 
 interface RouteEditorProps {
   gridMap: ModaCenterGridMap
   route: Route
   onUpdate: (route: Route) => void
   onCancel: () => void
-}
-
-const ClickPosition: React.FC<{
-  onClick: (lat: number, lng: number) => void
-}> = ({ onClick }) => {
-  useMapEvents({
-    click(e) {
-      const lat = e.latlng.lat
-      const lng = e.latlng.lng
-      onClick(Number.parseInt(lat.toString()), Number.parseInt(lng.toString()))
-    },
-  })
-  return false
 }
 
 const RouteEditor = ({
@@ -32,35 +20,40 @@ const RouteEditor = ({
 }: RouteEditorProps) => {
   const [isEditingMarcadorInicio, setIsEditingMarcadorInicio] = useState(true)
   const [isAddingDestiny, setIsAddingDestiny] = useState(false)
+  const { clickLocation } = useClickContext()
 
-  const isInsideGridMap = (lat: number, lng: number) => {
-    return (
-      lat >= 0 &&
-      lat < gridMap.getDimensions()[0] &&
-      lng >= 0 &&
-      lng < gridMap.getDimensions()[1]
-    )
-  }
+  useEffect(() => {
+    console.log('mouseClickPos AAAA: ', clickLocation)
+    const isInsideGridMap = (lat: number, lng: number) => {
+      return (
+        lat >= 0 &&
+        lat < gridMap.getDimensions()[0] &&
+        lng >= 0 &&
+        lng < gridMap.getDimensions()[1]
+      )
+    }
+    if (!clickLocation) return
+    if (!isInsideGridMap(clickLocation.lat, clickLocation.lng)) return
 
-  const onClickMouse = (lat: number, lng: number) => {
-    if (!isInsideGridMap(lat, lng)) return
-
-    if (isEditingMarcadorInicio && gridMap.getGrid()[lat][lng] === 0) {
+    if (
+      isEditingMarcadorInicio &&
+      gridMap.getGrid()[clickLocation.lat][clickLocation.lng] === 0
+    ) {
       const newRoute = {
         ...route,
         inicio: {
-          position: { x: lng, y: lat },
+          position: { x: clickLocation.lng, y: clickLocation.lat },
           info: null,
         },
       }
       onUpdate(newRoute)
-      setIsEditingMarcadorInicio(false)
     }
     if (
       isAddingDestiny &&
-      gridMap.getGrid()[lat][lng] === ModaCenterGridMap.BOXE
+      gridMap.getGrid()[clickLocation.lat][clickLocation.lng] ===
+        ModaCenterGridMap.BOXE
     ) {
-      const boxe = gridMap.getBoxe(lat, lng)
+      const boxe = gridMap.getBoxe(clickLocation.lat, clickLocation.lng)
 
       if (boxe === null) return
       const newRoute = {
@@ -69,7 +62,7 @@ const RouteEditor = ({
           ...route.destinos,
           {
             info: boxe || null,
-            position: { x: lng, y: lat },
+            position: { x: clickLocation.lng, y: clickLocation.lat },
           },
         ],
       }
@@ -79,9 +72,10 @@ const RouteEditor = ({
 
     if (
       isAddingDestiny &&
-      gridMap.getGrid()[lat][lng] === ModaCenterGridMap.LOJA
+      gridMap.getGrid()[clickLocation.lat][clickLocation.lng] ===
+        ModaCenterGridMap.LOJA
     ) {
-      const loja = gridMap.getLoja(lat, lng)
+      const loja = gridMap.getLoja(clickLocation.lat, clickLocation.lng)
       if (!loja) return
       const entrance = loja.getEntrance()
       const newRoute = {
@@ -97,7 +91,7 @@ const RouteEditor = ({
       onUpdate(newRoute)
       setIsAddingDestiny(false)
     }
-  }
+  }, [onUpdate, clickLocation])
 
   const removeDestiny = (index: number) => {
     const newRoute = {
@@ -115,9 +109,15 @@ const RouteEditor = ({
 
   return (
     <div className="route-editor-content">
-      <ClickPosition onClick={onClickMouse} />
-
-      {isEditingMarcadorInicio && <div>Clique no local de início</div>}
+      {isEditingMarcadorInicio && (
+        <DialogAction
+          title="Informe o local de início"
+          text="Clique em um ponto caminhável no mapa"
+          onAccept={() => setIsEditingMarcadorInicio(false)}
+          onCancel={cancel}
+          acceptEnabled={route.inicio !== null}
+        />
+      )}
 
       {route.inicio && !isEditingMarcadorInicio && (
         <button

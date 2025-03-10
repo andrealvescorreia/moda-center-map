@@ -11,8 +11,6 @@ html, body{
 .ui {
   position: absolute;
   z-index: 501;
-  height: 100dvh;
-  width: 100dvw;
 }
 
 .leaflet-control-container { position: absolute; left: 5px; bottom: 100px; padding: 10px;} 

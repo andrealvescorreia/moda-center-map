@@ -6,13 +6,34 @@ import L from 'leaflet'
 import RoutingManager from './components/Routing/RoutingManager'
 import { ModaCenterGridMap } from './models/ModaCenterGridMap'
 import './globals.css'
+import { useCallback, useState } from 'react'
+import { ClickPosition } from './components/ClickPosition'
+import RouteDrawer from './components/Routing/RouteDrawer'
+import type { Destiny } from './interfaces/Destiny'
+import type { Position } from './interfaces/Position'
+import ClickProvider from './providers/ClickProvider'
 
 const modaCenterGridMap = new ModaCenterGridMap()
 const minZoomLevelToRenderMarkers = 5
 
+interface MyRoute {
+  inicio: Position | null
+  destinos: Destiny[]
+  passos: Position[]
+}
+
 function App() {
+  const [route, setRoute] = useState<MyRoute>()
+
+  const handleUpdate = useCallback((route: MyRoute) => setRoute(route), [])
+
   return (
-    <div>
+    <ClickProvider>
+      <RoutingManager
+        gridMap={modaCenterGridMap}
+        onUpdateRoute={handleUpdate}
+      />
+
       <MapContainer
         crs={L.CRS.Simple}
         bounds={modaCenterGridMap.getBounds()}
@@ -21,13 +42,20 @@ function App() {
         maxZoom={7}
         preferCanvas={true}
       >
-        <RoutingManager gridMap={modaCenterGridMap} />
         <GridDrawer
           gridMap={modaCenterGridMap}
           minZoomLevelToRenderMarkers={minZoomLevelToRenderMarkers}
         />
+        {route?.inicio && (
+          <RouteDrawer
+            inicio={route.inicio}
+            destinos={route.destinos}
+            passos={route.passos}
+          />
+        )}
+        <ClickPosition />
       </MapContainer>
-    </div>
+    </ClickProvider>
   )
 }
 
