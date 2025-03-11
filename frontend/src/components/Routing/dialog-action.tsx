@@ -22,7 +22,7 @@ export function DialogAction({
       </button>
       <div className="flex flex-col gap-1 pl-2">
         <h2 className="text-base">{title}</h2>
-        <p className="text-gray-500 text-sm">{text}</p>
+        <p className="text-gray05 text-sm">{text}</p>
       </div>
       <button
         className="ml-auto font-bold hover:cursor-pointer  right-2.5 relative text-base disabled:opacity-50"

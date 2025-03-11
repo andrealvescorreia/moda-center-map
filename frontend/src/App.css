@@ -10,7 +10,7 @@ html, body{
 
 .ui {
   position: absolute;
-  z-index: 501;
+  z-index: 1001;
 }
 
 .leaflet-control-container { position: absolute; left: 5px; bottom: 100px; padding: 10px;} 
