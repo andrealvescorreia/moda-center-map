@@ -39,12 +39,12 @@ function App() {
         bounds={modaCenterGridMap.getBounds()}
         maxBounds={[
           [
-            modaCenterGridMap.getBounds()[0][0] - 10,
-            modaCenterGridMap.getBounds()[0][1] - 10,
+            modaCenterGridMap.getBounds()[0][0] - 60, //TODO: multiply by zoom level
+            modaCenterGridMap.getBounds()[0][1] - 60,
           ],
           [
-            modaCenterGridMap.getBounds()[1][0] + 10,
-            modaCenterGridMap.getBounds()[1][1] + 10,
+            modaCenterGridMap.getBounds()[1][0] + 60,
+            modaCenterGridMap.getBounds()[1][1] + 60,
           ],
         ]}
         center={[3, 3.5]}

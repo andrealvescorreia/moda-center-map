@@ -93,4 +93,19 @@ export class ModaCenterGridMap {
       return loja.gridArea.some((pos) => pos.x === x && pos.y === y)
     })
   }
+
+  findNearestBoxe(y: number, x: number) {
+    let nearestBoxe = null
+    let minDistance = Number.MAX_VALUE
+    for (const boxe of this.#modaCenter.boxes) {
+      const distance =
+        Math.abs(boxe.positionInGrid.x - x) +
+        Math.abs(boxe.positionInGrid.y - y)
+      if (distance < minDistance) {
+        minDistance = distance
+        nearestBoxe = boxe
+      }
+    }
+    return nearestBoxe
+  }
 }

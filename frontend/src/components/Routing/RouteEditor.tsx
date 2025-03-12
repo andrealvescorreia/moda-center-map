@@ -1,11 +1,16 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import type { Loja } from '../../interfaces/Loja'
 import type { Route } from '../../interfaces/Route'
 import { ModaCenterGridMap } from '../../models/ModaCenterGridMap'
 import { useClickContext } from '../../providers/ClickProvider'
 import { SearchStore } from '../SearchStore'
-import { DialogAction } from './dialog-action'
+import { DestinyList } from './destiny-list'
 
+import { Route as RouteIcon, X } from 'lucide-react'
+import { Sheet, type SheetRef } from 'react-modal-sheet'
+import { IconButton } from '../icon-button'
+import { SheetHeaderTitle } from '../sheet-header-title'
+import { DialogAction } from './dialog-action'
 interface RouteEditorProps {
   gridMap: ModaCenterGridMap
   route: Route
@@ -23,6 +28,15 @@ const RouteEditor = ({
   const [isAddingDestiny, setIsAddingDestiny] = useState(false)
   const [isAddingDestinyFromMap, setIsAddingDestinyFromMap] = useState(false)
   const { clickLocation } = useClickContext()
+
+  const [bottomSheetOpen, setBottomSheetOpen] = useState(false)
+  const ref = useRef<SheetRef>(null)
+
+  useEffect(() => {
+    if (!isAddingDestiny && !!route.inicio) {
+      setBottomSheetOpen(true)
+    }
+  }, [isAddingDestiny, route.inicio])
 
   // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
   useEffect(() => {
@@ -62,7 +76,7 @@ const RouteEditor = ({
         ...route,
         inicio: {
           position: { x, y },
-          info: null,
+          info: gridMap.findNearestBoxe(y, x),
         },
       }
       onUpdate(newRoute)
@@ -143,75 +157,63 @@ const RouteEditor = ({
     )
   }
 
+  const snapTo = (i: number) => ref.current?.snapTo(i)
   if (!isAddingDestiny && route.inicio) {
     return (
-      <div className="ui">
-        <button
-          type="button"
-          onClick={() => {
-            setIsEditingMarcadorInicio(true)
-            setIsAddingDestiny(false)
-          }}
-        >
-          Posição inicial: {route.inicio.position.x} {
-            route.inicio.position.y
-          }{' '}
-        </button>
+      <span>
+        <DestinyList route={route} onClickRemoveDestiny={removeDestiny} />
 
-        {route.destinos.map((destiny, index) => {
-          if (!destiny.info) return null
-          if ('rua' in destiny.info && 'numero' in destiny.info)
-            return (
-              <div
-                key={`${destiny.info.setor}-${destiny.info.rua}-${destiny.info.numero}`}
-              >
-                Destino {index + 1}: Setor {destiny.info.setor} Rua{' '}
-                {destiny.info.rua} Boxe {destiny.info.numero}
-                <button type="button" onClick={() => removeDestiny(index)}>
-                  X
-                </button>
-              </div>
-            )
-          if ('bloco' in destiny.info && 'numLoja' in destiny.info)
-            return (
-              <div
-                key={`${destiny.info.setor}-${destiny.info.bloco}-${destiny.info.numLoja}`}
-              >
-                Destino {index + 1}: Setor {destiny.info.setor} Bloco{' '}
-                {destiny.info.bloco} Loja {destiny.info.numLoja}
-                <button type="button" onClick={() => removeDestiny(index)}>
-                  X
-                </button>
-              </div>
-            )
-        })}
-
-        <button
-          type="button"
-          disabled={isEditingMarcadorInicio}
-          onClick={() => {
-            setIsAddingDestiny(true)
-            setIsEditingMarcadorInicio(false)
-          }}
+        <Sheet
+          ref={ref}
+          isOpen={bottomSheetOpen}
+          onClose={cancel}
+          snapPoints={[1000, 130]}
+          onCloseEnd={cancel}
+          onOpenEnd={() => snapTo(1)}
+          initialSnap={1}
         >
-          Adicionar parada
-        </button>
-        <div>
-          <button type="button" onClick={cancel}>
-            Cancelar
-          </button>
-          <button
-            type="button"
-            disabled={!route.inicio || route.destinos.length === 0}
-            onClick={() => {
-              console.log('marcadorInicio: ', route.inicio)
-              console.log('marcadoresDestino: ', route.destinos)
-            }}
-          >
-            🔼Iniciar
-          </button>
-        </div>
-      </div>
+          <Sheet.Container>
+            <SheetHeaderTitle onDismiss={cancel}>
+              <h2>Minha rota</h2>
+            </SheetHeaderTitle>
+            <Sheet.Content className="flex gap-3 pl-5 pt-4">
+              <div className="flex gap-4 overflow-x-auto">
+                <IconButton
+                  className="shrink-0"
+                  type="submit"
+                  onClick={() => console.log('TODO')}
+                  disabled={route.destinos.length === 0}
+                >
+                  <RouteIcon size={20} />
+                  Iniciar
+                </IconButton>
+
+                <IconButton
+                  className="shrink-0"
+                  onClick={() => {
+                    setIsAddingDestiny(true)
+                    setIsEditingMarcadorInicio(false)
+                  }}
+                >
+                  <RouteIcon size={20} />
+                  Adicionar parada
+                </IconButton>
+
+                <IconButton
+                  className="shrink-0"
+                  onClick={() => {
+                    setIsEditingMarcadorInicio(true)
+                    setIsAddingDestiny(false)
+                  }}
+                >
+                  <RouteIcon size={20} />
+                  Mudar ponto inicial
+                </IconButton>
+              </div>
+            </Sheet.Content>
+          </Sheet.Container>
+        </Sheet>
+      </span>
     )
   }
 
