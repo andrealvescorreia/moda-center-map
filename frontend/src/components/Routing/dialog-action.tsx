@@ -32,7 +32,7 @@ export function DialogAction({
   return (
     <div
       ref={dialogRef}
-      className="w-full flex bg-green-secondary gap-1 p-3 text-white rounded-xl font-inter pb-5 items-start"
+      className="w-full flex bg-green-secondary gap-1 p-3 text-white rounded-xl pb-5 items-start"
       {...props}
     >
       <button type="button" className="hover:cursor-pointer" onClick={onCancel}>
