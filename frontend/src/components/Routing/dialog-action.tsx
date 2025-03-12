@@ -1,6 +1,9 @@
+import { useGSAP } from '@gsap/react'
+import { gsap } from 'gsap'
 import { ArrowLeft } from 'lucide-react'
+import { type ComponentProps, useRef } from 'react'
 
-interface DialogActionProps {
+interface DialogActionProps extends ComponentProps<'div'> {
   onAccept?: () => void
   onCancel?: () => void
   acceptEnabled?: boolean
@@ -14,9 +17,24 @@ export function DialogAction({
   acceptEnabled = true,
   title,
   text,
+  ...props
 }: DialogActionProps) {
+  const dialogRef = useRef<HTMLDivElement>(null)
+
+  useGSAP(() => {
+    const dialogElement = dialogRef.current
+    gsap.fromTo(
+      dialogElement,
+      { opacity: 0, y: -50 },
+      { opacity: 1, y: 0, duration: 0.2, ease: 'power2.out' }
+    )
+  })
   return (
-    <div className="w-full flex bg-green-secondary gap-1 p-3 text-white rounded-xl font-inter pb-5 items-start">
+    <div
+      ref={dialogRef}
+      className="w-full flex bg-green-secondary gap-1 p-3 text-white rounded-xl font-inter pb-5 items-start"
+      {...props}
+    >
       <button type="button" className="hover:cursor-pointer" onClick={onCancel}>
         <ArrowLeft className="size-8" />
       </button>
