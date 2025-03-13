@@ -6,7 +6,7 @@ import { useClickContext } from '../../providers/ClickProvider'
 import { SearchStore } from '../SearchStore'
 import { DestinyList } from './destiny-list'
 
-import { Route as RouteIcon, X } from 'lucide-react'
+import { MapPinPlus, Navigation, PersonStanding } from 'lucide-react'
 import { Sheet, type SheetRef } from 'react-modal-sheet'
 import { IconButton } from '../icon-button'
 import { SheetHeaderTitle } from '../sheet-header-title'
@@ -184,7 +184,7 @@ const RouteEditor = ({
                   onClick={() => console.log('TODO')}
                   disabled={route.destinos.length === 0}
                 >
-                  <RouteIcon size={20} />
+                  <Navigation size={20} />
                   Iniciar
                 </IconButton>
 
@@ -195,7 +195,7 @@ const RouteEditor = ({
                     setIsEditingMarcadorInicio(false)
                   }}
                 >
-                  <RouteIcon size={20} />
+                  <MapPinPlus size={20} />
                   Adicionar parada
                 </IconButton>
 
@@ -206,7 +206,7 @@ const RouteEditor = ({
                     setIsAddingDestiny(false)
                   }}
                 >
-                  <RouteIcon size={20} />
+                  <PersonStanding size={20} />
                   Mudar ponto inicial
                 </IconButton>
               </div>
