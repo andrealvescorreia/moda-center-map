@@ -9,7 +9,7 @@ export function validateData(schema: z.ZodSchema) {
     } catch (error) {
       if (error instanceof ZodError) {
         const errorMessages = error.errors.map((issue: z.ZodIssue) => ({
-          message: `${issue.path.join('.')} is ${issue.message}`,
+          message: `${issue.path.join('.')}: ${issue.message}`,
         }))
         res.status(400).json({ error: 'Invalid data', details: errorMessages })
       } else {

@@ -2,19 +2,9 @@ import express from 'express'
 import { type Request, type Response, Router } from 'express'
 import z from 'zod'
 import { validateData } from './middleware/validationMiddleware'
-
-const bodySchema = z.object({
-  name: z.string().nonempty().min(3).max(255),
-})
-
-const router = Router()
-router.post('/', validateData(bodySchema), createName)
-
-async function createName(req: Request, res: Response) {
-  res.status(200).json({
-    message: req.body.name,
-  })
-}
+import './database/index' //executes the database connection
+import sequelizeErrorsMiddleware from './middleware/sequelizeErrorsMiddleware'
+import userRouter from './routes/userRouter'
 
 class App {
   app: express.Application
@@ -25,11 +15,12 @@ class App {
     this.routes()
   }
   routes() {
-    this.app.use('/', router)
+    this.app.use('/user', userRouter)
   }
   middlewares() {
     this.app.use(express.urlencoded({ extended: true }))
     this.app.use(express.json())
+    this.app.use(sequelizeErrorsMiddleware)
   }
 }
 
