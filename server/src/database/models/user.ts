@@ -1,3 +1,5 @@
+import bcryptjs from 'bcryptjs'
+
 import {
   BeforeCreate,
   Column,
@@ -28,6 +30,17 @@ export default class User extends Model {
   declare username: string
 
   @Column({
+    type: DataType.VIRTUAL, // 💡 campo que não fica salvo no BD.
+    allowNull: false,
+  })
+  declare password: string
+
+  @Column({
+    type: DataType.STRING,
+  })
+  declare password_hash: string
+
+  @Column({
     allowNull: false,
     type: DataType.DATE,
     defaultValue: DataType.NOW,
@@ -43,7 +56,10 @@ export default class User extends Model {
 
   @BeforeCreate
   static async hashPassword(user: User) {
-    //user.password = await bcrypt.hash(user.password, 10)
-    console.log('hashPassword')
+    user.password_hash = await bcryptjs.hash(user.password, 8)
+  }
+
+  passwordIsCorrect(password: string): Promise<boolean> {
+    return bcryptjs.compare(password, this.password_hash)
   }
 }

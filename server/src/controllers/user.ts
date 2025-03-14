@@ -20,6 +20,7 @@ export async function createUser(
 
     const user = await User.create({
       username: req.body.username,
+      password: req.body.password,
     })
     res.status(200).json({
       message: user.id,
