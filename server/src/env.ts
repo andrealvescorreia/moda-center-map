@@ -10,6 +10,8 @@ const envSchema = z.object({
   DATABASE_USERNAME: z.string(),
   DATABASE_PASSWORD: z.string(),
   DATABASE: z.string(),
+  TOKEN_SECRET: z.string(),
+  TOKEN_EXPIRATION: z.string().default('14d'),
   //WEB_URL: z.string().url(),
 })
 
