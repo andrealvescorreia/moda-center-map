@@ -19,6 +19,7 @@ export async function createUser(
       res.status(400).json({
         message: 'Username already taken',
       })
+      return
     }
 
     const user = await User.create({
@@ -34,9 +35,10 @@ export async function createUser(
       httpOnly: true,
       maxAge: ms(env.TOKEN_EXPIRATION as StringValue),
     })
-    res.status(200).json({
+    res.status(201).json({
       message: user.id,
     })
+    return
   } catch (error) {
     next(error)
   }

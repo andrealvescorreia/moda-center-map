@@ -17,6 +17,7 @@ export async function authenticate(
       res.status(401).json({
         errors: ['Credenciais inválidas'],
       })
+      return
     }
 
     const user = await User.findOne({ where: { username } })
@@ -32,6 +33,7 @@ export async function authenticate(
       res.status(401).json({
         errors: ['Senha inválida'],
       })
+      return
     }
 
     const { id } = user
@@ -42,8 +44,8 @@ export async function authenticate(
       httpOnly: true,
       maxAge: ms(env.TOKEN_EXPIRATION as StringValue),
     })
-
-    res.send({ token })
+    res.send('authenticated!')
+    return
   } catch (error) {
     next(error)
   }
