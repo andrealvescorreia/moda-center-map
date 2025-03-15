@@ -2,11 +2,14 @@ import bcryptjs from 'bcryptjs'
 
 import {
   BeforeCreate,
+  BelongsToMany,
   Column,
   DataType,
   Model,
   Table,
 } from 'sequelize-typescript'
+import Seller from './seller'
+import UserFavoriteSellers from './user-favorite-sellers'
 
 @Table({
   tableName: 'users',
@@ -40,19 +43,11 @@ export default class User extends Model {
   })
   declare password_hash: string
 
-  @Column({
-    allowNull: false,
-    type: DataType.DATE,
-    defaultValue: DataType.NOW,
-  })
-  declare created_at: Date
-
-  @Column({
-    allowNull: false,
-    type: DataType.DATE,
-    defaultValue: DataType.NOW,
-  })
-  declare updated_at: Date
+  @BelongsToMany(
+    () => Seller,
+    () => UserFavoriteSellers //associative table
+  )
+  declare favorite_sellers: Seller[]
 
   @BeforeCreate
   static async hashPassword(user: User) {
