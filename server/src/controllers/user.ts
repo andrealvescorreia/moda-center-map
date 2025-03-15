@@ -3,6 +3,7 @@ import jwt from 'jsonwebtoken'
 import ms, { type StringValue } from 'ms'
 import User from '../database/models/user'
 import { env } from '../env'
+import { registerUser } from '../schemas/userSchema'
 
 export async function createUser(
   req: Request,
@@ -10,6 +11,7 @@ export async function createUser(
   next: NextFunction
 ): Promise<void> {
   try {
+    registerUser.parse(req.body)
     const existingUser = await User.findOne({
       where: {
         username: req.body.username,
