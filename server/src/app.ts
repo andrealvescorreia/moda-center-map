@@ -1,8 +1,8 @@
+import cookieParser from 'cookie-parser'
 import express from 'express'
-import sequelizeErrorsMiddleware from './middleware/sequelizeErrorsMiddleware'
+import errorHandler from './middleware/errorHandler'
 import authRoutes from './routes/authRoutes'
 import userRoutes from './routes/userRoutes'
-const cookieParser = require('cookie-parser')
 
 class App {
   app: express.Application
@@ -11,6 +11,7 @@ class App {
     this.app = express()
     this.middlewares()
     this.routes()
+    this.app.use(errorHandler) //o unico middleware que deve vir depois das rotas
   }
   routes() {
     this.app.use('/user', userRoutes)
@@ -19,7 +20,6 @@ class App {
   middlewares() {
     this.app.use(express.urlencoded({ extended: true }))
     this.app.use(express.json())
-    this.app.use(sequelizeErrorsMiddleware)
     this.app.use(cookieParser())
   }
 }
