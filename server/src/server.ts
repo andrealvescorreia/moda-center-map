@@ -1,6 +1,6 @@
-import { config } from 'dotenv'
+import './database/index' //executes the database connection
+//import './database/mock' //executes the database connection
 import app from './app'
-config()
 const port = 3001
 
 app.listen(port, () => {

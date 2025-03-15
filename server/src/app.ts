@@ -1,8 +1,4 @@
 import express from 'express'
-import { type Request, type Response, Router } from 'express'
-import z from 'zod'
-import { validateData } from './middleware/validationMiddleware'
-import './database/index' //executes the database connection
 import sequelizeErrorsMiddleware from './middleware/sequelizeErrorsMiddleware'
 import authRoutes from './routes/authRoutes'
 import userRoutes from './routes/userRoutes'
