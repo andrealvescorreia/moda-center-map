@@ -8,18 +8,10 @@ import Store from './models/store'
 import User from './models/user'
 import UserFavoriteSellers from './models/user-favorite-sellers'
 
-const models = [
-  User,
-  Seller,
-  UserFavoriteSellers,
-  Boxe,
-  Store,
-  ProductCategory,
-  SellerProductCategories,
-]
-
-const sequelize = new Sequelize(databaseConfig)
-sequelize.addModels(models)
+const sequelize = new Sequelize({
+  ...databaseConfig,
+  models: [`${__dirname}/models`],
+})
 
 //!dev
 async function testeRelationamento() {

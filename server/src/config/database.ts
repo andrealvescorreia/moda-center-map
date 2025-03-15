@@ -8,7 +8,6 @@ export default {
   username: env.DATABASE_USERNAME,
   password: env.DATABASE_PASSWORD,
   database: env.DATABASE,
-  models: [`${__dirname}/../models`],
   define: {
     timestamps: true,
     underscored: true,
