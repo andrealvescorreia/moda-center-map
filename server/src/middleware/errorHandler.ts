@@ -18,7 +18,7 @@ const sequelizeErrorsMiddleware = (
             ? errorsIds.TOO_BIG
             : errorsIds.INVALID,
       message: e.message,
-      field: e.path[0],
+      field: e.path.join('.'),
     }))
 
     res.status(400).json({ errors: errorsDetails })

@@ -171,6 +171,41 @@ describe('seller tests', () => {
     seller?.should.be.null
   })
 
+  it('should not be able to create a seller when selling location is invalid', async () => {
+    const reqBody = {
+      name: 'Olivia Palito',
+      sellingLocations: {
+        boxes: [{ sector_color: 'rosinha', box_number: 0, street_letter: 'Z' }],
+      },
+    }
+
+    const response = await postSeller(reqBody)
+    response.status.should.be.equal(400)
+    response.body.should.be.deep.equal({
+      errors: [
+        {
+          code: 'INVALID',
+          message:
+            "Invalid enum value. Expected 'blue' | 'orange' | 'red' | 'green' | 'yellow' | 'white', received 'rosinha'",
+          field: 'sellingLocations.boxes.0.sector_color',
+        },
+        {
+          code: 'TOO_SHORT',
+          message: 'Number must be greater than 0',
+          field: 'sellingLocations.boxes.0.box_number',
+        },
+        {
+          code: 'INVALID',
+          message: 'Invalid',
+          field: 'sellingLocations.boxes.0.street_letter',
+        },
+      ],
+    })
+
+    const seller = await findSeller(reqBody.name)
+    seller?.should.be.null
+  })
+
   //TODO:
 
   // teste com boxe invalido -> box_number = 0 || box_number > 128
