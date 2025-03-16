@@ -1,9 +1,11 @@
 import type { NextFunction, Request, Response } from 'express'
 import jwt from 'jsonwebtoken'
 import ms, { type StringValue } from 'ms'
+import errorsIds from '../../../shared/operation-errors'
 import User from '../database/models/user'
 import { env } from '../env'
 import { registerUser } from '../schemas/userSchema'
+import { z, ZodError } from 'zod'
 
 export async function createUser(
   req: Request,
@@ -19,7 +21,13 @@ export async function createUser(
     })
     if (existingUser) {
       res.status(400).json({
-        message: 'Username already taken',
+        errors: [
+          {
+            field: 'username',
+            code: errorsIds.USERNAME_ALREADY_TAKEN,
+            message: 'Username already taken',
+          },
+        ],
       })
       return
     }
@@ -42,6 +50,22 @@ export async function createUser(
     })
     return
   } catch (error) {
-    next(error)
+    if (error instanceof ZodError) {
+      const errorsDetails = error.errors.map((e) => ({
+        code: e.code === 'too_small'
+          ? errorsIds.TOO_SHORT
+          : e.code === 'too_big'
+            ? errorsIds.TOO_BIG
+            : errorsIds.INVALID,
+        message: e.message,
+        field: e.path[0],
+      })).filter(e => e.code !== errorsIds.INVALID || e.field);
+
+      if (errorsDetails.length > 0) {
+        res.status(400).json({ errors: errorsDetails });
+        return;
+      }
+    }
+    next(error);
   }
 }

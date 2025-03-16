@@ -1,6 +1,7 @@
 const chai = require('chai')
 const request = require('supertest')
 const should = chai.should()
+import errorsId from '../../shared/operation-errors'
 import app from '../src/app'
 import User from '../src/database/models/user'
 import mockedSequelize from './mock-database'
@@ -35,6 +36,17 @@ describe('user tests', () => {
       password: '123456',
     })
     response.status.should.be.equal(400)
+
+    response.body.should.be.deep.equal({
+      errors: [
+        {
+          code: errorsId.USERNAME_ALREADY_TAKEN,
+          field: 'username',
+          message: 'Username already taken',
+        },
+      ],
+    })
+
     await User.findAll({ where: { username: 'JohnDoe' } }).then((users) => {
       users.length.should.be.equal(1)
     })
@@ -46,8 +58,101 @@ describe('user tests', () => {
       password: '12345',
     })
     response.status.should.be.equal(400)
+    response.body.should.be.deep.equal({
+      errors: [
+        {
+          code: errorsId.TOO_SHORT,
+          field: 'password',
+          message: 'String must contain at least 6 character(s)',
+        },
+      ],
+    })
+
     await User.findOne({ where: { username: 'maria' } }).then((user) => {
       should.not.exist(user)
+    })
+  })
+
+  it('should not be able to create a user with 51 characters password', async () => {
+    const response = await request(app).post('/user').send({
+      username: 'maria',
+      password: '1'.repeat(51),
+    })
+    response.status.should.be.equal(400)
+    response.body.should.be.deep.equal({
+      errors: [
+        {
+          code: errorsId.TOO_BIG,
+          field: 'password',
+          message: 'String must contain at most 50 character(s)',
+        },
+      ],
+    })
+
+    await User.findOne({ where: { username: 'maria' } }).then((user) => {
+      should.not.exist(user)
+    })
+  })
+
+  it('should not be able to create a user with 2 characters username', async () => {
+    const response = await request(app).post('/user').send({
+      username: 'ma',
+      password: '123456',
+    })
+    response.status.should.be.equal(400)
+    response.body.should.be.deep.equal({
+      errors: [
+        {
+          code: errorsId.TOO_SHORT,
+          field: 'username',
+          message: 'String must contain at least 3 character(s)',
+        },
+      ],
+    })
+
+    await User.findOne({ where: { username: 'ma' } }).then((user) => {
+      should.not.exist(user)
+    })
+  })
+
+  it('should not be able to create a user with 256 characters username', async () => {
+    const username = 'm'.repeat(256)
+    const response = await request(app).post('/user').send({
+      username,
+      password: '123456',
+    })
+    response.status.should.be.equal(400)
+    response.body.should.be.deep.equal({
+      errors: [
+        {
+          code: errorsId.TOO_BIG,
+          field: 'username',
+          message: 'String must contain at most 255 character(s)',
+        },
+      ],
+    })
+
+    await User.findOne({ where: { username } }).then((user) => {
+      should.not.exist(user)
+    })
+  })
+
+  it('should not be able to create a user with missing required fields', async () => {
+    const response = await request(app).post('/user').send({})
+    response.status.should.be.equal(400)
+    response.body.should.be.deep.equal({
+      errors: [
+        {
+          code: errorsId.INVALID,
+          field: 'username',
+          message: 'Required',
+        },
+        {
+          code: errorsId.INVALID,
+          field: 'password',
+          message: 'Required',
+        },
+      ],
     })
   })
 })
