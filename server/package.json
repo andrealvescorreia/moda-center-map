@@ -8,11 +8,12 @@
     "build": "tsup-node  --config tsup.config.ts",
     "start": "node dist/server.js",
     "startlocal": "node --env-file .env dist/server.js",
-    "test": "mocha --require ts-node/register test/**/*.test.ts --exit"
+    "test": "cross-env NODE_ENV=test mocha --require ts-node/register test/**/*.test.ts --exit"
   },
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "cross-env": "^7.0.3",
     "@biomejs/biome": "^1.9.4",
     "@types/chai": "^5.2.0",
     "@types/cookie-parser": "^1.4.8",

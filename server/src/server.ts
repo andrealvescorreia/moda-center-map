@@ -1,5 +1,4 @@
 import './database/index' //executes the database connection
-//import './database/mock' //executes the database connection
 import app from './app'
 const port = 3001
 

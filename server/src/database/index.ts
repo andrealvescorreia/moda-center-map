@@ -1,5 +1,6 @@
+import type { Dialect } from 'sequelize'
 import { Sequelize } from 'sequelize-typescript'
-import databaseConfig from '../config/database'
+import configs from '../config/database'
 import Boxe from './models/boxe'
 import ProductCategory from './models/product-category'
 import Seller from './models/seller'
@@ -8,8 +9,17 @@ import Store from './models/store'
 import User from './models/user'
 import UserFavoriteSellers from './models/user-favorite-sellers'
 
+const envConfigs =
+  process.env.NODE_ENV === 'test'
+    ? {
+        dialect: 'sqlite' as Dialect,
+        storage: ':memory:',
+        logging: false,
+      }
+    : configs
+
 const sequelize = new Sequelize({
-  ...databaseConfig,
+  ...envConfigs,
   models: [`${__dirname}/models`],
 })
 

@@ -3,12 +3,12 @@ const request = require('supertest')
 const should = chai.should()
 import errorsId from '../../shared/operation-errors'
 import app from '../src/app'
+import sequelize from '../src/database' //executes the database connection
 import User from '../src/database/models/user'
-import mockedSequelize from './mock-database'
 
 describe('user tests', () => {
   before(async () => {
-    await mockedSequelize.sync({ force: true })
+    await sequelize.sync({ force: true })
   })
 
   it('should be able to create a new user', async () => {
@@ -74,10 +74,12 @@ describe('user tests', () => {
   })
 
   it('should not be able to create a user with 51 characters password', async () => {
-    const response = await request(app).post('/user').send({
-      username: 'maria',
-      password: '1'.repeat(51),
-    })
+    const response = await request(app)
+      .post('/user')
+      .send({
+        username: 'maria',
+        password: '1'.repeat(51),
+      })
     response.status.should.be.equal(400)
     response.body.should.be.deep.equal({
       errors: [
