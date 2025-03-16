@@ -1,8 +1,8 @@
 import cookieParser from 'cookie-parser'
 import express from 'express'
 import errorHandler from './middleware/errorHandler'
-import authRoutes from './routes/authRoutes'
-import userRoutes from './routes/userRoutes'
+import authRoutes from './routes/auth-routes'
+import userRoutes from './routes/user-routes'
 
 class App {
   app: express.Application
