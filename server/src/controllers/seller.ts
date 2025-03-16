@@ -1,5 +1,5 @@
 import type { NextFunction, Request, Response } from 'express'
-import { ZodError, z } from 'zod'
+import type z from 'zod'
 import errorsIds from '../../../shared/operation-errors'
 import sequelize from '../database'
 import Boxe from '../database/models/boxe'
@@ -14,155 +14,141 @@ export async function createSeller(
   next: NextFunction
 ) {
   try {
+    const parsed = registerSellerSchema.parse({
+      ...req.body,
+      phone_number: req.body.phone_number?.replace(/\D/g, '').trim(),
+    })
+    const errors = await validateNewSeller(parsed)
+    if (errors.length > 0) {
+      res.status(400).json({ errors })
+      return
+    }
+
     const t = await sequelize.transaction()
+
     try {
-      let { name, sellingLocations, phone_number, productCategories } = req.body
-
-      if (phone_number) phone_number = phone_number.replace(/\D/g, '').trim()
-
-      const parsedSeller = registerSellerSchema.parse({
-        name,
-        sellingLocations,
-        phone_number,
-      })
-
       const newSeller = await Seller.create(
-        { name, phone_number },
+        { name: parsed.name, phone_number: parsed.phone_number },
         { transaction: t }
       )
-
-      const hasNoSellingLocations = !(
-        sellingLocations.boxes?.length || sellingLocations.stores?.length
+      const boxes = await Boxe.bulkCreate(parsed.sellingLocations.boxes || [], {
+        transaction: t,
+      })
+      await newSeller.$add('boxes', boxes, {
+        transaction: t,
+      })
+      const stores = await Store.bulkCreate(
+        parsed.sellingLocations.stores || [],
+        {
+          transaction: t,
+        }
       )
+      await newSeller.$add('stores', stores, {
+        transaction: t,
+      })
 
-      if (hasNoSellingLocations) {
-        await t.rollback()
-        res.status(400).json({
-          errors: [
-            {
-              error: errorsIds.MISSING_SELLING_LOCATION,
-              field: 'sellingLocations',
-              message: 'A seller must have at least one selling location',
-            },
-          ],
+      const seller_product_categories: ProductCategory[] = []
+      for (const category of parsed.productCategories || []) {
+        const foundCategory = await ProductCategory.findOne({
+          where: { category },
         })
-        return
+        if (foundCategory) seller_product_categories.push(foundCategory)
       }
-
-      if (sellingLocations.boxes && sellingLocations.boxes.length > 0) {
-        for (let i = 0; i < sellingLocations.boxes.length; i++) {
-          const box = sellingLocations.boxes[i]
-          // verify if the box location is already occupied
-          const boxLocation = await Boxe.findOne({
-            where: {
-              sector_color: box.sector_color,
-              box_number: box.box_number,
-              street_letter: box.street_letter,
-            },
-          })
-          if (boxLocation) {
-            await t.rollback()
-            res.status(400).json({
-              errors: [
-                {
-                  code: errorsIds.LOCATION_OCCUPIED,
-                  field: 'sellingLocations.boxes',
-                  message: 'Box already occupied by other seller',
-                  occupiedBy: {
-                    id: boxLocation.seller_id,
-                    name: await Seller.findOne({
-                      where: { id: boxLocation.seller_id },
-                    }).then((seller) => seller?.name),
-                  },
-                },
-              ],
-            })
-            return
-          }
-        }
-
-        const boxes = await Boxe.bulkCreate(sellingLocations.boxes, {
-          transaction: t,
-        })
-        await newSeller.$add('boxes', boxes, {
-          transaction: t,
-        })
-      }
-      if (sellingLocations.stores && sellingLocations.stores.length > 0) {
-        for (let i = 0; i < sellingLocations.stores.length; i++) {
-          const store = sellingLocations.stores[i]
-          // verify if the box location is already occupied
-          const storeLocation = await Store.findOne({
-            where: {
-              sector_color: store.sector_color,
-              block_number: store.block_number,
-              store_number: store.store_number,
-            },
-          })
-          if (storeLocation) {
-            await t.rollback()
-            res.status(400).json({
-              errors: [
-                {
-                  code: errorsIds.LOCATION_OCCUPIED,
-                  field: 'sellingLocations.stores',
-                  message: 'Store already occupied by other seller',
-                  occupiedBy: {
-                    id: storeLocation.seller_id,
-                    name: await Seller.findOne({
-                      where: { id: storeLocation.seller_id },
-                    }).then((seller) => seller?.name),
-                  },
-                },
-              ],
-            })
-            return
-          }
-        }
-        const stores = await Store.bulkCreate(sellingLocations.stores, {
-          transaction: t,
-        })
-        await newSeller.$add('stores', stores, {
-          transaction: t,
-        })
-      }
-      if (productCategories && productCategories.length > 0) {
-        const seller_product_categories: ProductCategory[] = []
-        for (const category of productCategories) {
-          const foundCategory = await ProductCategory.findOne({
-            where: { category },
-          })
-          if (foundCategory) {
-            seller_product_categories.push(foundCategory)
-          } else {
-            await t.rollback()
-            res.status(400).json({
-              errors: [
-                {
-                  code: errorsIds.INVALID,
-                  field: 'productCategories',
-                  message: `Product category "${category}" is invalid`,
-                },
-              ],
-            })
-            return
-          }
-        }
-        await newSeller.$add('product_categories', seller_product_categories, {
-          transaction: t,
-        })
-      }
+      await newSeller.$add('product_categories', seller_product_categories, {
+        transaction: t,
+      })
 
       await t.commit()
       res.status(201).json(newSeller)
       return
     } catch (error) {
       console.log(error)
-      //if (!t.finished) await t.rollback()
+      await t.rollback()
       return next(error)
     }
   } catch (error) {
     console.log(error)
     return next(error)
   }
+}
+
+async function validateNewSeller({
+  name,
+  sellingLocations,
+  phone_number,
+  productCategories,
+}: z.infer<typeof registerSellerSchema>) {
+  const errors = []
+
+  const hasNoSellingLocations = !(
+    sellingLocations.boxes?.length || sellingLocations.stores?.length
+  )
+
+  if (hasNoSellingLocations) {
+    errors.push({
+      error: errorsIds.MISSING_SELLING_LOCATION,
+      field: 'sellingLocations',
+      message: 'A seller must have at least one selling location',
+    })
+  }
+
+  for (const box of sellingLocations.boxes || []) {
+    const boxLocation = await Boxe.findOne({
+      where: {
+        sector_color: box.sector_color,
+        box_number: box.box_number,
+        street_letter: box.street_letter,
+      },
+    })
+    if (boxLocation) {
+      const sellerName = await Seller.findOne({
+        where: { id: boxLocation.seller_id },
+      }).then((seller) => seller?.name)
+      errors.push({
+        code: errorsIds.LOCATION_OCCUPIED,
+        field: 'sellingLocations.boxes',
+        message: 'Box already occupied by other seller',
+        occupiedBy: {
+          id: boxLocation.seller_id,
+          name: sellerName,
+        },
+      })
+    }
+  }
+
+  for (const store of sellingLocations.stores || []) {
+    const storeLocation = await Store.findOne({
+      where: {
+        sector_color: store.sector_color,
+        block_number: store.block_number,
+        store_number: store.store_number,
+      },
+    })
+    if (storeLocation) {
+      errors.push({
+        code: errorsIds.LOCATION_OCCUPIED,
+        field: 'sellingLocations.stores',
+        message: 'Store already occupied by other seller',
+        occupiedBy: {
+          id: storeLocation.seller_id,
+          name: await Seller.findOne({
+            where: { id: storeLocation.seller_id },
+          }).then((seller) => seller?.name),
+        },
+      })
+    }
+  }
+  for (const category of productCategories || []) {
+    const foundCategory = await ProductCategory.findOne({
+      where: { category },
+    })
+    if (!foundCategory) {
+      errors.push({
+        code: errorsIds.INVALID,
+        field: 'productCategories',
+        message: `Product category "${category}" is invalid`,
+      })
+    }
+  }
+  return errors
 }
