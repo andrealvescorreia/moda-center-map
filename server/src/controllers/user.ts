@@ -1,11 +1,11 @@
 import type { NextFunction, Request, Response } from 'express'
 import jwt from 'jsonwebtoken'
 import ms, { type StringValue } from 'ms'
+import { ZodError } from 'zod'
 import errorsIds from '../../../shared/operation-errors'
 import User from '../database/models/user'
 import { env } from '../env'
 import { registerUser } from '../schemas/userSchema'
-import { z, ZodError } from 'zod'
 
 export async function createUser(
   req: Request,
@@ -46,26 +46,26 @@ export async function createUser(
       maxAge: ms(env.TOKEN_EXPIRATION as StringValue),
     })
     res.status(201).json({
-      message: user.id,
+      id: user.id,
+      username: user.username,
     })
     return
   } catch (error) {
     if (error instanceof ZodError) {
       const errorsDetails = error.errors.map((e) => ({
-        code: e.code === 'too_small'
-          ? errorsIds.TOO_SHORT
-          : e.code === 'too_big'
-            ? errorsIds.TOO_BIG
-            : errorsIds.INVALID,
+        code:
+          e.code === 'too_small'
+            ? errorsIds.TOO_SHORT
+            : e.code === 'too_big'
+              ? errorsIds.TOO_BIG
+              : errorsIds.INVALID,
         message: e.message,
         field: e.path[0],
-      })).filter(e => e.code !== errorsIds.INVALID || e.field);
+      }))
 
-      if (errorsDetails.length > 0) {
-        res.status(400).json({ errors: errorsDetails });
-        return;
-      }
+      res.status(400).json({ errors: errorsDetails })
+      return
     }
-    next(error);
+    next(error)
   }
 }
