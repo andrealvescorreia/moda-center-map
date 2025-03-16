@@ -40,7 +40,7 @@ describe('user tests', () => {
     response.body.should.be.deep.equal({
       errors: [
         {
-          code: errorsId.USERNAME_ALREADY_TAKEN,
+          code: errorsId.ALREADY_IN_USE,
           field: 'username',
           message: 'Username already taken',
         },

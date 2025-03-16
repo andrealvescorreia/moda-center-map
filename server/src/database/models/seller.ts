@@ -36,7 +36,7 @@ export default class Seller extends Model {
 
   @Column({
     allowNull: true,
-    type: DataType.CHAR(13),
+    type: DataType.CHAR(11),
   })
   declare phone_number: string
 

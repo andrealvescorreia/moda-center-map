@@ -1,6 +1,7 @@
 import type { NextFunction, Request, Response } from 'express'
 import { DatabaseError, ValidationError } from 'sequelize'
 import { ZodError, type z } from 'zod'
+import errorsIds from '../../../shared/operation-errors'
 
 const sequelizeErrorsMiddleware = (
   err: Error,
@@ -9,10 +10,18 @@ const sequelizeErrorsMiddleware = (
   next: NextFunction
 ) => {
   if (err instanceof ZodError) {
-    const errorMessages = err.errors.map((issue: z.ZodIssue) => ({
-      message: `${issue.path.join('.')}: ${issue.message}`,
+    const errorsDetails = err.errors.map((e) => ({
+      code:
+        e.code === 'too_small'
+          ? errorsIds.TOO_SHORT
+          : e.code === 'too_big'
+            ? errorsIds.TOO_BIG
+            : errorsIds.INVALID,
+      message: e.message,
+      field: e.path[0],
     }))
-    res.status(400).json({ error: 'Invalid data', details: errorMessages })
+
+    res.status(400).json({ errors: errorsDetails })
     return
   }
   if (err instanceof ValidationError) {

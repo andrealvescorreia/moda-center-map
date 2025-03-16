@@ -2,6 +2,7 @@ import cookieParser from 'cookie-parser'
 import express from 'express'
 import errorHandler from './middleware/errorHandler'
 import authRoutes from './routes/auth-routes'
+import sellerRoutes from './routes/seller-routes'
 import userRoutes from './routes/user-routes'
 
 class App {
@@ -16,6 +17,7 @@ class App {
   routes() {
     this.app.use('/user', userRoutes)
     this.app.use('/auth', authRoutes)
+    this.app.use('/seller', sellerRoutes)
   }
   middlewares() {
     this.app.use(express.urlencoded({ extended: true }))

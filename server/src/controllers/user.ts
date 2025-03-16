@@ -13,10 +13,10 @@ export async function createUser(
   next: NextFunction
 ): Promise<void> {
   try {
-    registerUser.parse(req.body)
+    const { username, password } = registerUser.parse(req.body)
     const existingUser = await User.findOne({
       where: {
-        username: req.body.username,
+        username
       },
     })
     if (existingUser) {
@@ -24,7 +24,7 @@ export async function createUser(
         errors: [
           {
             field: 'username',
-            code: errorsIds.USERNAME_ALREADY_TAKEN,
+            code: errorsIds.ALREADY_IN_USE,
             message: 'Username already taken',
           },
         ],
@@ -33,11 +33,11 @@ export async function createUser(
     }
 
     const user = await User.create({
-      username: req.body.username,
-      password: req.body.password,
+      username,
+      password,
     })
 
-    const { id, username } = user
+    const { id } = user
     const token = jwt.sign({ id, username }, env.TOKEN_SECRET, {
       expiresIn: ms(env.TOKEN_EXPIRATION as StringValue),
     })
