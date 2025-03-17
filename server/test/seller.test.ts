@@ -325,4 +325,170 @@ describe('seller tests', () => {
       ],
     })
   })
+
+  it('should not be able to create a seller whith invalid store -> block_number 10 and store_number 20', async () => {
+    const reqBody = {
+      name: 'Teste',
+      sellingLocations: {
+        stores: [{ block_number: 10, store_number: 20, sector_color: 'blue' }],
+      },
+    }
+
+    const response = await postSeller(reqBody)
+    response.status.should.be.equal(400)
+    response.body.should.be.deep.include({
+      errors: [
+        {
+          code: 'TOO_BIG',
+          field: 'sellingLocations.stores.0.store_number',
+          message: 'Number must be less than or equal to 19',
+        },
+        {
+          code: 'TOO_BIG',
+          field: 'sellingLocations.stores.0.block_number',
+          message: 'Number must be less than or equal to 9',
+        },
+      ],
+    })
+  })
+
+  it('should be able to create a seller whith store store_number 15 block_number 7 blue sector', async () => {
+    const reqBody = {
+      name: 'Teste teste',
+      sellingLocations: {
+        stores: [{ block_number: 7, store_number: 15, sector_color: 'blue' }],
+      },
+    }
+
+    const response = await postSeller(reqBody)
+    response.status.should.be.equal(201)
+  })
+
+  it('should not be able to create a seller whith invalid store -> store_number 16 block_number 1-7 sector blue orange green red', async () => {
+    const sectors = ['blue', 'orange', 'green', 'red']
+    const reqsBody = sectors.map((sector) => ({
+      name: 'Teste',
+      sellingLocations: {
+        stores: [{ block_number: 7, store_number: 16, sector_color: sector }],
+      },
+    }))
+
+    for (const reqBody of reqsBody) {
+      const response = await postSeller(reqBody)
+      response.status.should.be.equal(400)
+      response.body.should.be.deep.include({
+        errors: [
+          {
+            code: 'TOO_BIG',
+            field: 'sellingLocations.stores.0.store_number',
+            message:
+              'Number must be less than or equal to 15 for blocks between 1 and 7 of this sector',
+          },
+        ],
+      })
+    }
+  })
+
+  it('should not be able to create a seller whith invalid store -> store_number 15 block_number 8 sector blue and orange', async () => {
+    const sectors = ['blue', 'orange']
+    const reqsBody = sectors.map((sector) => ({
+      name: 'Teste',
+      sellingLocations: {
+        stores: [{ block_number: 8, store_number: 15, sector_color: sector }],
+      },
+    }))
+
+    for (const reqBody of reqsBody) {
+      const response = await postSeller(reqBody)
+      response.status.should.be.equal(400)
+      response.body.should.be.deep.include({
+        errors: [
+          {
+            code: 'TOO_BIG',
+            field: 'sellingLocations.stores.0.store_number',
+            message:
+              'Number must be less than or equal to 14 for block 8 of this sector',
+          },
+        ],
+      })
+    }
+  })
+
+  it('should not be able to create a seller whith invalid store -> store_number 7 block_number 8 sector red and green', async () => {
+    const sectors = ['red', 'green']
+    const reqsBody = sectors.map((sector) => ({
+      name: 'Teste',
+      sellingLocations: {
+        stores: [{ block_number: 8, store_number: 7, sector_color: sector }],
+      },
+    }))
+
+    for (const reqBody of reqsBody) {
+      const response = await postSeller(reqBody)
+      response.status.should.be.equal(400)
+      response.body.should.be.deep.include({
+        errors: [
+          {
+            code: 'TOO_BIG',
+            field: 'sellingLocations.stores.0.store_number',
+            message:
+              'Number must be less than or equal to 6 for block 8 of this sector',
+          },
+        ],
+      })
+    }
+  })
+
+  it('should not be able to create a seller whith invalid store -> store_number 19 block_number 1 sector yellow and white', async () => {
+    const sectors = ['yellow', 'white']
+    const reqsBody = sectors.map((sector) => ({
+      name: 'Teste',
+      sellingLocations: {
+        stores: [{ block_number: 1, store_number: 19, sector_color: sector }],
+      },
+    }))
+
+    for (const reqBody of reqsBody) {
+      const response = await postSeller(reqBody)
+      response.status.should.be.equal(400)
+      response.body.should.be.deep.include({
+        errors: [
+          {
+            code: 'TOO_BIG',
+            field: 'sellingLocations.stores.0.store_number',
+            message:
+              'Number must be less than or equal to 18 for blocks between 1 and 4 of this sector',
+          },
+        ],
+      })
+    }
+  })
+
+  it('should be able to create a seller whith store -> store_number 19 block_number 5 sector yellow and white', async () => {
+    const reqsBody = ['yellow', 'white'].map((sector) => ({
+      sellingLocations: {
+        stores: [{ block_number: 5, store_number: 19, sector_color: sector }],
+      },
+    }))
+
+    for (let i = 0; i < reqsBody.length; i++) {
+      const reqBody = { ...reqsBody[i], name: `Teste ${i}` }
+      const response = await postSeller(reqBody)
+      response.status.should.be.equal(201)
+    }
+  })
+
+  it('should be able to create a seller whith store -> store_number 19 block_number 9 sector blue orange red green', async () => {
+    const reqsBody = ['orange', 'blue', 'red', 'green'].map((sector) => ({
+      sellingLocations: {
+        stores: [{ block_number: 9, store_number: 19, sector_color: sector }],
+      },
+    }))
+
+    for (let i = 1; i < reqsBody.length; i++) {
+      const reqBody = { ...reqsBody[i], name: `Teste ${i + 10}` }
+      const response = await postSeller(reqBody)
+      response.status.should.be.equal(201)
+    }
+  })
 })
