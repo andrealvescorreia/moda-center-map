@@ -7,11 +7,19 @@ import Store from '../database/models/store'
 import { registerSellerSchema } from '../schemas/sellerSchema'
 import { validateNewSeller } from '../services/seller-validation'
 
-export async function createSeller(
-  req: Request,
-  res: Response,
-  next: NextFunction
-) {
+export async function index(req: Request, res: Response, next: NextFunction) {
+  try {
+    const sellers = await Seller.findAll({
+      include: [Boxe, Store, ProductCategory],
+    })
+    res.json(sellers)
+    return
+  } catch (error) {
+    return next(error)
+  }
+}
+
+export async function create(req: Request, res: Response, next: NextFunction) {
   try {
     const parsed = registerSellerSchema.parse({
       ...req.body,

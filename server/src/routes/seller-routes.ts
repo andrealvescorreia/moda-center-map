@@ -1,8 +1,8 @@
 import { Router } from 'express'
-import { createSeller } from '../controllers/seller'
+import { create } from '../controllers/seller'
 import loginRequired from '../middleware/loginRequired'
 
 const router = Router()
-router.post('/', loginRequired, createSeller)
+router.post('/', loginRequired, create)
 
 export default router
