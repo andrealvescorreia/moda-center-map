@@ -1,13 +1,7 @@
 import type { Dialect } from 'sequelize'
 import { Sequelize } from 'sequelize-typescript'
 import configs from '../config/database'
-import Boxe from './models/boxe'
 import ProductCategory from './models/product-category'
-import Seller from './models/seller'
-import SellerProductCategories from './models/seller-product-categories'
-import Store from './models/store'
-import User from './models/user'
-import UserFavoriteSellers from './models/user-favorite-sellers'
 
 const envConfigs =
   process.env.NODE_ENV === 'test'
@@ -25,7 +19,7 @@ const sequelize = new Sequelize({
 
 //!dev
 async function sync() {
-  await sequelize.sync({ force: true })
+  //await sequelize.sync({ force: true })
 }
 
 async function setupSellerSearch() {
@@ -60,9 +54,35 @@ async function setupSellerSearch() {
   `)
 }
 
+async function setupProductCategories() {
+  // evite remover categorias existentes, apenas adicionar caso necessário
+  for (const category of [
+    'Acessórios',
+    'Bebês',
+    'Beleza',
+    'Calçados',
+    'Casa',
+    'Casual',
+    'Evangélica',
+    'Fitness',
+    'Infantil',
+    'Íntima',
+    'Jeans',
+    'Plus Size',
+    'Praia',
+    'Sleepwear',
+    'Social',
+    'Outros',
+  ]) {
+    await ProductCategory.findOrCreate({
+      where: { category },
+    })
+  }
+}
+
 async function setup() {
   await sync()
-
+  await setupProductCategories()
   if (process.env.NODE_ENV !== 'test') {
     setupSellerSearch()
       .then(() => console.log('Banco de dados configurado'))

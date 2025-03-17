@@ -27,6 +27,7 @@ export default class ProductCategory extends Model {
     allowNull: false,
     type: DataType.STRING,
     defaultValue: DataType.UUIDV4,
+    unique: true,
   })
   declare category: string
 
