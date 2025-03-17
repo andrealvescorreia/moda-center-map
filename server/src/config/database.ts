@@ -15,4 +15,5 @@ export default {
   },
   //dialectOptions: {},
   timezone: 'America/Sao_Paulo',
+  logging: false,
 }

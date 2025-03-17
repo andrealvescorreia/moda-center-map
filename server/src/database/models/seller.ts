@@ -40,6 +40,12 @@ export default class Seller extends Model {
   })
   declare phone_number: string
 
+  @Column({
+    type: 'TSVECTOR', //sequelize specific
+    allowNull: true,
+  })
+  declare search_vector: string
+
   @HasMany(() => Store)
   declare stores: Store[]
 

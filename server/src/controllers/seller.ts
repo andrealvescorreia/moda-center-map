@@ -1,4 +1,5 @@
 import type { NextFunction, Request, Response } from 'express'
+import { Sequelize } from 'sequelize'
 import z from 'zod'
 import sequelize from '../database'
 import Boxe from '../database/models/boxe'
@@ -19,7 +20,7 @@ export async function index(req: Request, res: Response, next: NextFunction) {
           attributes: { exclude: ['createdAt', 'updatedAt'] },
         },
       ],
-      attributes: { exclude: ['createdAt', 'updatedAt'] },
+      attributes: { exclude: ['createdAt', 'updatedAt', 'search_vector'] },
     })
     res.status(200).json(sellers)
     return
@@ -57,7 +58,7 @@ export async function showByBoxe(
         { model: Store, attributes: { exclude: ['createdAt', 'updatedAt'] } },
         {
           model: ProductCategory,
-          attributes: { exclude: ['createdAt', 'updatedAt'] },
+          attributes: { exclude: ['createdAt', 'updatedAt', 'search_vector'] },
         },
       ],
       attributes: { exclude: ['createdAt', 'updatedAt'] },
@@ -103,7 +104,7 @@ export async function showByStore(
           attributes: { exclude: ['createdAt', 'updatedAt'] },
         },
       ],
-      attributes: { exclude: ['createdAt', 'updatedAt'] },
+      attributes: { exclude: ['createdAt', 'updatedAt', 'search_vector'] },
     })
 
     res.status(200).json(seller)
@@ -111,6 +112,42 @@ export async function showByStore(
   } catch (error) {
     return next(error)
   }
+}
+
+const searchSchema = z.object({
+  searchTerm: z.string(),
+  limit: z.number().optional().default(10),
+  offset: z.number().optional().default(0),
+})
+
+export async function search(req: Request, res: Response, next: NextFunction) {
+  try {
+    const parsed = searchSchema.parse(req.query)
+
+    const sellers = await searchSeller(parsed)
+    res.status(200).json(sellers)
+    return
+  } catch (error) {
+    return next(error)
+  }
+}
+
+type Search = z.infer<typeof searchSchema>
+async function searchSeller({ searchTerm, limit, offset }: Search) {
+  const results = await Seller.findAll({
+    where: Sequelize.literal(`
+      search_vector @@ plainto_tsquery('portuguese', :searchTerm)
+    `),
+    order: Sequelize.literal(`
+      ts_rank(search_vector, plainto_tsquery('portuguese', :searchTerm)) DESC
+    `),
+    limit,
+    offset,
+    replacements: { searchTerm },
+    attributes: { exclude: ['createdAt', 'updatedAt', 'search_vector'] },
+  })
+
+  return results
 }
 
 export async function create(req: Request, res: Response, next: NextFunction) {
