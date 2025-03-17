@@ -39,9 +39,7 @@ export async function createSeller(
       })
       const stores = await Store.bulkCreate(
         parsed.sellingLocations.stores || [],
-        {
-          transaction: t,
-        }
+        { transaction: t }
       )
       await newSeller.$add('stores', stores, {
         transaction: t,
@@ -90,6 +88,28 @@ async function validateNewSeller({
       field: 'sellingLocations',
       message: 'A seller must have at least one selling location',
     })
+  }
+
+  if (sellingLocations.boxes && sellingLocations.boxes.length > 0) {
+    for (let i = 0; i < sellingLocations.boxes.length; i++) {
+      const box = sellingLocations.boxes[i]
+      if (boxOverlapsWithFoodCourt(box)) {
+        errors.push({
+          code: errorsIds.INVALID,
+          field: `sellingLocations.boxes.${i}`,
+          message:
+            'This box cannot exist inside Moda Center, otherwise it would overlap with food court',
+        })
+      }
+      if (boxOverlapsWithStores(box)) {
+        errors.push({
+          code: errorsIds.INVALID,
+          field: `sellingLocations.boxes.${i}`,
+          message:
+            'This box cannot exist inside Moda Center, otherwise it would overlap with stores',
+        })
+      }
+    }
   }
 
   for (const box of sellingLocations.boxes || []) {
@@ -151,4 +171,62 @@ async function validateNewSeller({
     }
   }
   return errors
+}
+
+function isOdd(n: number) {
+  return Math.abs(n % 2) === 1
+}
+
+function boxOverlapsWithStores(box: {
+  sector_color: string
+  box_number: number
+  street_letter: string
+}): boolean {
+  if (['blue', 'orange', 'red', 'green'].includes(box.sector_color)) {
+    return (
+      box.box_number > 32 &&
+      box.box_number < 57 &&
+      (['G', 'H', 'I', 'J'].includes(box.street_letter) ||
+        (box.street_letter === 'F' && isOdd(box.box_number)) ||
+        (box.street_letter === 'K' && !isOdd(box.box_number)))
+    )
+  }
+  if (['yellow', 'white'].includes(box.sector_color)) {
+    return (
+      box.box_number > 72 &&
+      box.box_number < 97 &&
+      (['G', 'H', 'I', 'J'].includes(box.street_letter) ||
+        (box.street_letter === 'F' && isOdd(box.box_number)) ||
+        (box.street_letter === 'K' && !isOdd(box.box_number)))
+    )
+  }
+  return false
+}
+
+function boxOverlapsWithFoodCourt(box: {
+  sector_color: string
+  box_number: number
+  street_letter: string
+}): boolean {
+  if (['blue', 'orange', 'red', 'green'].includes(box.sector_color)) {
+    return (
+      (['A', 'B', 'C', 'D'].includes(box.street_letter) &&
+        box.box_number > 88) ||
+      (box.street_letter === 'E' &&
+        box.box_number > 88 &&
+        isOdd(box.box_number))
+    )
+  }
+  if (['yellow', 'white'].includes(box.sector_color)) {
+    return (
+      (['A', 'B', 'C', 'D'].includes(box.street_letter) &&
+        box.box_number > 8 &&
+        box.box_number < 41) ||
+      (box.street_letter === 'E' &&
+        box.box_number > 8 &&
+        box.box_number < 41 &&
+        !isOdd(box.box_number))
+    )
+  }
+  return false
 }

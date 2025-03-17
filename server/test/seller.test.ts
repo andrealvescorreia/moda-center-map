@@ -206,10 +206,57 @@ describe('seller tests', () => {
     seller?.should.be.null
   })
 
+  it('should not be able to create a seller when selling location is invalid -> inside food court blue sector', async () => {
+    const reqBody = {
+      name: 'Desejo de Mulher',
+      sellingLocations: {
+        boxes: [{ sector_color: 'blue', box_number: 110, street_letter: 'B' }],
+      },
+    }
+
+    const response = await postSeller(reqBody)
+    response.status.should.be.equal(400)
+    response.body.should.be.deep.equal({
+      errors: [
+        {
+          code: 'INVALID',
+          field: 'sellingLocations.boxes.0',
+          message:
+            'This box cannot exist inside Moda Center, otherwise it would overlap with food court',
+        },
+      ],
+    })
+    const seller = await findSeller(reqBody.name)
+    seller?.should.be.null
+  })
+
+  it('should not be able to create a seller when selling location is invalid -> inside block 9 blue sector', async () => {
+    const reqBody = {
+      name: 'Desejo de Mulher',
+      sellingLocations: {
+        boxes: [{ sector_color: 'blue', box_number: 33, street_letter: 'G' }],
+      },
+    }
+
+    const response = await postSeller(reqBody)
+    response.status.should.be.equal(400)
+    response.body.should.be.deep.equal({
+      errors: [
+        {
+          code: 'INVALID',
+          field: 'sellingLocations.boxes.0',
+          message:
+            'This box cannot exist inside Moda Center, otherwise it would overlap with stores',
+        },
+      ],
+    })
+    const seller = await findSeller(reqBody.name)
+    seller?.should.be.null
+  })
+
   //TODO:
 
   // teste com boxe invalido -> box_number = 0 || box_number > 128
   // teste valido setor amarelo e branco box_number > 120 && box_number < 129
   // teste invalido setor azul, vermelho, laranja e verde box_number > 120
-  // teste loja invalida ->
 })
