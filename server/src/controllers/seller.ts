@@ -29,6 +29,36 @@ export async function index(req: Request, res: Response, next: NextFunction) {
   }
 }
 
+export async function show(req: Request, res: Response, next: NextFunction) {
+  try {
+    if (!z.string().uuid().safeParse(req.params.id).success) {
+      res.status(400).json({ message: 'Invalid id' })
+      return
+    }
+
+    const seller = await Seller.findOne({
+      where: { id: req.params.id },
+      include: [
+        { model: Boxe, attributes: { exclude: ['createdAt', 'updatedAt'] } },
+        { model: Store, attributes: { exclude: ['createdAt', 'updatedAt'] } },
+        {
+          model: ProductCategory,
+          attributes: { exclude: ['createdAt', 'updatedAt'] },
+        },
+      ],
+      attributes: { exclude: ['createdAt', 'updatedAt', 'search_vector'] },
+    })
+    if (!seller) {
+      res.status(404).json({ message: 'Seller not found' })
+      return
+    }
+    res.status(200).json(seller)
+  } catch (error) {
+    console.log(error)
+    return next(error)
+  }
+}
+
 const boxeSchema = z.object({
   sector_color: z.string(),
   street_letter: z.string(),
@@ -128,6 +158,7 @@ export async function search(req: Request, res: Response, next: NextFunction) {
     res.status(200).json(sellers)
     return
   } catch (error) {
+    console.log(error)
     return next(error)
   }
 }

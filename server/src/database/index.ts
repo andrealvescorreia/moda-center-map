@@ -19,7 +19,7 @@ const sequelize = new Sequelize({
 
 //!dev
 async function sync() {
-  //await sequelize.sync({ force: true })
+  await sequelize.sync({ alter: true })
 }
 
 async function setupSellerSearch() {
