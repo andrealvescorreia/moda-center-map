@@ -17,6 +17,7 @@ export async function createSeller(
     const parsed = registerSellerSchema.parse({
       ...req.body,
       phone_number: req.body.phone_number?.replace(/\D/g, '').trim(),
+      name: req.body.name.trim(),
     })
     const errors = await validateNewSeller(parsed)
     if (errors.length > 0) {
@@ -76,8 +77,17 @@ async function validateNewSeller({
   phone_number,
   productCategories,
 }: z.infer<typeof registerSellerSchema>) {
-  const errors = []
+  // biome-ignore lint/complexity/noBannedTypes: <explanation>
+  let errors: Array<Object> = []
 
+  errors = errors.concat(await validateName(name))
+  errors = errors.concat(await validateSellingLocations(sellingLocations))
+  errors = errors.concat(await validateProductCategories(productCategories))
+  return errors
+}
+
+async function validateName(name: string) {
+  const errors = []
   const seller = await Seller.findOne({
     where: { name },
   })
@@ -88,7 +98,12 @@ async function validateNewSeller({
       message: 'Seller with this name already exists',
     })
   }
+  return errors
+}
 
+type SellingLocations = z.infer<typeof registerSellerSchema>['sellingLocations']
+async function validateSellingLocations(sellingLocations: SellingLocations) {
+  const errors = []
   const hasNoSellingLocations = !(
     sellingLocations.boxes?.length || sellingLocations.stores?.length
   )
@@ -142,18 +157,16 @@ async function validateNewSeller({
         box_number: box.box_number,
         street_letter: box.street_letter,
       },
+      include: [Seller],
     })
     if (boxLocation) {
-      const sellerName = await Seller.findOne({
-        where: { id: boxLocation.seller_id },
-      }).then((seller) => seller?.name)
       errors.push({
         code: errorsIds.LOCATION_OCCUPIED,
         field: 'sellingLocations.boxes',
         message: 'Box already occupied by other seller',
         occupiedBy: {
           id: boxLocation.seller_id,
-          name: sellerName,
+          name: boxLocation.seller.name,
         },
       })
     }
@@ -166,6 +179,7 @@ async function validateNewSeller({
         block_number: store.block_number,
         store_number: store.store_number,
       },
+      include: [Seller],
     })
     if (storeLocation) {
       errors.push({
@@ -174,22 +188,8 @@ async function validateNewSeller({
         message: 'Store already occupied by other seller',
         occupiedBy: {
           id: storeLocation.seller_id,
-          name: await Seller.findOne({
-            where: { id: storeLocation.seller_id },
-          }).then((seller) => seller?.name),
+          name: storeLocation.seller.name,
         },
-      })
-    }
-  }
-  for (const category of productCategories || []) {
-    const foundCategory = await ProductCategory.findOne({
-      where: { category },
-    })
-    if (!foundCategory) {
-      errors.push({
-        code: errorsIds.INVALID,
-        field: 'productCategories',
-        message: `Product category "${category}" is invalid`,
       })
     }
   }
@@ -252,4 +252,24 @@ function boxOverlapsWithFoodCourt(box: {
     )
   }
   return false
+}
+
+async function validateProductCategories(
+  product_categories: string[] | undefined
+) {
+  if (!product_categories) return []
+  const errors = []
+  for (const category of product_categories) {
+    const foundCategory = await ProductCategory.findOne({
+      where: { category },
+    })
+    if (!foundCategory) {
+      errors.push({
+        code: errorsIds.INVALID,
+        field: 'productCategories',
+        message: `Product category "${category}" is invalid`,
+      })
+    }
+  }
+  return errors
 }
