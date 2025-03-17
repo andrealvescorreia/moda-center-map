@@ -7,9 +7,8 @@ import sequelize from '../src/database'
 import Boxe from '../src/database/models/boxe'
 import ProductCategory from '../src/database/models/product-category'
 import Seller from '../src/database/models/seller'
-import Store from '../src/database/models/store'
 
-describe('seller tests', () => {
+describe('create seller', () => {
   let authHeader: { [key: string]: string | string[] }
 
   const postSeller = async (

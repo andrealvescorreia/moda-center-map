@@ -1,4 +1,5 @@
 import type { NextFunction, Request, Response } from 'express'
+import z from 'zod'
 import sequelize from '../database'
 import Boxe from '../database/models/boxe'
 import ProductCategory from '../database/models/product-category'
@@ -21,6 +22,91 @@ export async function index(req: Request, res: Response, next: NextFunction) {
       attributes: { exclude: ['createdAt', 'updatedAt'] },
     })
     res.status(200).json(sellers)
+    return
+  } catch (error) {
+    return next(error)
+  }
+}
+
+const boxeSchema = z.object({
+  sector_color: z.string(),
+  street_letter: z.string(),
+  box_number: z.coerce.number(),
+})
+
+export async function showByBoxe(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  try {
+    const parsed = boxeSchema.parse(req.query)
+    const boxe = await Boxe.findOne({
+      where: parsed,
+      include: [Seller],
+    })
+    if (!boxe) {
+      res.status(404).json({ message: 'This boxe does not belong to a seller' })
+      return
+    }
+
+    const seller = await Seller.findOne({
+      where: { id: boxe.seller_id },
+      include: [
+        { model: Boxe, attributes: { exclude: ['createdAt', 'updatedAt'] } },
+        { model: Store, attributes: { exclude: ['createdAt', 'updatedAt'] } },
+        {
+          model: ProductCategory,
+          attributes: { exclude: ['createdAt', 'updatedAt'] },
+        },
+      ],
+      attributes: { exclude: ['createdAt', 'updatedAt'] },
+    })
+
+    res.status(200).json(seller)
+    return
+  } catch (error) {
+    return next(error)
+  }
+}
+
+const storeSchema = z.object({
+  sector_color: z.string(),
+  block_number: z.coerce.number(),
+  store_number: z.coerce.number(),
+})
+export async function showByStore(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  try {
+    const parsed = storeSchema.parse(req.query)
+    const store = await Store.findOne({
+      where: parsed,
+      include: [Seller],
+    })
+    if (!store) {
+      res
+        .status(404)
+        .json({ message: 'This store does not belong to a seller' })
+      return
+    }
+
+    const seller = await Seller.findOne({
+      where: { id: store.seller_id },
+      include: [
+        { model: Boxe, attributes: { exclude: ['createdAt', 'updatedAt'] } },
+        { model: Store, attributes: { exclude: ['createdAt', 'updatedAt'] } },
+        {
+          model: ProductCategory,
+          attributes: { exclude: ['createdAt', 'updatedAt'] },
+        },
+      ],
+      attributes: { exclude: ['createdAt', 'updatedAt'] },
+    })
+
+    res.status(200).json(seller)
     return
   } catch (error) {
     return next(error)
