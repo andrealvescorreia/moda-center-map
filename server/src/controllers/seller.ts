@@ -78,6 +78,17 @@ async function validateNewSeller({
 }: z.infer<typeof registerSellerSchema>) {
   const errors = []
 
+  const seller = await Seller.findOne({
+    where: { name },
+  })
+  if (seller) {
+    errors.push({
+      code: errorsIds.ALREADY_IN_USE,
+      field: 'name',
+      message: 'Seller with this name already exists',
+    })
+  }
+
   const hasNoSellingLocations = !(
     sellingLocations.boxes?.length || sellingLocations.stores?.length
   )
@@ -93,6 +104,18 @@ async function validateNewSeller({
   if (sellingLocations.boxes && sellingLocations.boxes.length > 0) {
     for (let i = 0; i < sellingLocations.boxes.length; i++) {
       const box = sellingLocations.boxes[i]
+      if (
+        ['blue', 'orange', 'red', 'green'].includes(box.sector_color) &&
+        box.box_number > 120
+      ) {
+        errors.push({
+          code: errorsIds.TOO_BIG,
+          field: `sellingLocations.boxes.${i}.box_number`,
+          message:
+            'Box number must be less than 121 for blue, orange, red, and green sectors',
+        })
+      }
+
       if (boxOverlapsWithFoodCourt(box)) {
         errors.push({
           code: errorsIds.INVALID,

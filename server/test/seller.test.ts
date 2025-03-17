@@ -95,7 +95,7 @@ describe('seller tests', () => {
     const reqBody = {
       name: 'Adagio moda feminina',
       sellingLocations: {
-        boxes: [{ sector_color: 'white', box_number: 1, street_letter: 'A' }],
+        boxes: [{ sector_color: 'white', box_number: 128, street_letter: 'P' }],
       },
       productCategories: ['Roupas', 'Moda Íntima'],
     }
@@ -252,6 +252,78 @@ describe('seller tests', () => {
     })
     const seller = await findSeller(reqBody.name)
     seller?.should.be.null
+  })
+
+  it('should not be able to create a seller when selling location is invalid -> number 121 blue sector', async () => {
+    const reqBody = {
+      name: 'Desejo de Mulher',
+      sellingLocations: {
+        boxes: [{ sector_color: 'blue', box_number: 121, street_letter: 'P' }],
+      },
+    }
+
+    const response = await postSeller(reqBody)
+    response.status.should.be.equal(400)
+    response.body.should.be.deep.equal({
+      errors: [
+        {
+          code: 'TOO_BIG',
+          field: 'sellingLocations.boxes.0.box_number',
+          message:
+            'Box number must be less than 121 for blue, orange, red, and green sectors',
+        },
+      ],
+    })
+    const seller = await findSeller(reqBody.name)
+    seller?.should.be.null
+  })
+
+  it('should not be able to create a seller when selling location is invalid -> number 129 yellow sector', async () => {
+    const reqBody = {
+      name: 'Desejo de Mulher',
+      sellingLocations: {
+        boxes: [
+          { sector_color: 'yellow', box_number: 129, street_letter: 'P' },
+        ],
+      },
+    }
+
+    const response = await postSeller(reqBody)
+    response.status.should.be.equal(400)
+    response.body.should.be.deep.equal({
+      errors: [
+        {
+          code: 'TOO_BIG',
+          field: 'sellingLocations.boxes.0.box_number',
+          message: 'Number must be less than or equal to 128',
+        },
+      ],
+    })
+    const seller = await findSeller(reqBody.name)
+    seller?.should.be.null
+  })
+
+  it('should not be able to create a seller when name already in use', async () => {
+    const reqBody = {
+      name: 'Olivia Palito moda feminina',
+      sellingLocations: {
+        boxes: [
+          { sector_color: 'yellow', box_number: 121, street_letter: 'P' },
+        ],
+      },
+    }
+
+    const response = await postSeller(reqBody)
+    response.status.should.be.equal(400)
+    response.body.should.be.deep.equal({
+      errors: [
+        {
+          code: 'ALREADY_IN_USE',
+          field: 'name',
+          message: 'Seller with this name already exists',
+        },
+      ],
+    })
   })
 
   //TODO:
