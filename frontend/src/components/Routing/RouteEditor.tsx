@@ -14,6 +14,7 @@ import { DialogAction } from './dialog-action'
 interface RouteEditorProps {
   gridMap: ModaCenterGridMap
   route: Route
+  bestRoute: Route
   onUpdate: (route: Route) => void
   onCancel: () => void
 }
@@ -21,6 +22,7 @@ interface RouteEditorProps {
 const RouteEditor = ({
   gridMap,
   route,
+  bestRoute,
   onUpdate,
   onCancel,
 }: RouteEditorProps) => {
@@ -56,7 +58,7 @@ const RouteEditor = ({
     if (
       isEditingMarcadorInicio &&
       gridMap.getGrid()[clickLocation.lat][clickLocation.lng] ===
-        ModaCenterGridMap.BOXE
+      ModaCenterGridMap.BOXE
     ) {
       if (
         gridMap.getGrid()[clickLocation.lat][clickLocation.lng + 1] ===
@@ -84,7 +86,7 @@ const RouteEditor = ({
     if (
       isAddingDestiny &&
       gridMap.getGrid()[clickLocation.lat][clickLocation.lng] ===
-        ModaCenterGridMap.BOXE
+      ModaCenterGridMap.BOXE
     ) {
       const boxe = gridMap.getBoxe(clickLocation.lat, clickLocation.lng)
 
@@ -106,7 +108,7 @@ const RouteEditor = ({
     if (
       isAddingDestiny &&
       gridMap.getGrid()[clickLocation.lat][clickLocation.lng] ===
-        ModaCenterGridMap.LOJA
+      ModaCenterGridMap.LOJA
     ) {
       const loja = gridMap.getLoja(clickLocation.lat, clickLocation.lng)
       if (!loja) return
@@ -128,9 +130,13 @@ const RouteEditor = ({
   }, [onUpdate, clickLocation])
 
   const removeDestiny = (index: number) => {
+    const otherDestinies = route.destinos.filter(
+      (destiny) => destiny.info !== bestRoute.destinos[index].info
+    )
+
     const newRoute = {
       ...route,
-      destinos: route.destinos.filter((_, i) => i !== index),
+      destinos: otherDestinies,
     }
     onUpdate(newRoute)
   }
@@ -161,7 +167,7 @@ const RouteEditor = ({
   if (!isAddingDestiny && route.inicio) {
     return (
       <span>
-        <DestinyList route={route} onClickRemoveDestiny={removeDestiny} />
+        <DestinyList route={{ ...bestRoute, inicio: route.inicio }} onClickRemoveDestiny={removeDestiny} />
 
         <Sheet
           ref={ref}

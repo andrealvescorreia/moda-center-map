@@ -24,11 +24,15 @@ const RoutingManager = ({ gridMap, onUpdateRoute }: RoutingManager) => {
     inicio: null,
     destinos: [],
   })
+  const [bestRoute, setBestRoute] = useState<Route>({
+    inicio: null,
+    destinos: [],
+  })
 
   const handleUpdate = useCallback((route: Route) => setRoute(route), [])
 
   useEffect(() => {
-    let destinosMelhorOrdem: Position[] = []
+    let destinosMelhorOrdem: Destiny[] = []
     let melhoresPassos: Position[] = []
 
     if (route.inicio && route.destinos.length > 0) {
@@ -38,19 +42,25 @@ const RoutingManager = ({ gridMap, onUpdateRoute }: RoutingManager) => {
       })
 
       const optimalRoute = routeCalculator.calculateBestRoute({
-        startPos: route.inicio.position,
-        destinies: route.destinos.map((destino) => destino.position),
+        startPos: route.inicio,
+        destinies: route.destinos,
       })
 
       destinosMelhorOrdem = optimalRoute.destiniesBestOrder
       melhoresPassos = optimalRoute.steps
+      setBestRoute({
+        inicio: route.inicio,
+        destinos: destinosMelhorOrdem.slice(1),
+      })
+    } else {
+      setBestRoute({
+        inicio: null,
+        destinos: [],
+      })
     }
     onUpdateRoute({
       inicio: route.inicio?.position || null,
-      destinos: destinosMelhorOrdem.map((position) => ({
-        position,
-        info: null,
-      })),
+      destinos: destinosMelhorOrdem,
       passos: melhoresPassos,
     })
   }, [route, onUpdateRoute, gridMap])
@@ -68,6 +78,7 @@ const RoutingManager = ({ gridMap, onUpdateRoute }: RoutingManager) => {
         <RouteEditor
           gridMap={gridMap}
           route={route}
+          bestRoute={bestRoute}
           onUpdate={handleUpdate}
           onCancel={() => {
             setIsCreatingRoute(false)
