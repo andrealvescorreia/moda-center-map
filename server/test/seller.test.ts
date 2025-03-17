@@ -126,7 +126,7 @@ describe('seller tests', () => {
         {
           code: 'INVALID',
           field: 'productCategories',
-          message: 'Product category "Automóveis" is invalid',
+          message: 'Product category "Automóveis" does not exist',
         },
       ],
     })
@@ -325,10 +325,4 @@ describe('seller tests', () => {
       ],
     })
   })
-
-  //TODO:
-
-  // teste com boxe invalido -> box_number = 0 || box_number > 128
-  // teste valido setor amarelo e branco box_number > 120 && box_number < 129
-  // teste invalido setor azul, vermelho, laranja e verde box_number > 120
 })

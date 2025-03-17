@@ -6,14 +6,24 @@ import Seller from '../database/models/seller'
 import Store from '../database/models/store'
 import type { registerSellerSchema } from '../schemas/sellerSchema'
 
+type NewSellerType = z.infer<typeof registerSellerSchema>
+type ValidationError = {
+  code: string
+  field: string
+  message: string
+  occupiedBy?: {
+    id: string
+    name: string
+  }
+}
+
 export async function validateNewSeller({
   name,
   sellingLocations,
   phone_number,
   productCategories,
-}: z.infer<typeof registerSellerSchema>) {
-  // biome-ignore lint/complexity/noBannedTypes: <explanation>
-  let errors: Array<Object> = []
+}: NewSellerType) {
+  let errors: ValidationError[] = []
 
   errors = errors.concat(await validateName(name))
   errors = errors.concat(await validateSellingLocations(sellingLocations))
@@ -36,56 +46,68 @@ async function validateName(name: string) {
   return errors
 }
 
-type SellingLocations = z.infer<typeof registerSellerSchema>['sellingLocations']
-async function validateSellingLocations(sellingLocations: SellingLocations) {
-  const errors = []
+async function validateSellingLocations(
+  sellingLocations: NewSellerType['sellingLocations']
+) {
+  let errors: ValidationError[] = []
   const hasNoSellingLocations = !(
     sellingLocations.boxes?.length || sellingLocations.stores?.length
   )
 
   if (hasNoSellingLocations) {
     errors.push({
-      error: errorsIds.MISSING_SELLING_LOCATION,
+      code: errorsIds.MISSING_SELLING_LOCATION,
       field: 'sellingLocations',
       message: 'A seller must have at least one selling location',
     })
+    return errors
   }
 
-  if (sellingLocations.boxes && sellingLocations.boxes.length > 0) {
-    for (let i = 0; i < sellingLocations.boxes.length; i++) {
-      const box = sellingLocations.boxes[i]
-      if (
-        ['blue', 'orange', 'red', 'green'].includes(box.sector_color) &&
-        box.box_number > 120
-      ) {
-        errors.push({
-          code: errorsIds.TOO_BIG,
-          field: `sellingLocations.boxes.${i}.box_number`,
-          message:
-            'Box number must be less than 121 for blue, orange, red, and green sectors',
-        })
-      }
+  errors = errors.concat(await validateBoxes(sellingLocations.boxes))
+  errors = errors.concat(await validateStores(sellingLocations.stores))
+  return errors
+}
 
-      if (boxOverlapsWithFoodCourt(box)) {
-        errors.push({
-          code: errorsIds.INVALID,
-          field: `sellingLocations.boxes.${i}`,
-          message:
-            'This box cannot exist inside Moda Center, otherwise it would overlap with food court',
-        })
-      }
-      if (boxOverlapsWithStores(box)) {
-        errors.push({
-          code: errorsIds.INVALID,
-          field: `sellingLocations.boxes.${i}`,
-          message:
-            'This box cannot exist inside Moda Center, otherwise it would overlap with stores',
-        })
-      }
+async function validateBoxes(
+  boxes: NewSellerType['sellingLocations']['boxes']
+) {
+  const errors = []
+  if (!boxes || boxes.length === 0) return []
+
+  for (let i = 0; i < boxes.length; i++) {
+    const box = boxes[i]
+    const box_number_tooBig =
+      ['blue', 'orange', 'red', 'green'].includes(box.sector_color) &&
+      box.box_number > 120
+
+    if (box_number_tooBig) {
+      errors.push({
+        code: errorsIds.TOO_BIG,
+        field: `sellingLocations.boxes.${i}.box_number`,
+        message:
+          'Box number must be less than 121 for blue, orange, red, and green sectors',
+      })
+    }
+
+    if (boxOverlapsWithFoodCourt(box)) {
+      errors.push({
+        code: errorsIds.INVALID,
+        field: `sellingLocations.boxes.${i}`,
+        message:
+          'This box cannot exist inside Moda Center, otherwise it would overlap with food court',
+      })
+    }
+    if (boxOverlapsWithStores(box)) {
+      errors.push({
+        code: errorsIds.INVALID,
+        field: `sellingLocations.boxes.${i}`,
+        message:
+          'This box cannot exist inside Moda Center, otherwise it would overlap with stores',
+      })
     }
   }
 
-  for (const box of sellingLocations.boxes || []) {
+  for (const box of boxes || []) {
     const boxLocation = await Boxe.findOne({
       where: {
         sector_color: box.sector_color,
@@ -107,7 +129,14 @@ async function validateSellingLocations(sellingLocations: SellingLocations) {
     }
   }
 
-  for (const store of sellingLocations.stores || []) {
+  return errors
+}
+
+async function validateStores(
+  stores: NewSellerType['sellingLocations']['stores']
+) {
+  const errors = []
+  for (const store of stores || []) {
     const storeLocation = await Store.findOne({
       where: {
         sector_color: store.sector_color,
@@ -127,6 +156,7 @@ async function validateSellingLocations(sellingLocations: SellingLocations) {
         },
       })
     }
+    //TODO: validate store number and block number
   }
   return errors
 }
@@ -202,7 +232,7 @@ async function validateProductCategories(
       errors.push({
         code: errorsIds.INVALID,
         field: 'productCategories',
-        message: `Product category "${category}" is invalid`,
+        message: `Product category "${category}" does not exist`,
       })
     }
   }
