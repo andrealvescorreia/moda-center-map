@@ -10,9 +10,17 @@ import { validateNewSeller } from '../services/seller-validation'
 export async function index(req: Request, res: Response, next: NextFunction) {
   try {
     const sellers = await Seller.findAll({
-      include: [Boxe, Store, ProductCategory],
+      include: [
+        { model: Boxe, attributes: { exclude: ['createdAt', 'updatedAt'] } },
+        { model: Store, attributes: { exclude: ['createdAt', 'updatedAt'] } },
+        {
+          model: ProductCategory,
+          attributes: { exclude: ['createdAt', 'updatedAt'] },
+        },
+      ],
+      attributes: { exclude: ['createdAt', 'updatedAt'] },
     })
-    res.json(sellers)
+    res.status(200).json(sellers)
     return
   } catch (error) {
     return next(error)
