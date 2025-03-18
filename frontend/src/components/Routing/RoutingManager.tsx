@@ -68,7 +68,7 @@ const RoutingManager = ({ gridMap, onUpdateRoute }: RoutingManager) => {
   return (
     <div>
       {!isCreatingRoute ? (
-        <span className="absolute 100dvh 100dvw ui bottom-9 right-5">
+        <span className="absolute 100dvh 100dvw ui bottom-29 right-5">
           <RouteButton
             onClick={() => setIsCreatingRoute(true)}
             className="relative"

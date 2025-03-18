@@ -3,6 +3,11 @@
   width: 100dvw;
 }
 
+/*NavLink active color*/
+a.active {
+  color: #4CAF50;
+}
+
 html, body{
   margin: 0;
   padding: 0;
