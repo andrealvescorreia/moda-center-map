@@ -25,7 +25,12 @@ class App {
     this.app.use(express.urlencoded({ extended: true }))
     this.app.use(express.json())
     this.app.use(cookieParser())
-    this.app.use(cors())
+    this.app.use(
+      cors({
+        credentials: true,
+        origin: 'http://localhost:5173',
+      })
+    )
   }
 }
 

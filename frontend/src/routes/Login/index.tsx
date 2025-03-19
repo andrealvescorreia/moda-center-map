@@ -1,8 +1,8 @@
 import { NavLink } from 'react-router-dom'
 import Logo from '../../assets/logo.png'
-import RegistrationForm from './register-form'
+import LoginForm from './login-form'
 
-export default function Register() {
+export default function Login() {
   return (
     <div className="flex md:justify-center md:items-center h-screen flex-col">
       <div className="flex items-center p-2 gap-1">
@@ -12,10 +12,10 @@ export default function Register() {
         </h1>
       </div>
 
-      <RegistrationForm />
+      <LoginForm />
       <div className="w-full flex justify-center pt-2">
-        <NavLink to="/login" className="text-green-secondary underline">
-          Já possui uma conta?
+        <NavLink to="/register" className="text-green-secondary underline">
+          Ainda não tem uma conta?
         </NavLink>
       </div>
     </div>

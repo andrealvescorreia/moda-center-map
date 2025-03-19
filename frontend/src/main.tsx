@@ -1,29 +1,23 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
-import { BrowserRouter, Route, Routes } from 'react-router-dom'
-import App from './routes/Home/App.tsx'
+import { BrowserRouter } from 'react-router-dom'
 import './globals.css'
+import App from './App.tsx'
 import ClickProvider from './providers/ClickProvider.tsx'
 import NavProvider from './providers/NavProvider.tsx'
-import Register from './routes/Register/intex.tsx'
-
-function NotFound() {
-  return <h1>404 Page Not Not Found</h1>
-}
+import UserProvider from './providers/UserProvider.tsx'
 
 // biome-ignore lint/style/noNonNullAssertion: <explanation>
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <BrowserRouter>
-      <NavProvider>
-        <ClickProvider>
-          <Routes>
-            <Route path="" element={<App />} />
-            <Route path="register" element={<Register />} />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </ClickProvider>
-      </NavProvider>
+      <UserProvider>
+        <NavProvider>
+          <ClickProvider>
+            <App />
+          </ClickProvider>
+        </NavProvider>
+      </UserProvider>
     </BrowserRouter>
   </StrictMode>
 )

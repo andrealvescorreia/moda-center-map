@@ -1,11 +1,9 @@
 import { MapContainer } from 'react-leaflet'
 import GridDrawer from '../../components/GridDrawer'
 import 'leaflet/dist/leaflet.css'
-import './App.css'
 import L from 'leaflet'
-import Logo from '../../assets/logo.png'
-
 import { useCallback, useState } from 'react'
+import Logo from '../../assets/logo.png'
 import { ClickPosition } from '../../components/ClickPosition'
 import RouteDrawer from '../../components/Routing/RouteDrawer'
 import RoutingManager from '../../components/Routing/RoutingManager'
@@ -16,6 +14,7 @@ import type { Destiny } from '../../interfaces/Destiny'
 import type { Position } from '../../interfaces/Position'
 import { ModaCenterGridMap } from '../../models/ModaCenterGridMap'
 import { useNavContext } from '../../providers/NavProvider'
+import { useUserContext } from '../../providers/UserProvider'
 const modaCenterGridMap = new ModaCenterGridMap()
 const minZoomLevelToRenderMarkers = 5
 
@@ -28,6 +27,7 @@ interface MyRoute {
 function App() {
   const [route, setRoute] = useState<MyRoute>()
   const { show } = useNavContext()
+  const { user } = useUserContext()
 
   const handleUpdate = useCallback((route: MyRoute) => setRoute(route), [])
 
@@ -35,10 +35,10 @@ function App() {
     <div>
       <NavBar />
 
-      <div className="absolute ui top-0 w-full shadow-md">
-        {show && <CallToLogin />}
+      <div className="absolute ui top-0 w-full ">
+        {show && !user && <CallToLogin />}
         {show && (
-          <div className="absolute top-15 w-full px-5 md:max-w-125 md:top-0 ml-[50%] transform -translate-x-1/2">
+          <div className="md:absolute md:mt-0 mt-5   w-full px-5 md:max-w-125 md:top-0 ml-[50%] transform -translate-x-1/2">
             <InputRoot>
               <InputIcon>
                 <img src={Logo} alt="Logo" className="size-6" />

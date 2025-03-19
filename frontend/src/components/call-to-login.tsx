@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom'
 
 export default function CallToLogin() {
   return (
-    <div className="relative w-full h-12 px-5 bg-white font-bold  flex items-center justify-between">
+    <div className="relative w-full h-12 px-5 bg-white font-bold  flex items-center justify-between shadow-md">
       <span className=" font-plus-jakarta-sans italic text-gray04">
         ModaCenterMap
       </span>

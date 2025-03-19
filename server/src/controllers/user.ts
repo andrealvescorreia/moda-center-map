@@ -7,6 +7,22 @@ import User from '../database/models/user'
 import { env } from '../env'
 import { registerUser } from '../schemas/userSchema'
 
+export async function showUser(
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> {
+  try {
+    res.status(200).json({
+      userId: req.body.userId,
+      username: req.body.username,
+    })
+    return
+  } catch (error) {
+    return next(error)
+  }
+}
+
 export async function createUser(
   req: Request,
   res: Response,
@@ -16,7 +32,7 @@ export async function createUser(
     const { username, password } = registerUser.parse(req.body)
     const existingUser = await User.findOne({
       where: {
-        username
+        username,
       },
     })
     if (existingUser) {
