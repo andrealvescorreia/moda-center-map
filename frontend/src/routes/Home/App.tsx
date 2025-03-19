@@ -11,6 +11,7 @@ import RouteDrawer from '../../components/Routing/RouteDrawer'
 import RoutingManager from '../../components/Routing/RoutingManager'
 import CallToLogin from '../../components/call-to-login'
 import { InputField, InputIcon, InputRoot } from '../../components/input'
+import NavBar from '../../components/nav'
 import type { Destiny } from '../../interfaces/Destiny'
 import type { Position } from '../../interfaces/Position'
 import { ModaCenterGridMap } from '../../models/ModaCenterGridMap'
@@ -32,6 +33,8 @@ function App() {
 
   return (
     <div>
+      <NavBar />
+
       <div className="absolute ui top-0 w-full shadow-md">
         {show && <CallToLogin />}
         {show && (
