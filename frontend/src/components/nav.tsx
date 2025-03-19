@@ -6,7 +6,7 @@ export default function NavBar() {
   const { show } = useNavContext()
   if (!show) return null
   return (
-    <nav className="ui absolute bottom-0 bg-[#FAFAFA] w-full px-15 h-20 flex items-center justify-between text-gray04 [&>*]:hover:cursor-pointer">
+    <nav className="ui absolute bottom-0 bg-[#FAFAFA] w-full px-15 h-20 flex items-center justify-between text-gray04 [&>*]:hover:cursor-pointer md:w-100 ml-[50%] transform -translate-x-1/2 md:rounded-t-2xl shadow-lg">
       <NavLink to="/">
         <MapPin size={32} strokeWidth={3} />
       </NavLink>

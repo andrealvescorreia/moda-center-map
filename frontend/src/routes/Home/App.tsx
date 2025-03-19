@@ -14,11 +14,7 @@ import { InputField, InputIcon, InputRoot } from '../../components/input'
 import type { Destiny } from '../../interfaces/Destiny'
 import type { Position } from '../../interfaces/Position'
 import { ModaCenterGridMap } from '../../models/ModaCenterGridMap'
-import {
-  CircleXtext,
-  useNavCon,
-  useNavContext,
-} from '../../providers/NavProvider'
+import { useNavContext } from '../../providers/NavProvider'
 const modaCenterGridMap = new ModaCenterGridMap()
 const minZoomLevelToRenderMarkers = 5
 
@@ -36,15 +32,20 @@ function App() {
 
   return (
     <div>
-      {show && <CallToLogin />}
-      <div className="absolute ui top-15 w-full px-5">
-        <InputRoot>
-          <InputIcon>
-            <img src={Logo} alt="Logo" className="size-6" />
-          </InputIcon>
-          <InputField placeholder="Busque pontos de venda" />
-        </InputRoot>
+      <div className="absolute ui top-0 w-full shadow-md">
+        {show && <CallToLogin />}
+        {show && (
+          <div className="absolute top-15 w-full px-5 md:max-w-125 md:top-0 ml-[50%] transform -translate-x-1/2">
+            <InputRoot>
+              <InputIcon>
+                <img src={Logo} alt="Logo" className="size-6" />
+              </InputIcon>
+              <InputField placeholder="Busque pontos de venda" />
+            </InputRoot>
+          </div>
+        )}
       </div>
+
       <RoutingManager
         gridMap={modaCenterGridMap}
         onUpdateRoute={handleUpdate}
