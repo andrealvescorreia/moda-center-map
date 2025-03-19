@@ -3,15 +3,22 @@ import GridDrawer from '../../components/GridDrawer'
 import 'leaflet/dist/leaflet.css'
 import './App.css'
 import L from 'leaflet'
+import Logo from '../../assets/logo.png'
+
 import { useCallback, useState } from 'react'
 import { ClickPosition } from '../../components/ClickPosition'
 import RouteDrawer from '../../components/Routing/RouteDrawer'
 import RoutingManager from '../../components/Routing/RoutingManager'
+import CallToLogin from '../../components/call-to-login'
+import { InputField, InputIcon, InputRoot } from '../../components/input'
 import type { Destiny } from '../../interfaces/Destiny'
 import type { Position } from '../../interfaces/Position'
 import { ModaCenterGridMap } from '../../models/ModaCenterGridMap'
-import ClickProvider from '../../providers/ClickProvider'
-
+import {
+  CircleXtext,
+  useNavCon,
+  useNavContext,
+} from '../../providers/NavProvider'
 const modaCenterGridMap = new ModaCenterGridMap()
 const minZoomLevelToRenderMarkers = 5
 
@@ -23,16 +30,25 @@ interface MyRoute {
 
 function App() {
   const [route, setRoute] = useState<MyRoute>()
+  const { show } = useNavContext()
 
   const handleUpdate = useCallback((route: MyRoute) => setRoute(route), [])
 
   return (
-    <ClickProvider>
+    <div>
+      {show && <CallToLogin />}
+      <div className="absolute ui top-15 w-full px-5">
+        <InputRoot>
+          <InputIcon>
+            <img src={Logo} alt="Logo" className="size-6" />
+          </InputIcon>
+          <InputField placeholder="Busque pontos de venda" />
+        </InputRoot>
+      </div>
       <RoutingManager
         gridMap={modaCenterGridMap}
         onUpdateRoute={handleUpdate}
       />
-
       <MapContainer
         crs={L.CRS.Simple}
         bounds={modaCenterGridMap.getBounds()}
@@ -65,7 +81,7 @@ function App() {
         )}
         <ClickPosition />
       </MapContainer>
-    </ClickProvider>
+    </div>
   )
 }
 

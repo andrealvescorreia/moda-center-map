@@ -57,7 +57,7 @@ const GridDrawer = ({
 
         if (grid[i][j] === ModaCenterGridMap.BOXE) {
           components.push(
-            <Boxe y={i} x={j} onClick={() => {}} key={`${i}-${j}`} />
+            <Boxe y={i} x={j} onClick={() => { }} key={`${i}-${j}`} />
           )
         }
       }
@@ -149,7 +149,7 @@ const GridDrawer = ({
         alt="mapa moda center"
         zIndex={-1}
       />
-      {/*mapInfo && mapInfo.zoom >= minZoomLevelToRenderMarkers ? markers : []*/}
+      {/*mapInfo && mapInfo.zoom >= minZoomLevelToRenderBoxes ? markers : []*/}
       {components}
     </>
   )

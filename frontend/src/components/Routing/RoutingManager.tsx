@@ -5,6 +5,7 @@ import type { Route } from '../../interfaces/Route'
 import type { ModaCenterGridMap } from '../../models/ModaCenterGridMap'
 import { RouteCalculator } from '../../models/RouteCalculator'
 import { TSPSolverNN } from '../../models/TSPSolverNN'
+import { useNavContext } from '../../providers/NavProvider'
 import RouteButton from './RouteButton'
 import RouteEditor from './RouteEditor'
 
@@ -18,6 +19,8 @@ interface RoutingManager {
 }
 
 const RoutingManager = ({ gridMap, onUpdateRoute }: RoutingManager) => {
+  const { setShow } = useNavContext()
+
   const [isCreatingRoute, setIsCreatingRoute] = useState(false)
 
   const [route, setRoute] = useState<Route>({
@@ -30,6 +33,14 @@ const RoutingManager = ({ gridMap, onUpdateRoute }: RoutingManager) => {
   })
 
   const handleUpdate = useCallback((route: Route) => setRoute(route), [])
+
+  useEffect(() => {
+    if (!isCreatingRoute) {
+      setShow(true)
+    } else {
+      setShow(false)
+    }
+  }, [isCreatingRoute, setShow])
 
   useEffect(() => {
     let destinosMelhorOrdem: Destiny[] = []
