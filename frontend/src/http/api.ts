@@ -1,4 +1,6 @@
 import axios from 'axios'
+import type { BoxeSchema } from '../schemas/box'
+import type { StoreSchema } from '../schemas/store'
 
 const axiosInstance = axios.create({
   withCredentials: true,
@@ -22,4 +24,23 @@ export async function loginUser(data: {
 
 export async function getUser() {
   return await axiosInstance.get('http://localhost:3001/user')
+}
+
+export async function getSellers() {
+  return await axiosInstance.get('http://localhost:3001/seller')
+}
+
+export async function getProductCategories() {
+  return await axiosInstance.get('http://localhost:3001/product-categories')
+}
+
+interface NewSeller {
+  name: string
+  phone_number: string | undefined
+  sellingLocations: { boxes: BoxeSchema[]; stores: StoreSchema[] }
+  productCategories: string[]
+}
+
+export async function createSeller(data: NewSeller) {
+  return await axiosInstance.post('http://localhost:3001/seller', data)
 }

@@ -10,7 +10,7 @@ const sector_colors = z.enum([
 ])
 
 const registerSellerSchema = z.object({
-  name: z.string().nonempty().min(3).max(255),
+  name: z.string().min(3).max(255),
   phone_number: z.string().min(10).max(11).optional(),
   productCategories: z.array(z.string()).optional(),
   sellingLocations: z.object({

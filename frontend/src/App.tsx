@@ -6,9 +6,17 @@ import Home from './routes/Home'
 import Login from './routes/Login'
 import Register from './routes/Register'
 import './App.css'
+import NavBar from './components/nav'
+import NewSeller from './routes/NewSeller'
+import Sellers from './routes/Sellers'
 
 function NotFound() {
-  return <h1>404 Page Not Not Found</h1>
+  return (
+    <div>
+      <h1>404 Page Not Not Found</h1>
+      <NavBar />
+    </div>
+  )
 }
 export default function App() {
   const { setUser } = useUserContext()
@@ -31,6 +39,8 @@ export default function App() {
       <Route path="" element={<Home />} />
       <Route path="register" element={<Register />} />
       <Route path="login" element={<Login />} />
+      <Route path="sellers" element={<Sellers />} />
+      <Route path="sellers/new" element={<NewSeller />} />
       <Route path="*" element={<NotFound />} />
     </Routes>
   )
