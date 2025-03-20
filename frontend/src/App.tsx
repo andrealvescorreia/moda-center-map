@@ -9,6 +9,7 @@ import './App.css'
 import NavBar from './components/nav'
 import NewSeller from './routes/NewSeller'
 import Sellers from './routes/Sellers'
+import UserProfile from './routes/UserProfile'
 
 function NotFound() {
   return (
@@ -41,6 +42,7 @@ export default function App() {
       <Route path="login" element={<Login />} />
       <Route path="sellers" element={<Sellers />} />
       <Route path="sellers/new" element={<NewSeller />} />
+      <Route path="user" element={<UserProfile />} />
       <Route path="*" element={<NotFound />} />
     </Routes>
   )

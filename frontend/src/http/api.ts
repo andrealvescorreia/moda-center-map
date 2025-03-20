@@ -22,6 +22,10 @@ export async function loginUser(data: {
   return await axiosInstance.post('http://localhost:3001/auth', data)
 }
 
+export async function logoutUser() {
+  return await axiosInstance.post('http://localhost:3001/auth/logout')
+}
+
 export async function getUser() {
   return await axiosInstance.get('http://localhost:3001/user')
 }

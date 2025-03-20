@@ -50,3 +50,17 @@ export async function authenticate(
     next(error)
   }
 }
+
+export async function logout(
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> {
+  try {
+    res.clearCookie('authtoken')
+    res.send('logged out!')
+    return
+  } catch (error) {
+    next(error)
+  }
+}

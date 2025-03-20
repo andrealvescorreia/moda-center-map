@@ -11,6 +11,8 @@ type BoxeSchema = z.infer<typeof boxeSchema>
 type StoreSchema = z.infer<typeof storeSchema>
 import errorsCode from '../../../../shared/operation-errors'
 import AlertDialog from '../../components/alert-dialog'
+import LandingPage from '../../components/landing-page'
+import { useUserContext } from '../../providers/UserProvider'
 
 export default function NewSeller() {
   const [currentStep, setCurrentStep] = useState(1)
@@ -19,6 +21,7 @@ export default function NewSeller() {
   const [dialogOpen, setDialogOpen] = useState(false)
   const [errors, setErrors] = useState<Array<string>>([])
   const [isFetching, setIsFetching] = useState(false)
+  const { user } = useUserContext()
 
   const onSubmitStepOne = ({
     name,
@@ -93,6 +96,7 @@ export default function NewSeller() {
     window.history.back()
   }
 
+  if (!user) return <LandingPage />
   return (
     <div className="flex md:justify-center md:items-center flex-col h-screen">
       <div className="flex md:justify-center md:items-center flex-col w-full md:w-120 ">

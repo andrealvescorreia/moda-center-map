@@ -5,16 +5,19 @@ import RegistrationForm from './register-form'
 export default function Register() {
   return (
     <div className="flex md:justify-center md:items-center h-screen flex-col">
-      <div className="flex items-center p-2 gap-1">
+      <NavLink className="flex items-center p-2 gap-1" to={'/'}>
         <img src={Logo} alt="Logo" className="w-6" />
         <h1 className="text-2xl font-bold text-green-secondary italic font-plus-jakarta-sans">
           ModaCenterMap
         </h1>
-      </div>
+      </NavLink>
 
       <RegistrationForm />
       <div className="w-full flex justify-center pt-2">
-        <NavLink to="/login" className="text-green-secondary underline">
+        <NavLink
+          to="/login"
+          className="text-green-secondary underline text-lg font-semibold"
+        >
           Já possui uma conta?
         </NavLink>
       </div>
