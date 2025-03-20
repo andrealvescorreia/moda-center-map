@@ -8,7 +8,7 @@ import { z } from 'zod'
 import { Button } from '../../components/button'
 import { InputField, InputIcon, InputRoot } from '../../components/input'
 import { loginUser } from '../../http/api'
-
+import { useUserContext } from '../../providers/UserProvider'
 const loginSchema = z.object({
   username: z.string(),
   password: z.string(),
@@ -25,6 +25,7 @@ export default function LoginForm() {
   } = useForm<RegistrationSchema>({
     resolver: zodResolver(loginSchema),
   })
+  const { setUser } = useUserContext()
 
   const [showPassword, setShowPassword] = useState(false)
   const [isFetching, setIsFetching] = useState(false)
@@ -34,7 +35,7 @@ export default function LoginForm() {
     try {
       setIsFetching(true)
       const response = await loginUser({ username, password })
-      console.log(response)
+      setUser(response.data)
       navigate('/user')
     } catch (error) {
       if (error instanceof AxiosError) {

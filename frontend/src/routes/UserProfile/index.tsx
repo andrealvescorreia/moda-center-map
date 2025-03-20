@@ -11,16 +11,20 @@ export default function UserProfile() {
     setUser(undefined)
   }
 
-  if (!user) return <LandingPage />
-
   return (
-    <div>
-      <NavBar />
-      <h1>User Profile</h1>
-      <p>Olá, {user?.username}</p>
-      <button type="button" onClick={logOff}>
-        Sair
-      </button>
-    </div>
+    <>
+      {user ? (
+        <div>
+          <NavBar />
+          <h1>User Profile</h1>
+          <p>Olá, {user?.username}</p>
+          <button type="button" onClick={logOff}>
+            Sair
+          </button>
+        </div>
+      ) : (
+        <LandingPage />
+      )}
+    </>
   )
 }

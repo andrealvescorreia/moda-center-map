@@ -9,6 +9,7 @@ import errorsCode from '../../../../shared/operation-errors'
 import { Button } from '../../components/button'
 import { InputField, InputIcon, InputRoot } from '../../components/input'
 import { registerUser } from '../../http/api'
+import { useUserContext } from '../../providers/UserProvider'
 
 const registrationSchema = z.object({
   username: z
@@ -32,6 +33,7 @@ export default function RegistrationForm() {
   } = useForm<RegistrationSchema>({
     resolver: zodResolver(registrationSchema),
   })
+  const { setUser } = useUserContext()
 
   const [showPassword, setShowPassword] = useState(false)
   const [isFetching, setIsFetching] = useState(false)
@@ -41,6 +43,7 @@ export default function RegistrationForm() {
     try {
       setIsFetching(true)
       const response = await registerUser({ username, password })
+      setUser(response.data)
       if (response.status === 201) {
         alert('Usuário criado com sucesso!')
       }
