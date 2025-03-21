@@ -15,7 +15,6 @@ html, body{
 }
 
 .ui {
-  position: absolute;
   z-index: 1001;
 }
 

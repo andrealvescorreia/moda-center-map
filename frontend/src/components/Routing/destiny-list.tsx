@@ -16,7 +16,7 @@ export function DestinyList({ route, onClickRemoveDestiny }: DestinyListProps) {
     }
   }, [])
   return (
-    <div className="ui w-full flex justify-center items-center top-3">
+    <div className="ui absolute w-full flex justify-center items-center top-3">
       <ul
         className="w-100 max-h-45 bg-white overflow-auto shadow rounded-md py-2"
         ref={listRef}

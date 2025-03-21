@@ -1,6 +1,7 @@
 import axios from 'axios'
 import type { BoxeSchema } from '../schemas/box'
 import type { StoreSchema } from '../schemas/store'
+import type { SellerResponse } from './responses'
 
 const axiosInstance = axios.create({
   withCredentials: true,
@@ -31,7 +32,9 @@ export async function getUser() {
 }
 
 export async function getSellers() {
-  return await axiosInstance.get('http://localhost:3001/seller')
+  const response = await axiosInstance.get('http://192.168.1.147:3001/seller')
+  const sellers: SellerResponse[] = response.data
+  return sellers
 }
 
 export async function getProductCategories() {

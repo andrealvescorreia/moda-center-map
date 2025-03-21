@@ -29,7 +29,10 @@ export function SearchStore({
     )
   }, [])
   return (
-    <div ref={element} className="ui 100dvh 100dvw w-full h-full bg-white">
+    <div
+      ref={element}
+      className="ui absolute 100dvh 100dvw w-full h-full bg-white"
+    >
       <div className="flex flex-col gap-4 p-4">
         <InputRoot>
           <InputIcon>

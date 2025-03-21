@@ -22,15 +22,25 @@ class App {
     this.app.use('/product-categories', pCategoriesRoutes)
   }
   middlewares() {
+    const allowedOrigins = [
+      'http://localhost:5173',
+      'http://192.168.1.147:5173',
+    ]
+    this.app.use(
+      cors({
+        origin: (origin, callback) => {
+          if (!origin || allowedOrigins.includes(origin)) {
+            callback(null, origin)
+          } else {
+            callback(new Error('Not allowed by CORS'))
+          }
+        },
+        credentials: true,
+      })
+    )
     this.app.use(express.urlencoded({ extended: true }))
     this.app.use(express.json())
     this.app.use(cookieParser())
-    this.app.use(
-      cors({
-        credentials: true,
-        origin: 'http://localhost:5173',
-      })
-    )
   }
 }
 

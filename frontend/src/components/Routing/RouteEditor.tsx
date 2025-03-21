@@ -58,7 +58,7 @@ const RouteEditor = ({
     if (
       isEditingMarcadorInicio &&
       gridMap.getGrid()[clickLocation.lat][clickLocation.lng] ===
-      ModaCenterGridMap.BOXE
+        ModaCenterGridMap.BOXE
     ) {
       if (
         gridMap.getGrid()[clickLocation.lat][clickLocation.lng + 1] ===
@@ -86,7 +86,7 @@ const RouteEditor = ({
     if (
       isAddingDestiny &&
       gridMap.getGrid()[clickLocation.lat][clickLocation.lng] ===
-      ModaCenterGridMap.BOXE
+        ModaCenterGridMap.BOXE
     ) {
       const boxe = gridMap.getBoxe(clickLocation.lat, clickLocation.lng)
 
@@ -108,7 +108,7 @@ const RouteEditor = ({
     if (
       isAddingDestiny &&
       gridMap.getGrid()[clickLocation.lat][clickLocation.lng] ===
-      ModaCenterGridMap.LOJA
+        ModaCenterGridMap.LOJA
     ) {
       const loja = gridMap.getLoja(clickLocation.lat, clickLocation.lng)
       if (!loja) return
@@ -149,7 +149,7 @@ const RouteEditor = ({
 
   if (isEditingMarcadorInicio) {
     return (
-      <span className="ui flex w-full justify-center top-3">
+      <span className="ui absolute flex w-full justify-center top-3">
         <span className="w-98">
           <DialogAction
             title="Informe o local de início"
@@ -167,7 +167,10 @@ const RouteEditor = ({
   if (!isAddingDestiny && route.inicio) {
     return (
       <span>
-        <DestinyList route={{ ...bestRoute, inicio: route.inicio }} onClickRemoveDestiny={removeDestiny} />
+        <DestinyList
+          route={{ ...bestRoute, inicio: route.inicio }}
+          onClickRemoveDestiny={removeDestiny}
+        />
 
         <Sheet
           ref={ref}
@@ -225,7 +228,7 @@ const RouteEditor = ({
 
   if (isAddingDestinyFromMap) {
     return (
-      <span className="ui flex w-full justify-center top-3">
+      <span className="ui absolute flex w-full justify-center top-3">
         <span className="w-98">
           <DialogAction
             title="Informe o local de destino"
