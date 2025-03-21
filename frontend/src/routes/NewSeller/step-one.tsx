@@ -4,14 +4,12 @@ import { useForm } from 'react-hook-form'
 import { useHookFormMask } from 'use-mask-input'
 import { z } from 'zod'
 import { InputField, InputRoot } from '../../components/input'
+import sellerSchema from '../../schemas/seller'
 import ButtonRounded from './button-rounded'
 
 const sellerSchemaStepOne = z.object({
-  name: z
-    .string()
-    .min(3, 'Nome deve conter no mínimo 3 caracteres.')
-    .max(255, 'Nome deve conter no máximo 255 caracteres.'),
-  phone_number: z.string().transform((value) => value.replace(/[^0-9]/g, '')),
+  name: sellerSchema._def.schema.shape.name,
+  phone_number: sellerSchema._def.schema.shape.phone_number,
 })
 type SellerSchemaStepOne = z.infer<typeof sellerSchemaStepOne>
 

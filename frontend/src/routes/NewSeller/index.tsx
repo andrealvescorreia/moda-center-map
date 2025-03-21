@@ -13,21 +13,22 @@ import errorsCode from '../../../../shared/operation-errors'
 import AlertDialog from '../../components/alert-dialog'
 import LandingPage from '../../components/landing-page'
 import { useUserContext } from '../../providers/UserProvider'
+import sellerSchema from '../../schemas/seller'
 
 export default function NewSeller() {
   const [currentStep, setCurrentStep] = useState(1)
   const [name, setName] = useState('')
-  const [phone_number, setPhoneNumber] = useState('')
+  const [phone_number, setPhoneNumber] = useState<string | undefined>('')
   const [dialogOpen, setDialogOpen] = useState(false)
   const [errors, setErrors] = useState<Array<string>>([])
   const [isFetching, setIsFetching] = useState(false)
   const { user } = useUserContext()
 
-  const onSubmitStepOne = ({
-    name,
-    phone_number,
-  }: { name: string; phone_number: string }) => {
-    console.log(name, phone_number)
+  interface StepOne {
+    name: string
+    phone_number?: string | undefined
+  }
+  const onSubmitStepOne = ({ name, phone_number }: StepOne) => {
     setName(name)
     setPhoneNumber(phone_number)
     setCurrentStep(2)
@@ -50,6 +51,14 @@ export default function NewSeller() {
       sellingLocations,
       productCategories,
     }
+
+    const result = sellerSchema.safeParse(seller)
+    if (!result.success) {
+      setErrors(result.error.issues.map((err) => err.message))
+      setDialogOpen(true)
+      return
+    }
+
     try {
       setIsFetching(true)
       await createSeller(seller)
