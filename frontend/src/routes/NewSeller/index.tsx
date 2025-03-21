@@ -9,6 +9,8 @@ import SellerFormStepOne from './step-one'
 import SellerFormStepTwo from './step-two'
 type BoxeSchema = z.infer<typeof boxeSchema>
 type StoreSchema = z.infer<typeof storeSchema>
+import { SnackbarProvider, enqueueSnackbar } from 'notistack'
+import { useNavigate } from 'react-router-dom'
 import errorsCode from '../../../../shared/operation-errors'
 import AlertDialog from '../../components/alert-dialog'
 import LandingPage from '../../components/landing-page'
@@ -23,6 +25,7 @@ export default function NewSeller() {
   const [errors, setErrors] = useState<Array<string>>([])
   const [isFetching, setIsFetching] = useState(false)
   const { user } = useUserContext()
+  const navigate = useNavigate()
 
   interface StepOne {
     name: string
@@ -62,7 +65,10 @@ export default function NewSeller() {
     try {
       setIsFetching(true)
       await createSeller(seller)
-      console.log('Seller created')
+      enqueueSnackbar('Vendedor criado com sucesso', { variant: 'success' })
+      setTimeout(() => {
+        navigate('/sellers')
+      }, 2000)
     } catch (error: unknown) {
       const errorMessages = []
       if (error instanceof AxiosError && error.response?.data) {
@@ -108,6 +114,7 @@ export default function NewSeller() {
   if (!user) return <LandingPage />
   return (
     <div className="flex md:justify-center md:items-center flex-col h-screen">
+      <SnackbarProvider />
       <div className="md:items-center flex-col h-screen w-full md:w-120 ">
         {dialogOpen && (
           <AlertDialog

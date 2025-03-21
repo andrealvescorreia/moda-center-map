@@ -1,10 +1,12 @@
+import { useGSAP } from '@gsap/react'
 import Checkbox from '@mui/material/Checkbox'
 import ListItemText from '@mui/material/ListItemText'
 import MenuItem from '@mui/material/MenuItem'
 import OutlinedInput from '@mui/material/OutlinedInput'
 import Select, { type SelectChangeEvent } from '@mui/material/Select'
+import { gsap } from 'gsap'
 import { MapPinPlus, X } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import type { z } from 'zod'
 import { IconButton } from '../../components/icon-button'
 import { getProductCategories } from '../../http/api'
@@ -81,6 +83,16 @@ export default function SellerFormStepTwo({
     fetchData()
   }, [categories])
 
+  const formRef = useRef<HTMLDivElement>(null)
+  useGSAP(() => {
+    const element = formRef.current
+    gsap.fromTo(
+      element,
+      { opacity: 0, x: 50 },
+      { opacity: 1, x: 0, duration: 0.4, ease: 'power2.out' }
+    )
+  })
+
   const handleCategorySelection = (
     event: SelectChangeEvent<typeof productCategories>
   ) => {
@@ -107,7 +119,7 @@ export default function SellerFormStepTwo({
 
   if (isAddingSellingLocation) {
     return (
-      <div className="">
+      <div className="" ref={formRef}>
         <h2 className="font-heading text-gray02 font-bold text-2xl pl-8 pt-4">
           Local de venda
         </h2>
@@ -119,7 +131,7 @@ export default function SellerFormStepTwo({
     )
   }
   return (
-    <div className="space-y-4 w-full p-6">
+    <div className="space-y-4 w-full p-6" ref={formRef}>
       <h2 className="font-heading text-gray02 font-bold text-2xl">
         Novo Vendedor
       </h2>

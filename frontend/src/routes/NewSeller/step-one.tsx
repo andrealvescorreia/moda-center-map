@@ -1,5 +1,7 @@
+import { useGSAP } from '@gsap/react'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useEffect } from 'react'
+import { gsap } from 'gsap'
+import { useRef } from 'react'
 import { useForm } from 'react-hook-form'
 import { useHookFormMask } from 'use-mask-input'
 import { z } from 'zod'
@@ -30,12 +32,23 @@ export default function SellerFormStepOne({
     resolver: zodResolver(sellerSchemaStepOne),
   })
   const registerWithMask = useHookFormMask(register)
-  useEffect(() => {
-    console.log(errors)
-  }, [errors])
+
+  const formRef = useRef<HTMLFormElement>(null)
+  useGSAP(() => {
+    const element = formRef.current
+    gsap.fromTo(
+      element,
+      { opacity: 0, x: 50 },
+      { opacity: 1, x: 0, duration: 0.4, ease: 'power2.out' }
+    )
+  })
 
   return (
-    <form onSubmit={handleSubmit(onNext)} className="p-8 space-y-6 w-full">
+    <form
+      onSubmit={handleSubmit(onNext)}
+      ref={formRef}
+      className="p-8 space-y-6 w-full"
+    >
       <h2 className="font-heading text-gray04 font-bold text-2xl">
         Novo Vendedor
       </h2>
