@@ -22,10 +22,7 @@ class App {
     this.app.use('/product-categories', pCategoriesRoutes)
   }
   middlewares() {
-    const allowedOrigins = [
-      'http://localhost:5173',
-      'http://192.168.1.147:5173',
-    ]
+    const allowedOrigins = ['http://localhost:5173']
     this.app.use(
       cors({
         origin: (origin, callback) => {
