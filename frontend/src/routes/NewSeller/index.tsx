@@ -108,7 +108,7 @@ export default function NewSeller() {
   if (!user) return <LandingPage />
   return (
     <div className="flex md:justify-center md:items-center flex-col h-screen">
-      <div className="flex md:justify-center md:items-center flex-col w-full md:w-120 ">
+      <div className="md:items-center flex-col h-screen w-full md:w-120 ">
         {dialogOpen && (
           <AlertDialog
             isOpen={true}

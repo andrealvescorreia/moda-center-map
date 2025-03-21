@@ -165,7 +165,9 @@ export default function SellerFormStepTwo({
 
       {/* ________________________ */}
       <section className="space-y-3 pt-5">
-        <h3 className="text-gray02 font-bold text-xl">Categorias (opcional)</h3>
+        <h3 className="text-gray02 text-xl">
+          <b>Categorias</b> (opcional)
+        </h3>
         <Select
           labelId="demo-multiple-checkbox-label"
           id="demo-multiple-checkbox"
@@ -186,7 +188,7 @@ export default function SellerFormStepTwo({
         </Select>
       </section>
 
-      <div className="space-y-4 py-30">
+      <div className="space-y-4 py-30 md:py-5">
         <ButtonRounded
           type="submit"
           onClick={() => onNext({ boxes, stores, productCategories })}
