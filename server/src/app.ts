@@ -5,6 +5,7 @@ import errorHandler from './middleware/errorHandler'
 import authRoutes from './routes/auth-routes'
 import pCategoriesRoutes from './routes/product-categories-routes'
 import sellerRoutes from './routes/seller-routes'
+import sellingLocationRoutes from './routes/selling-location-routes'
 import userRoutes from './routes/user-routes'
 class App {
   app: express.Application
@@ -20,9 +21,13 @@ class App {
     this.app.use('/auth', authRoutes)
     this.app.use('/seller', sellerRoutes)
     this.app.use('/product-categories', pCategoriesRoutes)
+    this.app.use('/selling-locations', sellingLocationRoutes)
   }
   middlewares() {
-    const allowedOrigins = ['http://localhost:5173']
+    const allowedOrigins = [
+      'http://localhost:5173',
+      'http://192.168.1.147:5173',
+    ]
     this.app.use(
       cors({
         origin: (origin, callback) => {
