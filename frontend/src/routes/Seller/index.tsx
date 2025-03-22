@@ -16,7 +16,11 @@ import type { Boxe } from '../../interfaces/Boxe'
 import type { Loja } from '../../interfaces/Loja'
 import type { Position } from '../../interfaces/Position'
 import { ModaCenterGridMap } from '../../models/ModaCenterGridMap'
-import { colorMap, formatPhoneNumber } from '../../utils/utils'
+import {
+  colorMap,
+  formatPhoneNumber,
+  sellingLocationToText,
+} from '../../utils/utils'
 import SellerCard from './seller-card'
 
 const modaCenterGridMap = new ModaCenterGridMap()
@@ -50,7 +54,6 @@ export default function Seller() {
 
   useEffect(() => {
     if (!seller) return
-    console.log(seller)
     if (seller.boxes.length + seller.boxes.length > 2) {
       isMultiLocationSeller.current = true
     }
@@ -79,35 +82,18 @@ export default function Seller() {
   }, [seller])
 
   function drawPosition() {
-    if (!activeSellingLocation) return
-    if ('rua' in activeSellingLocation) {
-      return (
-        <Rectangle
-          bounds={[
-            [
-              activeSellingLocation.positionInGrid.y,
-              activeSellingLocation.positionInGrid.x,
-            ],
-            [
-              activeSellingLocation.positionInGrid.y + 1,
-              activeSellingLocation.positionInGrid.x + 1,
-            ],
-          ]}
-          fillColor="red"
-        />
-      )
-    }
+    if (!activeSellingLocation) return null
+
+    const { x, y } =
+      'rua' in activeSellingLocation
+        ? activeSellingLocation.positionInGrid
+        : activeSellingLocation.getEntrance()
+
     return (
       <Rectangle
         bounds={[
-          [
-            activeSellingLocation.getEntrance().y,
-            activeSellingLocation.getEntrance().x,
-          ],
-          [
-            activeSellingLocation.getEntrance().y + 1,
-            activeSellingLocation.getEntrance().x + 1,
-          ],
+          [y, x],
+          [y + 1, x + 1],
         ]}
         fillColor="red"
       />
@@ -238,16 +224,6 @@ export default function Seller() {
       </MapContainer>
     </div>
   )
-}
-function sellingLocationToText(location: BoxeResponse | StoreResponse) {
-  if ('box_number' in location) {
-    return `Setor ${colorMap[location.sector_color] || 'Branco'} - Rua ${
-      location.street_letter
-    } - Box ${location.box_number}`
-  }
-  return `Setor ${colorMap[location.sector_color] || 'Branco'} - Bloco ${
-    location.block_number
-  } - Loja ${location.store_number}`
 }
 
 function LocationItem({
