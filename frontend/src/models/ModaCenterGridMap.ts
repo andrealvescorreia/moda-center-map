@@ -80,6 +80,35 @@ export class ModaCenterGridMap {
     })
   }
 
+  getSellingLocation(
+    sellingLocation:
+      | { setor: string; numero: number; rua: string }
+      | { setor: string; numLoja: number; bloco: number }
+  ) {
+    if ('rua' in sellingLocation) {
+      for (const box of this.#modaCenter.boxes) {
+        if (
+          box.numero === sellingLocation.numero &&
+          box.setor === sellingLocation.setor &&
+          box.rua === sellingLocation.rua
+        ) {
+          return box
+        }
+      }
+    } else {
+      for (const loja of this.#modaCenter.lojas) {
+        if (
+          loja.numLoja === sellingLocation.numLoja &&
+          loja.setor === sellingLocation.setor &&
+          loja.bloco === sellingLocation.bloco
+        ) {
+          return loja
+        }
+      }
+    }
+    return undefined
+  }
+
   getBanheiros() {
     return this.#modaCenter.banheiros
   }

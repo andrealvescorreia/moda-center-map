@@ -14,10 +14,14 @@ function SellerItem(props: SellerItemProps) {
       {...props}
     >
       <div className="flex items-center justify-between p-4">
-        <div className="bg-gray06 size-13 rounded-xl" />
+        <div className="bg-gray06 size-13 min-w-13 rounded-xl" />
         <div className="flex flex-col gap-1 items-start px-3  ">
-          <h3 className="font-semibold text-gray04">{props.name}</h3>
-          <p className="text-gray03 text-sm">{props.description}</p>
+          <h3 className="font-semibold  text-gray04 text-ellipsis overflow-hidden whitespace-nowrap  max-w-[70vw]">
+            {props.name}
+          </h3>
+          <p className="text-gray03 text-sm whitespace-nowrap overflow-hidden text-ellipsis max-w-[70vw]">
+            {props.description}
+          </p>
           <hr className="w-[80%] md:text-white py-[0.5px] text-gray05 absolute bottom-0" />
         </div>
       </div>

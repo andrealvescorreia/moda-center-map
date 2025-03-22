@@ -183,7 +183,7 @@ const RouteEditor = ({
         >
           <Sheet.Container>
             <SheetHeaderTitle onDismiss={cancel}>
-              <h2>Minha rota</h2>
+              <h2 className="pl-6">Minha rota</h2>
             </SheetHeaderTitle>
             <Sheet.Content className="flex gap-3 pl-5 pt-4">
               <div className="flex gap-4 overflow-x-auto">

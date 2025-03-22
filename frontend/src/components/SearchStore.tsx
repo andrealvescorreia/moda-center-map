@@ -5,21 +5,14 @@ gsap.registerPlugin(CSSPlugin)
 // biome-ignore lint/suspicious/noShadowRestrictedNames: <explanation>
 import { ArrowLeft, CircleX, Map } from 'lucide-react'
 import { type ComponentProps, useEffect, useRef } from 'react'
-import type { Boxe } from '../interfaces/Boxe'
-import type { Loja } from '../interfaces/Loja'
 import { InputField, InputIcon, InputRoot } from './input'
 
 interface SearchStoreProps {
   onCancel?: () => void
   onChooseOnMap?: () => void
-  onChooseFromList?: (store: Loja | Boxe) => void
 }
 
-export function SearchStore({
-  onChooseOnMap,
-  onCancel,
-  onChooseFromList, //TODO -> necessita do backend
-}: SearchStoreProps) {
+export function SearchStore({ onChooseOnMap, onCancel }: SearchStoreProps) {
   const element = useRef<HTMLDivElement>(null)
   useEffect(() => {
     gsap.fromTo(

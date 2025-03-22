@@ -6,6 +6,7 @@ import type { SellerResponse } from './responses'
 const axiosInstance = axios.create({
   withCredentials: true,
   //baseURL: import.meta.env.VITE_API_URL,
+  baseURL: 'http://localhost:3001',
   headers: { 'Content-Type': 'application/json' },
 })
 
@@ -13,32 +14,37 @@ export async function registerUser(data: {
   username: string
   password: string
 }) {
-  return await axiosInstance.post('http://localhost:3001/user', data)
+  return await axiosInstance.post('user', data)
 }
 
 export async function loginUser(data: {
   username: string
   password: string
 }) {
-  return await axiosInstance.post('http://localhost:3001/auth', data)
+  return await axiosInstance.post('auth', data)
 }
 
 export async function logoutUser() {
-  return await axiosInstance.post('http://localhost:3001/auth/logout')
+  return await axiosInstance.post('auth/logout')
 }
 
 export async function getUser() {
-  return await axiosInstance.get('http://localhost:3001/user')
+  return await axiosInstance.get('user')
 }
 
 export async function getSellers() {
-  const response = await axiosInstance.get('http://192.168.1.147:3001/seller')
+  const response = await axiosInstance.get('seller')
   const sellers: SellerResponse[] = response.data
   return sellers
 }
+export async function getSeller(id: string) {
+  const response = await axiosInstance.get(`seller/id/${id}`)
+  const seller: SellerResponse = response.data
+  return seller
+}
 
 export async function getProductCategories() {
-  return await axiosInstance.get('http://localhost:3001/product-categories')
+  return await axiosInstance.get('product-categories')
 }
 
 interface NewSeller {
@@ -49,5 +55,5 @@ interface NewSeller {
 }
 
 export async function createSeller(data: NewSeller) {
-  return await axiosInstance.post('http://localhost:3001/seller', data)
+  return await axiosInstance.post('seller', data)
 }

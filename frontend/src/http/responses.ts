@@ -24,4 +24,4 @@ interface SellerResponse {
   stores: StoreResponse[]
   product_categories: ProductCategoryResponse[]
 }
-export type { SellerResponse }
+export type { SellerResponse, BoxeResponse, StoreResponse }
