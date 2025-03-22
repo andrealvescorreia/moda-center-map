@@ -1,6 +1,6 @@
 import { Plus } from 'lucide-react'
 import { useEffect, useState } from 'react'
-import { NavLink } from 'react-router-dom'
+import { NavLink, useNavigate } from 'react-router-dom'
 import { IconButton } from '../../components/icon-button'
 import NavBar from '../../components/nav'
 import { getSellers } from '../../http/api'
@@ -10,6 +10,7 @@ import SellerList from './seller-list'
 export default function Sellers() {
   const [sellers, setSellers] = useState<SellerResponse[]>([])
   const [loading, setLoading] = useState(true)
+  const navigate = useNavigate()
   useEffect(() => {
     const fetchSellers = async () => {
       const sellers = await getSellers()
@@ -32,7 +33,10 @@ export default function Sellers() {
           </p>
         </div>
       )}
-      <SellerList sellers={sellers} onClick={(id) => console.log(id)} />
+      <SellerList
+        sellers={sellers}
+        onClick={(id) => navigate(`/sellers/${id}`)}
+      />
       <NavLink
         to="/new-seller"
         className="fixed bottom-24 ml-[50%] transform -translate-x-1/2"
