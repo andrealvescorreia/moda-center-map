@@ -40,92 +40,77 @@ const RouteEditor = ({
     }
   }, [isAddingDestiny, route.inicio])
 
-  // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
-  useEffect(() => {
-    const isInsideGridMap = (lat: number, lng: number) => {
-      return (
-        lat >= 0 &&
-        lat < gridMap.getDimensions()[0] &&
-        lng >= 0 &&
-        lng < gridMap.getDimensions()[1]
-      )
+  function notAddingDestiny() {
+    setIsAddingDestiny(false)
+    setIsAddingDestinyFromMap(false)
+  }
+
+  function editRouteStartPoint(click: { lat: number; lng: number }) {
+    const { lat: y, lng: x } = click
+    const isBoxe = gridMap.getGrid()[y][x] === ModaCenterGridMap.BOXE
+    const isCaminho = (lat: number, lng: number) =>
+      gridMap.getGrid()[lat][lng] === ModaCenterGridMap.CAMINHO
+
+    const adjustedX = isBoxe
+      ? ([x + 1, x - 1].find((lng) => isCaminho(y, lng)) ?? x)
+      : x
+
+    if (!isCaminho(y, adjustedX)) return
+
+    onUpdate({
+      ...route,
+      inicio: {
+        position: { x: adjustedX, y },
+        info: gridMap.findNearestBoxe(y, adjustedX),
+      },
+    })
+  }
+
+  function addDestinationFromMap(click: { lat: number; lng: number }) {
+    const gridValue = gridMap.getGrid()[click.lat][click.lng]
+
+    if (
+      gridValue === ModaCenterGridMap.BOXE ||
+      gridValue === ModaCenterGridMap.LOJA
+    ) {
+      const sellingLocation =
+        gridValue === ModaCenterGridMap.BOXE
+          ? gridMap.getBoxe(click.lat, click.lng)
+          : gridMap.getLoja(click.lat, click.lng)
+
+      if (!sellingLocation) return
+
+      const position =
+        gridValue === ModaCenterGridMap.BOXE
+          ? { x: click.lng, y: click.lat }
+          : (sellingLocation as Loja).getEntrance()
+
+      const newRoute = {
+        ...route,
+        destinos: [...route.destinos, { info: sellingLocation, position }],
+      }
+
+      onUpdate(newRoute)
+      notAddingDestiny()
     }
+  }
+
+  function isInsideGridMap(lat: number, lng: number) {
+    const [rows, cols] = gridMap.getDimensions()
+    return lat >= 0 && lat < rows && lng >= 0 && lng < cols
+  }
+
+  function onClickMap() {
     if (!clickLocation) return
     if (!isInsideGridMap(clickLocation.lat, clickLocation.lng)) return
 
-    const y = clickLocation.lat
-    let x = clickLocation.lng
-    if (
-      isEditingMarcadorInicio &&
-      gridMap.getGrid()[clickLocation.lat][clickLocation.lng] ===
-        ModaCenterGridMap.BOXE
-    ) {
-      if (
-        gridMap.getGrid()[clickLocation.lat][clickLocation.lng + 1] ===
-        ModaCenterGridMap.CAMINHO
-      ) {
-        x = clickLocation.lng + 1
-      } else if (
-        gridMap.getGrid()[clickLocation.lat][clickLocation.lng - 1] ===
-        ModaCenterGridMap.CAMINHO
-      ) {
-        x = clickLocation.lng - 1
-      }
-    }
+    if (isEditingMarcadorInicio) editRouteStartPoint(clickLocation)
+    if (isAddingDestinyFromMap) addDestinationFromMap(clickLocation)
+  }
 
-    if (isEditingMarcadorInicio && gridMap.getGrid()[y][x] === 0) {
-      const newRoute = {
-        ...route,
-        inicio: {
-          position: { x, y },
-          info: gridMap.findNearestBoxe(y, x),
-        },
-      }
-      onUpdate(newRoute)
-    }
-    if (
-      isAddingDestiny &&
-      gridMap.getGrid()[clickLocation.lat][clickLocation.lng] ===
-        ModaCenterGridMap.BOXE
-    ) {
-      const boxe = gridMap.getBoxe(clickLocation.lat, clickLocation.lng)
-
-      if (boxe === null) return
-      const newRoute = {
-        ...route,
-        destinos: [
-          ...route.destinos,
-          {
-            info: boxe || null,
-            position: { x: clickLocation.lng, y: clickLocation.lat },
-          },
-        ],
-      }
-      onUpdate(newRoute)
-      setIsAddingDestiny(false)
-    }
-
-    if (
-      isAddingDestiny &&
-      gridMap.getGrid()[clickLocation.lat][clickLocation.lng] ===
-        ModaCenterGridMap.LOJA
-    ) {
-      const loja = gridMap.getLoja(clickLocation.lat, clickLocation.lng)
-      if (!loja) return
-      const entrance = loja.getEntrance()
-      const newRoute = {
-        ...route,
-        destinos: [
-          ...route.destinos,
-          {
-            info: loja as Loja,
-            position: entrance,
-          },
-        ],
-      }
-      onUpdate(newRoute)
-      setIsAddingDestiny(false)
-    }
+  // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
+  useEffect(() => {
+    onClickMap()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [onUpdate, clickLocation])
 
@@ -133,7 +118,6 @@ const RouteEditor = ({
     const otherDestinies = route.destinos.filter(
       (destiny) => destiny.info !== bestRoute.destinos[index].info
     )
-
     const newRoute = {
       ...route,
       destinos: otherDestinies,
@@ -143,7 +127,7 @@ const RouteEditor = ({
 
   const cancel = () => {
     setIsEditingMarcadorInicio(false)
-    setIsAddingDestiny(false)
+    notAddingDestiny()
     onCancel()
   }
 
@@ -212,7 +196,7 @@ const RouteEditor = ({
                   className="shrink-0"
                   onClick={() => {
                     setIsEditingMarcadorInicio(true)
-                    setIsAddingDestiny(false)
+                    notAddingDestiny()
                   }}
                 >
                   <PersonStanding size={20} />
@@ -226,6 +210,16 @@ const RouteEditor = ({
     )
   }
 
+  if (isAddingDestiny && !isAddingDestinyFromMap) {
+    return (
+      <SearchStore
+        onCancel={notAddingDestiny}
+        onChooseOnMap={() => {
+          setIsAddingDestinyFromMap(true)
+        }}
+      />
+    )
+  }
   if (isAddingDestinyFromMap) {
     return (
       <span className="ui absolute flex w-full justify-center top-3">
@@ -233,29 +227,11 @@ const RouteEditor = ({
           <DialogAction
             title="Informe o local de destino"
             text="Clique em um ponto de venda no mapa"
-            onAccept={() => {
-              setIsAddingDestinyFromMap(false)
-              setIsAddingDestiny(false)
-            }}
-            onCancel={() => {
-              setIsAddingDestiny(false)
-            }}
+            onAccept={notAddingDestiny}
+            onCancel={notAddingDestiny}
           />
         </span>
       </span>
-    )
-  }
-
-  if (isAddingDestiny) {
-    return (
-      <SearchStore
-        onCancel={() => {
-          setIsAddingDestiny(false)
-        }}
-        onChooseOnMap={() => {
-          setIsAddingDestinyFromMap(true)
-        }}
-      />
     )
   }
 
