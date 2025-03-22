@@ -258,7 +258,7 @@ describe('create seller', () => {
     const reqBody = {
       name: 'Desejo de Mulher',
       sellingLocations: {
-        boxes: [{ sector_color: 'blue', box_number: 121, street_letter: 'P' }],
+        boxes: [{ sector_color: 'blue', box_number: 121, street_letter: 'O' }],
       },
     }
 
@@ -303,12 +303,58 @@ describe('create seller', () => {
     seller?.should.be.null
   })
 
+  it('should not be able to create a seller when box is invalid -> even box number and street letter A', async () => {
+    const reqBody = {
+      name: 'Desejo de Mulher',
+      sellingLocations: {
+        boxes: [{ sector_color: 'blue', box_number: 2, street_letter: 'A' }],
+      },
+    }
+
+    const response = await postSeller(reqBody)
+    response.status.should.be.equal(400)
+    response.body.should.be.deep.equal({
+      errors: [
+        {
+          code: 'INVALID',
+          field: 'sellingLocations.boxes.0.box_number',
+          message: 'Street letter A does not have even box numbers',
+        },
+      ],
+    })
+    const seller = await findSeller(reqBody.name)
+    seller?.should.be.null
+  })
+
+  it('should not be able to create a seller when box is invalid -> odd box number and street letter P', async () => {
+    const reqBody = {
+      name: 'Desejo de Mulher',
+      sellingLocations: {
+        boxes: [{ sector_color: 'blue', box_number: 1, street_letter: 'P' }],
+      },
+    }
+
+    const response = await postSeller(reqBody)
+    response.status.should.be.equal(400)
+    response.body.should.be.deep.equal({
+      errors: [
+        {
+          code: 'INVALID',
+          field: 'sellingLocations.boxes.0.box_number',
+          message: 'Street letter P does not have odd box numbers',
+        },
+      ],
+    })
+    const seller = await findSeller(reqBody.name)
+    seller?.should.be.null
+  })
+
   it('should not be able to create a seller when name already in use', async () => {
     const reqBody = {
       name: 'Olivia Palito moda feminina',
       sellingLocations: {
         boxes: [
-          { sector_color: 'yellow', box_number: 121, street_letter: 'P' },
+          { sector_color: 'yellow', box_number: 121, street_letter: 'O' },
         ],
       },
     }

@@ -89,6 +89,21 @@ async function validateBoxes(
       })
     }
 
+    if (box.box_number % 2 === 0 && box.street_letter === 'A') {
+      errors.push({
+        code: errorsIds.INVALID,
+        field: `sellingLocations.boxes.${i}.box_number`,
+        message: 'Street letter A does not have even box numbers',
+      })
+    }
+    if (box.box_number % 2 !== 0 && box.street_letter === 'P') {
+      errors.push({
+        code: errorsIds.INVALID,
+        field: `sellingLocations.boxes.${i}.box_number`,
+        message: 'Street letter P does not have odd box numbers',
+      })
+    }
+
     if (boxOverlapsWithFoodCourt(box)) {
       errors.push({
         code: errorsIds.INVALID,

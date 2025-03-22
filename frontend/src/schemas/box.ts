@@ -27,6 +27,20 @@ const boxeSchema = z
         path: ['box_number'],
       })
     }
+    if (values.street_letter === 'A' && values.box_number % 2 === 0) {
+      ctx.addIssue({
+        message: 'Boxes na rua A devem ser ímpares',
+        code: z.ZodIssueCode.custom,
+        path: ['box_number'],
+      })
+    }
+    if (values.street_letter === 'P' && values.box_number % 2 !== 0) {
+      ctx.addIssue({
+        message: 'Boxes na rua P devem ser pares',
+        code: z.ZodIssueCode.custom,
+        path: ['box_number'],
+      })
+    }
     return true
   })
 
