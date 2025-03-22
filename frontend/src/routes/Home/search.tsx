@@ -1,5 +1,6 @@
-import { ArrowLeft } from 'lucide-react'
+import { ArrowLeft, CircleX } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { InputField, InputIcon, InputRoot } from '../../components/input'
 import { searchSeller } from '../../http/api'
 import type { SellerResponse } from '../../http/responses'
@@ -12,20 +13,18 @@ export default function Search({ onCancel }: SearchProps) {
   const [searchTerm, setSearchTerm] = useState('')
   const [sellers, setSellers] = useState<SellerResponse[]>([])
   const isFetchingRef = useRef(false)
-
-  const isFetching = isFetchingRef.current
+  const navigate = useNavigate()
 
   useEffect(() => {
-    if (isFetching || searchTerm.length < 3) return
+    if (isFetchingRef.current || searchTerm.length < 3) return
     isFetchingRef.current = true
     searchSeller(searchTerm)
       .then((res) => {
-        console.log(res)
         isFetchingRef.current = false
         setSellers(res)
       })
       .catch(console.error)
-  }, [searchTerm, isFetching])
+  }, [searchTerm])
 
   return (
     <div className="ui absolute 100dvh 100dvw w-full h-full bg-white">
@@ -40,10 +39,23 @@ export default function Search({ onCancel }: SearchProps) {
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
+          {searchTerm.length > 0 && (
+            <InputIcon>
+              <CircleX
+                className="cursor-pointer"
+                onClick={() => setSearchTerm('')}
+              />
+            </InputIcon>
+          )}
         </InputRoot>
       </div>
       <div>
-        <SellerList sellers={sellers} onClick={(id) => console.log(id)} />
+        <SellerList
+          sellers={sellers}
+          onClick={(id) => {
+            navigate(`/sellers/${id}`)
+          }}
+        />
       </div>
     </div>
   )
