@@ -42,6 +42,13 @@ export async function getSeller(id: string) {
   const seller: SellerResponse = response.data
   return seller
 }
+export async function searchSeller(searchTerm: string) {
+  const response = await axiosInstance.get(
+    `seller/search?searchTerm=${searchTerm}`
+  )
+  const sellers: SellerResponse[] = response.data
+  return sellers
+}
 
 export async function getProductCategories() {
   return await axiosInstance.get('product-categories')

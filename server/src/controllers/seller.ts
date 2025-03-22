@@ -175,10 +175,27 @@ async function searchSeller({ searchTerm, limit, offset }: Search) {
     limit,
     offset,
     replacements: { searchTerm },
+
+    attributes: { exclude: ['createdAt', 'updatedAt', 'search_vector'] },
+    raw: true,
+  })
+
+  const sellers = await Seller.findAll({
+    where: { id: results.map((result) => result.id) },
+    include: [
+      { model: Boxe, attributes: { exclude: ['createdAt', 'updatedAt'] } },
+      { model: Store, attributes: { exclude: ['createdAt', 'updatedAt'] } },
+      {
+        model: ProductCategory,
+        attributes: {
+          exclude: ['createdAt', 'updatedAt'],
+        },
+      },
+    ],
     attributes: { exclude: ['createdAt', 'updatedAt', 'search_vector'] },
   })
 
-  return results
+  return sellers
 }
 
 export async function create(req: Request, res: Response, next: NextFunction) {

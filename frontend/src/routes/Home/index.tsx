@@ -15,6 +15,7 @@ import type { Position } from '../../interfaces/Position'
 import { ModaCenterGridMap } from '../../models/ModaCenterGridMap'
 import { useNavContext } from '../../providers/NavProvider'
 import { useUserContext } from '../../providers/UserProvider'
+import Search from './search'
 const modaCenterGridMap = new ModaCenterGridMap()
 const minZoomLevelToRenderMarkers = 5
 
@@ -28,8 +29,12 @@ function App() {
   const [route, setRoute] = useState<MyRoute>()
   const { show } = useNavContext()
   const { user } = useUserContext()
-
+  const [isSearching, setIsSearching] = useState(false)
   const handleUpdate = useCallback((route: MyRoute) => setRoute(route), [])
+
+  if (isSearching) {
+    return <Search onCancel={() => setIsSearching(false)} />
+  }
 
   return (
     <div>
@@ -43,7 +48,10 @@ function App() {
               <InputIcon>
                 <img src={Logo} alt="Logo" className="size-6" />
               </InputIcon>
-              <InputField placeholder="Busque pontos de venda" />
+              <InputField
+                placeholder="Busque pontos de venda"
+                onClick={() => setIsSearching(true)}
+              />
             </InputRoot>
           </div>
         )}
