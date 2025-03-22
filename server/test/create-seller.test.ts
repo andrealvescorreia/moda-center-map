@@ -3,7 +3,7 @@ const request = require('supertest')
 const should = chai.should()
 import type { Includeable } from 'sequelize'
 import app from '../src/app'
-import sequelize from '../src/database'
+import sequelize, { setup } from '../src/database'
 import Boxe from '../src/database/models/boxe'
 import ProductCategory from '../src/database/models/product-category'
 import Seller from '../src/database/models/seller'
@@ -28,6 +28,7 @@ describe('create seller', () => {
   }
 
   before(async () => {
+    await setup()
     await sequelize.sync({ force: true })
     await request(app)
       .post('/user')

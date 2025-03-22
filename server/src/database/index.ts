@@ -80,7 +80,7 @@ async function setupProductCategories() {
   }
 }
 
-async function setup() {
+export async function setup() {
   await sync()
   await setupProductCategories()
   if (process.env.NODE_ENV !== 'test') {
@@ -91,5 +91,5 @@ async function setup() {
       )
   }
 }
-setup()
+
 export default sequelize
