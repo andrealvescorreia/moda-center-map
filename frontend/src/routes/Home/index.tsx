@@ -74,10 +74,10 @@ function App() {
             modaCenterGridMap.getBounds()[1][1] + 60,
           ],
         ]}
-        center={[3, 3.5]}
-        zoom={5}
         maxZoom={6}
         minZoom={1}
+        center={modaCenterGridMap.getCenter()}
+        zoom={2}
         preferCanvas={true}
       >
         <GridDrawer

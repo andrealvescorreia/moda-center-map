@@ -69,6 +69,12 @@ export class ModaCenterGridMap {
     ]
     return bounds
   }
+  getCenter() {
+    return [
+      this.#yxDimensions[0] / 2,
+      this.#yxDimensions[1] / 2,
+    ] as L.LatLngExpression
+  }
 
   getBoxe(y: number, x: number) {
     if (this.#grid[y][x] !== ModaCenterGridMap.BOXE) {
