@@ -8,6 +8,7 @@ import Register from './routes/Register'
 import './App.css'
 import NavBar from './components/nav'
 import NewSeller from './routes/NewSeller'
+import Seller from './routes/Seller'
 import Sellers from './routes/Sellers'
 import UserProfile from './routes/UserProfile'
 
@@ -41,7 +42,8 @@ export default function App() {
       <Route path="register" element={<Register />} />
       <Route path="login" element={<Login />} />
       <Route path="sellers" element={<Sellers />} />
-      <Route path="sellers/new" element={<NewSeller />} />
+      <Route path="sellers/:id" element={<Seller />} />
+      <Route path="new-seller" element={<NewSeller />} />
       <Route path="user" element={<UserProfile />} />
       <Route path="*" element={<NotFound />} />
     </Routes>
