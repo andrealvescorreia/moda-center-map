@@ -57,6 +57,11 @@ export default function Search({ onCancel }: SearchProps) {
           }}
         />
       </div>
+      {sellers.length === 0 && searchTerm.length >= 3 && (
+        <div className="flex justify-center items-center h-20">
+          <p className="text-gray-03">Nenhum resultado encontrado</p>
+        </div>
+      )}
     </div>
   )
 }
