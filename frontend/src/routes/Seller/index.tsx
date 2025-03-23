@@ -54,7 +54,7 @@ export default function Seller() {
 
   useEffect(() => {
     if (!seller) return
-    if (seller.boxes.length + seller.boxes.length > 2) {
+    if (seller.boxes.length + seller.boxes.length >= 2) {
       isMultiLocationSeller.current = true
     }
 
