@@ -1,21 +1,18 @@
 import CircularProgress from '@mui/material/CircularProgress'
 import { AxiosError } from 'axios'
-import { useState } from 'react'
-import type { z } from 'zod'
-import { createSeller } from '../../http/api'
-import type boxeSchema from '../../schemas/box'
-import type storeSchema from '../../schemas/store'
-import SellerFormStepOne from './step-one'
-import SellerFormStepTwo from './step-two'
-type BoxeSchema = z.infer<typeof boxeSchema>
-type StoreSchema = z.infer<typeof storeSchema>
 import { SnackbarProvider, enqueueSnackbar } from 'notistack'
+import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import errorsCode from '../../../../shared/operation-errors'
 import AlertDialog from '../../components/alert-dialog'
 import LandingPage from '../../components/landing-page'
+import { createSeller } from '../../http/api'
 import { useUserContext } from '../../providers/UserProvider'
+import type { BoxeSchema } from '../../schemas/box'
 import sellerSchema from '../../schemas/seller'
+import type { StoreSchema } from '../../schemas/store'
+import SellerFormStepOne from './step-one'
+import SellerFormStepTwo from './step-two'
 
 export default function NewSeller() {
   const [currentStep, setCurrentStep] = useState(1)

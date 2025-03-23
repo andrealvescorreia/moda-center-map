@@ -9,11 +9,12 @@ import { MapPinPlus, X } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import type { z } from 'zod'
 import { IconButton } from '../../components/icon-button'
+import IconOnlyButton from '../../components/icon-only-button'
 import { getProductCategories } from '../../http/api'
 import type boxeSchema from '../../schemas/box'
 import type storeSchema from '../../schemas/store'
+import { colorMap } from '../../utils/utils'
 import ButtonRounded from './button-rounded'
-import IconOnlyButton from './icon-only-button'
 import SellingLocationForm from './selling-location-form'
 
 const ITEM_HEIGHT = 48
@@ -147,7 +148,7 @@ export default function SellerFormStepTwo({
               key={box.sector_color + box.street_letter + box.box_number}
             >
               Rua {box.street_letter}, Box {box.box_number}, Setor{' '}
-              {box.sector_color}
+              {colorMap[box.sector_color]}
               <IconOnlyButton onClick={() => removeBox(box)}>
                 <X />
               </IconOnlyButton>

@@ -2,8 +2,8 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import type { z } from 'zod'
 import { InputField, InputRoot } from '../../components/input'
+import SelectOptions from '../../components/select-options'
 import storeSchema from '../../schemas/store'
-import SelectOptions from './select-options'
 
 type StoreSchema = z.infer<typeof storeSchema>
 

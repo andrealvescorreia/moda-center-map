@@ -3,8 +3,8 @@ import { useState } from 'react'
 import { ImageOverlay, Marker, Rectangle } from 'react-leaflet'
 import type { JSX } from 'react/jsx-runtime'
 import { ModaCenterGridMap } from '../models/ModaCenterGridMap'
-import Boxe from './Boxe'
-import MapInfoCollector from './MapInfoCollector'
+import MapInfoCollector from './Map/map-info-collector'
+import 'leaflet-extra-markers'
 
 interface MapCameraBounds {
   getSouthWest: () => { lat: number; lng: number }
@@ -57,7 +57,7 @@ const GridDrawer = ({
 
         if (grid[i][j] === ModaCenterGridMap.BOXE) {
           components.push(
-            <Boxe y={i} x={j} onClick={() => { }} key={`${i}-${j}`} />
+            <Boxe y={i} x={j} onClick={() => {}} key={`${i}-${j}`} />
           )
         }
       }
@@ -155,3 +155,25 @@ const GridDrawer = ({
   )
 }
 export default GridDrawer
+
+interface BoxeProps {
+  x: number
+  y: number
+  onClick: () => void
+}
+
+const Boxe = ({ x, y, onClick }: BoxeProps) => {
+  return (
+    <Rectangle
+      bounds={[
+        [y, x],
+        [y + 1, x + 1],
+      ]}
+      color="#ffffff00"
+      fillColor="orange"
+      eventHandlers={{
+        click: onClick,
+      }}
+    />
+  )
+}

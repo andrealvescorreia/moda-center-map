@@ -1,8 +1,8 @@
 import { Marker } from 'react-leaflet'
 import type { Destiny } from '../../interfaces/Destiny'
 import type { Position } from '../../interfaces/Position'
-import AntPath from '../AntPath'
-import DestinyMarker from '../DestinyMarker'
+import AntPath from './ant-path'
+import DestinyMarker from './destiny-marker'
 
 interface RouteDrawerProps {
   inicio: Position

@@ -11,6 +11,7 @@ export default function Sellers() {
   const [sellers, setSellers] = useState<SellerResponse[]>([])
   const [loading, setLoading] = useState(true)
   const navigate = useNavigate()
+
   useEffect(() => {
     const fetchSellers = async () => {
       const sellers = await getSellers()

@@ -1,5 +1,5 @@
 import { useMapEvents } from 'react-leaflet'
-import { useClickContext } from '../providers/ClickProvider'
+import { useClickContext } from '../../providers/ClickProvider'
 
 export function ClickPosition() {
   const { setClickLocation } = useClickContext()
@@ -11,8 +11,6 @@ export function ClickPosition() {
         lat: Number.parseInt(lat.toString()),
         lng: Number.parseInt(lng.toString()),
       })
-      //onClick(Number.parseInt(lat.toString()), Number.parseInt(lng.toString()))
-      console.log(lat, lng)
     },
   })
   return false

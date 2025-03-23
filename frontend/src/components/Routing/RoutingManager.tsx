@@ -6,8 +6,8 @@ import type { ModaCenterGridMap } from '../../models/ModaCenterGridMap'
 import { RouteCalculator } from '../../models/RouteCalculator'
 import { TSPSolverNN } from '../../models/TSPSolverNN'
 import { useNavContext } from '../../providers/NavProvider'
-import RouteButton from './RouteButton'
 import RouteEditor from './RouteEditor'
+import RouteButton from './route-button'
 
 interface RoutingManager {
   gridMap: ModaCenterGridMap

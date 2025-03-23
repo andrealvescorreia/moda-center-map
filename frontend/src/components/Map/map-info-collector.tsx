@@ -34,7 +34,7 @@ function MapInfoCollector({ onUpdateInfo }: MapInfoCollectorProps) {
     }
   }, [map, updateInfo])
   return false
-  return (
+  /*return (
     <div>
       <div
         style={{
@@ -71,7 +71,7 @@ function MapInfoCollector({ onUpdateInfo }: MapInfoCollectorProps) {
         </ul>
       </div>
     </div>
-  )
+  )*/
 }
 
 export default MapInfoCollector
