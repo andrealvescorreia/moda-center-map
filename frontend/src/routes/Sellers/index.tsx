@@ -25,7 +25,7 @@ export default function Sellers() {
     <div className="relative h-full w-full">
       <NavBar />
       <div className="flex justify-center items-center h-18">
-        <h1 className="text-2xl">Vendedores</h1>
+        <h1 className="text-3xl font-semibold">Vendedores</h1>
       </div>
       {sellers.length === 0 && !loading && (
         <div className="flex justify-center items-center h-full">

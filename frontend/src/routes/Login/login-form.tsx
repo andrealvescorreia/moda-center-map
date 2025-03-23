@@ -31,7 +31,7 @@ export default function LoginForm() {
   const [isFetching, setIsFetching] = useState(false)
   const navigate = useNavigate()
 
-  async function onRegister({ username, password }: RegistrationSchema) {
+  async function onLogin({ username, password }: RegistrationSchema) {
     try {
       setIsFetching(true)
       const response = await loginUser({ username, password })
@@ -67,7 +67,7 @@ export default function LoginForm() {
 
   return (
     <form
-      onSubmit={handleSubmit(onRegister)}
+      onSubmit={handleSubmit(onLogin)}
       className="p-8 space-y-6 w-full md:max-w-[440px] md:border border-gray05 md:shadow-lg md:rounded-2xl"
     >
       <h2 className="font-heading text-gray04 font-semibold text-xl">ENTRAR</h2>
