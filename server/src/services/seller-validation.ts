@@ -138,7 +138,7 @@ async function validateBoxes(
         message: 'Box already occupied by other seller',
         occupiedBy: {
           id: boxLocation.seller_id,
-          name: boxLocation.seller.name,
+          name: boxLocation.seller?.name,
         },
       })
     }
@@ -218,7 +218,7 @@ async function validateStores(
         message: 'Store already occupied by other seller',
         occupiedBy: {
           id: storeLocation.seller_id,
-          name: storeLocation.seller.name,
+          name: storeLocation.seller?.name,
         },
       })
     }

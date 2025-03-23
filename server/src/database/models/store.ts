@@ -31,12 +31,12 @@ export default class Store extends Model {
 
   @ForeignKey(() => Seller)
   @Column({
-    allowNull: true,
     type: DataType.UUID,
+    onDelete: 'CASCADE',
   })
   declare seller_id: string
 
-  @BelongsTo(() => Seller)
+  @BelongsTo(() => Seller, { onDelete: 'CASCADE' })
   declare seller: Seller
   //SellingLocation end
 
@@ -45,6 +45,7 @@ export default class Store extends Model {
     type: DataType.INTEGER,
   })
   declare store_number: number
+
   @Column({
     allowNull: false,
     type: DataType.INTEGER,

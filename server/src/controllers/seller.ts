@@ -203,7 +203,7 @@ export async function create(req: Request, res: Response, next: NextFunction) {
     const parsed = registerSellerSchema.parse({
       ...req.body,
       phone_number: req.body.phone_number?.replace(/\D/g, '').trim(),
-      name: req.body.name.trim(),
+      name: req.body.name?.trim(),
     })
     const errors = await validateNewSeller(parsed)
     if (errors.length > 0) {
@@ -250,6 +250,21 @@ export async function create(req: Request, res: Response, next: NextFunction) {
       await t.rollback()
       return next(error)
     }
+  } catch (error) {
+    return next(error)
+  }
+}
+
+export async function destroy(req: Request, res: Response, next: NextFunction) {
+  try {
+    if (!z.string().uuid().safeParse(req.params.id).success) {
+      res.status(400).json({ message: 'Invalid id' })
+      return
+    }
+
+    await Seller.destroy({ where: { id: req.params.id } })
+    res.status(204).send()
+    return
   } catch (error) {
     return next(error)
   }

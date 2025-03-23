@@ -46,11 +46,11 @@ export default class Seller extends Model {
   })
   declare search_vector: string
 
-  @HasMany(() => Store)
-  declare stores: Store[]
-
-  @HasMany(() => Boxe)
+  @HasMany(() => Boxe, { onDelete: 'CASCADE' })
   declare boxes: Boxe[]
+
+  @HasMany(() => Store, { onDelete: 'CASCADE' })
+  declare stores: Store[]
 
   @BelongsToMany(
     () => User,
@@ -58,9 +58,9 @@ export default class Seller extends Model {
   )
   declare users: User[]
 
-  @BelongsToMany(
-    () => ProductCategory,
-    () => SellerProductCategories
-  )
+  @BelongsToMany(() => ProductCategory, {
+    through: () => SellerProductCategories,
+    onDelete: 'CASCADE',
+  })
   declare product_categories: ProductCategory[]
 }

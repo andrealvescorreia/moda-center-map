@@ -31,12 +31,12 @@ export default class Boxe extends Model {
 
   @ForeignKey(() => Seller)
   @Column({
-    allowNull: true,
     type: DataType.UUID,
+    onDelete: 'CASCADE',
   })
   declare seller_id: string
 
-  @BelongsTo(() => Seller)
+  @BelongsTo(() => Seller, { onDelete: 'CASCADE' })
   declare seller: Seller
   //SellingLocation end
 
