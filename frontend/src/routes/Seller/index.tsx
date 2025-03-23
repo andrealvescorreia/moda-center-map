@@ -1,12 +1,13 @@
 import L from 'leaflet'
-import { ArrowRight, Phone } from 'lucide-react'
+import { ArrowRight, Phone, Trash2 } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import { ImageOverlay, Rectangle, useMap } from 'react-leaflet'
 import { MapContainer } from 'react-leaflet'
 import { Sheet, type SheetRef } from 'react-modal-sheet'
 import { useNavigate, useParams } from 'react-router-dom'
+import { IconButton } from '../../components/icon-button'
 import { SheetHeaderTitle } from '../../components/sheet-header-title'
-import { getSeller } from '../../http/api'
+import { deleteSeller, getSeller } from '../../http/api'
 import type {
   BoxeResponse,
   SellerResponse,
@@ -40,6 +41,7 @@ export default function Seller() {
     Boxe | Loja | undefined
   >()
   const isMultiLocationSeller = useRef(false)
+  const [modalOpen, setModalOpen] = useState(false)
 
   useEffect(() => {
     if (!id) return
@@ -133,13 +135,28 @@ export default function Seller() {
     }
   }
 
+  async function deleteSell() {
+    if (!seller) return
+    try {
+      await deleteSeller(seller.id)
+      alert('Vendedor deletado com sucesso')
+      navigate('/sellers')
+    } catch (error) {
+      console.error(error)
+    }
+  }
+
   return (
     <div>
       <Sheet
         ref={ref}
         isOpen={true}
         onClose={onClose}
-        snapPoints={[1000, 380, 140]}
+        snapPoints={[
+          isMultiLocationSeller.current ? 1000 : 230,
+          isMultiLocationSeller.current ? 380 : 230,
+          140,
+        ]}
         onCloseEnd={onClose}
         onOpenEnd={() => snapTo(1)}
         initialSnap={1}
@@ -171,6 +188,26 @@ export default function Seller() {
                 <Phone size={24} />
                 <p>{formatPhoneNumber(seller.phone_number.trim())}</p>
               </div>
+            )}
+
+            <DeleteButton
+              onClick={() => {
+                snapTo(2)
+                setModalOpen(true)
+              }}
+            />
+            {modalOpen && (
+              <DialogAction
+                title="Deseja realmente deletar esse vendedor?"
+                onClose={() => {
+                  snapTo(1)
+                  setModalOpen(false)
+                }}
+                onAccept={() => {
+                  deleteSell()
+                  setModalOpen(false)
+                }}
+              />
             )}
             {isMultiLocationSeller.current && (
               <div className="pt-5">
@@ -223,6 +260,61 @@ export default function Seller() {
         {drawPosition()}
       </MapContainer>
     </div>
+  )
+}
+
+import Button from '@mui/material/Button'
+import Dialog from '@mui/material/Dialog'
+import DialogActions from '@mui/material/DialogActions'
+import DialogContent from '@mui/material/DialogContent'
+import DialogTitle from '@mui/material/DialogTitle'
+function DialogAction({
+  onClose,
+  onAccept,
+  title,
+  children,
+}: {
+  onClose: () => void
+  onAccept: () => void
+  title: string
+  children?: React.ReactNode
+}) {
+  const handleClose = () => {
+    onClose()
+  }
+  const handleAccept = () => {
+    onAccept()
+  }
+  return (
+    <Dialog
+      open
+      onClose={handleClose}
+      aria-labelledby="alert-dialog-title"
+      aria-describedby="alert-dialog-description"
+    >
+      <DialogTitle id="alert-dialog-title">{title}</DialogTitle>
+      <DialogContent>{children}</DialogContent>
+      <DialogActions>
+        <Button onClick={handleClose} autoFocus>
+          CANCELAR
+        </Button>
+        <Button onClick={handleAccept} autoFocus>
+          OK
+        </Button>
+      </DialogActions>
+    </Dialog>
+  )
+}
+
+function DeleteButton({ onClick }: { onClick: () => void }) {
+  return (
+    <IconButton
+      className="mr-auto opacity-65 text-danger border-danger h-7 text-sm p-2"
+      onClick={onClick}
+    >
+      <Trash2 size={18} />
+      Deletar
+    </IconButton>
   )
 }
 

@@ -43,6 +43,10 @@ export async function getSeller(id: string) {
   return seller
 }
 
+export async function deleteSeller(id: string) {
+  return await axiosInstance.delete(`seller/id/${id}`)
+}
+
 export async function getSellerByBox({
   sector_color,
   box_number,
