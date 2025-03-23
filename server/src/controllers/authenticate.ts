@@ -44,7 +44,7 @@ export async function authenticate(
       httpOnly: true,
       maxAge: ms(env.TOKEN_EXPIRATION as StringValue),
     })
-    res.send('authenticated!')
+    res.status(200).json({ id, username })
     return
   } catch (error) {
     next(error)
