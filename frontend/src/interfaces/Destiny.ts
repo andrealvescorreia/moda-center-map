@@ -4,5 +4,6 @@ import type { Position } from './Position'
 
 export interface Destiny {
   position: Position
-  info: Boxe | Loja | null
+  sellingLocation: Boxe | Loja | null
+  sellerName?: string
 }

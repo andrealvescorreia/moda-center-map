@@ -42,6 +42,31 @@ export async function getSeller(id: string) {
   const seller: SellerResponse = response.data
   return seller
 }
+
+export async function getSellerByBox({
+  sector_color,
+  box_number,
+  street_letter,
+}: BoxeSchema) {
+  const response = await axiosInstance.get(
+    `seller/boxe?sector_color=${sector_color}&street_letter=${street_letter}&box_number=${box_number}`
+  )
+  const seller: SellerResponse = response.data
+  return seller
+}
+
+export async function getSellerByStore({
+  sector_color,
+  block_number,
+  store_number,
+}: StoreSchema) {
+  const response = await axiosInstance.get(
+    `seller/store?sector_color=${sector_color}&block_number=${block_number}&store_number=${store_number}`
+  )
+  const seller: SellerResponse = response.data
+  return seller
+}
+
 export async function searchSeller(searchTerm: string) {
   const response = await axiosInstance.get(
     `seller/search?searchTerm=${searchTerm}`

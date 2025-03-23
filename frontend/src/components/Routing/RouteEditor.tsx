@@ -3,11 +3,14 @@ import type { Loja } from '../../interfaces/Loja'
 import type { Route } from '../../interfaces/Route'
 import { ModaCenterGridMap } from '../../models/ModaCenterGridMap'
 import { useClickContext } from '../../providers/ClickProvider'
-import { SearchStore } from '../SearchStore'
+import { SearchStore } from './SearchSellingPoint'
 import { DestinyList } from './destiny-list'
 
 import { MapPinPlus, Navigation, PersonStanding } from 'lucide-react'
 import { Sheet, type SheetRef } from 'react-modal-sheet'
+import { getSellerByBox, getSellerByStore } from '../../http/api'
+import type { Boxe } from '../../interfaces/Boxe'
+import { colorToEnglishMap } from '../../utils/utils'
 import { IconButton } from '../icon-button'
 import { SheetHeaderTitle } from '../sheet-header-title'
 import { DialogAction } from './dialog-action'
@@ -61,12 +64,44 @@ const RouteEditor = ({
       ...route,
       inicio: {
         position: { x: adjustedX, y },
-        info: gridMap.findNearestBoxe(y, adjustedX),
+        sellingLocation: gridMap.findNearestBoxe(y, adjustedX),
       },
     })
   }
 
-  function addDestinationFromMap(click: { lat: number; lng: number }) {
+  async function getSellerName(sellingLocation: Loja | Boxe) {
+    const sector_color = colorToEnglishMap[sellingLocation.setor]
+    if ('rua' in sellingLocation) {
+      const req = {
+        sector_color,
+        street_letter: sellingLocation.rua,
+        box_number: sellingLocation.numero,
+      }
+
+      try {
+        const seller = await getSellerByBox(req)
+        return seller.name
+      } catch (error) {
+        console.log(error)
+        return '<Sem Vendedor>'
+      }
+    } else {
+      const req = {
+        sector_color,
+        block_number: sellingLocation.bloco,
+        store_number: sellingLocation.numLoja,
+      }
+      try {
+        const seller = await getSellerByStore(req)
+        return seller.name
+      } catch (error) {
+        console.log(error)
+        return '<Sem Vendedor>'
+      }
+    }
+  }
+
+  async function addDestinationFromMap(click: { lat: number; lng: number }) {
     const gridValue = gridMap.getGrid()[click.lat][click.lng]
 
     if (
@@ -85,9 +120,17 @@ const RouteEditor = ({
           ? { x: click.lng, y: click.lat }
           : (sellingLocation as Loja).getEntrance()
 
+      const sellerName = await getSellerName(sellingLocation)
       const newRoute = {
         ...route,
-        destinos: [...route.destinos, { info: sellingLocation, position }],
+        destinos: [
+          ...route.destinos,
+          {
+            sellingLocation,
+            position,
+            sellerName,
+          },
+        ],
       }
 
       onUpdate(newRoute)
@@ -116,7 +159,8 @@ const RouteEditor = ({
 
   const removeDestiny = (index: number) => {
     const otherDestinies = route.destinos.filter(
-      (destiny) => destiny.info !== bestRoute.destinos[index].info
+      (destiny) =>
+        destiny.sellingLocation !== bestRoute.destinos[index].sellingLocation
     )
     const newRoute = {
       ...route,
@@ -216,6 +260,43 @@ const RouteEditor = ({
         onCancel={notAddingDestiny}
         onChooseOnMap={() => {
           setIsAddingDestinyFromMap(true)
+        }}
+        onSellectSeller={(sellerName, sellingLocation) => {
+          const choosenLocation = gridMap.getSellingLocation(sellingLocation)
+          if (!choosenLocation) {
+            notAddingDestiny()
+            return
+          }
+          if ('rua' in choosenLocation) {
+            onUpdate({
+              ...route,
+              destinos: [
+                ...route.destinos,
+                {
+                  sellerName,
+                  sellingLocation: choosenLocation,
+                  position: {
+                    x: choosenLocation.positionInGrid.x,
+                    y: choosenLocation.positionInGrid.y,
+                  },
+                },
+              ],
+            })
+            notAddingDestiny()
+          } else {
+            onUpdate({
+              ...route,
+              destinos: [
+                ...route.destinos,
+                {
+                  sellerName,
+                  sellingLocation: choosenLocation,
+                  position: choosenLocation.getEntrance(),
+                },
+              ],
+            })
+            notAddingDestiny()
+          }
         }}
       />
     )

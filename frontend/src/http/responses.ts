@@ -24,4 +24,20 @@ interface SellerResponse {
   stores: StoreResponse[]
   product_categories: ProductCategoryResponse[]
 }
-export type { SellerResponse, BoxeResponse, StoreResponse }
+
+interface SellingLocationResponse {
+  boxe?: BoxeResponse
+  store?: StoreResponse
+  seller: {
+    name: string
+    id: string
+    phone_number?: string
+  }
+}
+
+export type {
+  SellerResponse,
+  BoxeResponse,
+  StoreResponse,
+  SellingLocationResponse,
+}

@@ -60,17 +60,17 @@ function DestinyLiItem({
   isEndingPoint,
   onClickRemoveDestiny,
 }: DestinyLiItemProps) {
-  if (!destiny.info) return null
+  if (!destiny.sellingLocation) return null
 
   let location = ''
-  const locationName = isStartingPoint ? 'Seu local' : '<Vendedor>'
+  const locationName = isStartingPoint ? 'Seu local' : destiny.sellerName
   let leftIcon: JSX.Element
 
-  if ('rua' in destiny.info && 'numero') {
-    location = `${destiny.info.setor} - Rua ${destiny.info.rua} - Boxe ${destiny.info.numero}`
+  if ('rua' in destiny.sellingLocation && 'numero') {
+    location = `${destiny.sellingLocation.setor} - Rua ${destiny.sellingLocation.rua} - Boxe ${destiny.sellingLocation.numero}`
   }
-  if ('bloco' in destiny.info && 'numLoja') {
-    location = `${destiny.info.setor} - Bloco ${destiny.info.bloco} - Loja ${destiny.info.numLoja}`
+  if ('bloco' in destiny.sellingLocation && 'numLoja') {
+    location = `${destiny.sellingLocation.setor} - Bloco ${destiny.sellingLocation.bloco} - Loja ${destiny.sellingLocation.numLoja}`
   }
 
   if (isStartingPoint) {
@@ -101,7 +101,7 @@ function DestinyLiItem({
 
   return (
     <li
-      key={`${destiny.info.setor}-${destiny.position.x}-${destiny.position.y}`}
+      key={`${destiny.sellingLocation.setor}-${destiny.position.x}-${destiny.position.y}`}
       className="list-none w-full h-14
        px-4 gap-1 grid grid-cols-[8%_auto_8%] items-center"
     >
@@ -121,7 +121,7 @@ function DestinyLiItem({
           className="ml-auto"
           onClick={() => onClickRemoveDestiny?.(index)}
         >
-          <X size={20} />
+          <X size={20} className="hover:cursor-pointer" />
         </button>
       )}
     </li>

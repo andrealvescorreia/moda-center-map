@@ -1,7 +1,8 @@
 import type { BoxeResponse, StoreResponse } from '../http/responses'
 import type { Boxe } from '../interfaces/Boxe'
+import type { BoxeSchema } from '../schemas/box'
 
-const colorMap: Record<string, Boxe['setor']> = {
+const colorToPortugueseMap: Record<string, Boxe['setor']> = {
   blue: 'Azul',
   orange: 'Laranja',
   red: 'Vermelho',
@@ -9,6 +10,16 @@ const colorMap: Record<string, Boxe['setor']> = {
   yellow: 'Amarelo',
   white: 'Branco',
 }
+
+const colorToEnglishMap: Record<string, BoxeSchema['sector_color']> = {
+  Azul: 'blue',
+  Laranja: 'orange',
+  Vermelho: 'red',
+  Verde: 'green',
+  Amarelo: 'yellow',
+  Branco: 'white',
+}
+
 const formatPhoneNumber = (phone?: string) =>
   phone?.replace(
     phone.length === 11 ? /(\d{2})(\d{5})(\d{4})/ : /(\d{2})(\d{4})(\d{4})/,
@@ -17,13 +28,18 @@ const formatPhoneNumber = (phone?: string) =>
 
 function sellingLocationToText(location: BoxeResponse | StoreResponse) {
   if ('box_number' in location) {
-    return `Setor ${colorMap[location.sector_color] || 'Branco'} - Rua ${
+    return `Setor ${colorToPortugueseMap[location.sector_color] || 'Branco'} - Rua ${
       location.street_letter
     } - Box ${location.box_number}`
   }
-  return `Setor ${colorMap[location.sector_color] || 'Branco'} - Bloco ${
+  return `Setor ${colorToPortugueseMap[location.sector_color] || 'Branco'} - Bloco ${
     location.block_number
   } - Loja ${location.store_number}`
 }
 
-export { colorMap, formatPhoneNumber, sellingLocationToText }
+export {
+  colorToPortugueseMap as colorMap,
+  colorToEnglishMap,
+  formatPhoneNumber,
+  sellingLocationToText,
+}
