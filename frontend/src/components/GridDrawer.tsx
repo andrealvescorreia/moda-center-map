@@ -132,8 +132,8 @@ const GridDrawer = ({
     }
   }
 
-  drawMarkers()
   if (debug) {
+    drawMarkers()
     drawBoxes()
     drawLojasExternas()
     drawBanheiros()
@@ -144,12 +144,17 @@ const GridDrawer = ({
     <>
       <MapInfoCollector onUpdateInfo={(newInfo) => setMapInfo(newInfo)} />
       <ImageOverlay
-        url="grid.png"
+        url={
+          mapInfo && mapInfo.zoom >= 5
+            ? '/grid (detailed).jpg'
+            : mapInfo && mapInfo.zoom >= 2
+              ? '/grid (medium detail).jpg'
+              : '/grid (no detail).jpg'
+        }
         bounds={gridMap.getBounds()}
         alt="mapa moda center"
         zIndex={-1}
       />
-      {/*mapInfo && mapInfo.zoom >= minZoomLevelToRenderBoxes ? markers : []*/}
       {components}
     </>
   )

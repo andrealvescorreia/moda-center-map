@@ -1,7 +1,7 @@
 import L from 'leaflet'
 import { ArrowRight, Phone, Trash2 } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
-import { ImageOverlay, Rectangle, useMap } from 'react-leaflet'
+import { Rectangle, useMap } from 'react-leaflet'
 import { MapContainer } from 'react-leaflet'
 import { Sheet, type SheetRef } from 'react-modal-sheet'
 import { useNavigate, useParams } from 'react-router-dom'
@@ -242,11 +242,7 @@ export default function Seller() {
         maxZoom={6}
         minZoom={1}
       >
-        <ImageOverlay
-          url="/grid.png"
-          bounds={modaCenterGridMap.getBounds()}
-          alt="mapa moda center"
-        />
+        <GridDrawer gridMap={modaCenterGridMap} />
         {activeSellingLocation && (
           <SetView
             position={
@@ -268,6 +264,7 @@ import Dialog from '@mui/material/Dialog'
 import DialogActions from '@mui/material/DialogActions'
 import DialogContent from '@mui/material/DialogContent'
 import DialogTitle from '@mui/material/DialogTitle'
+import GridDrawer from '../../components/GridDrawer'
 function DialogAction({
   onClose,
   onAccept,
