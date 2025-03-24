@@ -7,6 +7,7 @@ import Login from './routes/Login'
 import Register from './routes/Register'
 import './App.css'
 import NavBar from './components/nav'
+import RouteProvider from './providers/RouteProvider'
 import NewSeller from './routes/NewSeller'
 import Seller from './routes/Seller'
 import Sellers from './routes/Sellers'
@@ -38,7 +39,14 @@ export default function App() {
 
   return (
     <Routes>
-      <Route path="" element={<Home />} />
+      <Route
+        path=""
+        element={
+          <RouteProvider>
+            <Home />
+          </RouteProvider>
+        }
+      />
       <Route path="register" element={<Register />} />
       <Route path="login" element={<Login />} />
       <Route path="sellers" element={<Sellers />} />

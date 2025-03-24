@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import type { Destiny } from '../../interfaces/Destiny'
 import type { Position } from '../../interfaces/Position'
 import type { Route } from '../../interfaces/Route'
@@ -6,33 +6,67 @@ import type { ModaCenterGridMap } from '../../models/ModaCenterGridMap'
 import { RouteCalculator } from '../../models/RouteCalculator'
 import { TSPSolverNN } from '../../models/TSPSolverNN'
 import { useNavContext } from '../../providers/NavProvider'
+import { useRouteContext } from '../../providers/RouteProvider'
 import RouteEditor from './RouteEditor'
 import RouteButton from './route-button'
 
 interface RoutingManager {
   gridMap: ModaCenterGridMap
-  onUpdateRoute: (route: {
-    inicio: Position | null
-    destinos: Destiny[]
-    passos: Position[]
-  }) => void
 }
 
-const RoutingManager = ({ gridMap, onUpdateRoute }: RoutingManager) => {
+const RoutingManager = ({ gridMap }: RoutingManager) => {
   const { setShow } = useNavContext()
-
+  const { route, setRoute } = useRouteContext()
   const [isCreatingRoute, setIsCreatingRoute] = useState(false)
 
-  const [route, setRoute] = useState<Route>({
-    inicio: null,
-    destinos: [],
-  })
   const [bestRoute, setBestRoute] = useState<Route>({
     inicio: null,
     destinos: [],
   })
 
-  const handleUpdate = useCallback((route: Route) => setRoute(route), [])
+  const handleUpdate = (newRoute: Route) => {
+    if (!newRoute) return
+    let destinosMelhorOrdem: Destiny[] = []
+    let melhoresPassos: Position[] = []
+
+    if (newRoute.inicio && newRoute.destinos.length > 0) {
+      const routeCalculator = new RouteCalculator({
+        grid: gridMap.getGrid(),
+        tspSolver: new TSPSolverNN(),
+      })
+
+      const optimalRoute = routeCalculator.calculateBestRoute({
+        startPos: newRoute.inicio,
+        destinies: newRoute.destinos,
+      })
+
+      destinosMelhorOrdem = optimalRoute.destiniesBestOrder
+      melhoresPassos = optimalRoute.steps
+      setBestRoute({
+        inicio: newRoute.inicio,
+        destinos: destinosMelhorOrdem.slice(1),
+      })
+    } else {
+      setBestRoute({
+        inicio: null,
+        destinos: [],
+      })
+    }
+    const newBestRoute = {
+      inicio: newRoute.inicio,
+      destinos: destinosMelhorOrdem.slice(1),
+      passos: melhoresPassos,
+    }
+    if (JSON.stringify(route) !== JSON.stringify(newBestRoute)) {
+      setRoute(newBestRoute)
+    }
+  }
+
+  // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
+  useEffect(() => {
+    if (route) handleUpdate(route)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [route])
 
   useEffect(() => {
     if (!isCreatingRoute) {
@@ -42,39 +76,14 @@ const RoutingManager = ({ gridMap, onUpdateRoute }: RoutingManager) => {
     }
   }, [isCreatingRoute, setShow])
 
-  useEffect(() => {
-    let destinosMelhorOrdem: Destiny[] = []
-    let melhoresPassos: Position[] = []
-
-    if (route.inicio && route.destinos.length > 0) {
-      const routeCalculator = new RouteCalculator({
-        grid: gridMap.getGrid(),
-        tspSolver: new TSPSolverNN(),
-      })
-
-      const optimalRoute = routeCalculator.calculateBestRoute({
-        startPos: route.inicio,
-        destinies: route.destinos,
-      })
-
-      destinosMelhorOrdem = optimalRoute.destiniesBestOrder
-      melhoresPassos = optimalRoute.steps
-      setBestRoute({
-        inicio: route.inicio,
-        destinos: destinosMelhorOrdem.slice(1),
-      })
-    } else {
-      setBestRoute({
-        inicio: null,
-        destinos: [],
-      })
-    }
-    onUpdateRoute({
-      inicio: route.inicio?.position || null,
-      destinos: destinosMelhorOrdem,
-      passos: melhoresPassos,
+  function cancelRoute() {
+    setIsCreatingRoute(false)
+    setRoute({
+      inicio: null,
+      destinos: [],
+      passos: [],
     })
-  }, [route, onUpdateRoute, gridMap])
+  }
 
   return (
     <div>
@@ -88,16 +97,12 @@ const RoutingManager = ({ gridMap, onUpdateRoute }: RoutingManager) => {
       ) : (
         <RouteEditor
           gridMap={gridMap}
-          route={route}
+          route={route || { inicio: null, destinos: [] }}
           bestRoute={bestRoute}
-          onUpdate={handleUpdate}
-          onCancel={() => {
-            setIsCreatingRoute(false)
-            setRoute({
-              inicio: null,
-              destinos: [],
-            })
+          onUpdate={(newRoute) => {
+            handleUpdate(newRoute)
           }}
+          onCancel={cancelRoute}
         />
       )}
     </div>

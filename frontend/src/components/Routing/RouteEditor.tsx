@@ -155,7 +155,7 @@ const RouteEditor = ({
   useEffect(() => {
     onClickMap()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [onUpdate, clickLocation])
+  }, [clickLocation])
 
   const removeDestiny = (index: number) => {
     const otherDestinies = route.destinos.filter(
@@ -167,6 +167,28 @@ const RouteEditor = ({
       destinos: otherDestinies,
     }
     onUpdate(newRoute)
+  }
+
+  const addDestiny = (sellingLocation: Loja | Boxe, sellerName: string) => {
+    const position =
+      'rua' in sellingLocation
+        ? {
+            x: sellingLocation.positionInGrid.x,
+            y: sellingLocation.positionInGrid.y,
+          }
+        : sellingLocation.getEntrance()
+
+    onUpdate({
+      ...route,
+      destinos: [
+        ...route.destinos,
+        {
+          sellingLocation,
+          position,
+          sellerName,
+        },
+      ],
+    })
   }
 
   const cancel = () => {
@@ -183,7 +205,7 @@ const RouteEditor = ({
             title="Informe o local de início"
             text="Clique em um ponto caminhável no mapa"
             onAccept={() => setIsEditingMarcadorInicio(false)}
-            onCancel={cancel}
+            onCancel={() => setIsEditingMarcadorInicio(false)}
             acceptEnabled={route.inicio !== null}
           />
         </span>
@@ -267,36 +289,8 @@ const RouteEditor = ({
             notAddingDestiny()
             return
           }
-          if ('rua' in choosenLocation) {
-            onUpdate({
-              ...route,
-              destinos: [
-                ...route.destinos,
-                {
-                  sellerName,
-                  sellingLocation: choosenLocation,
-                  position: {
-                    x: choosenLocation.positionInGrid.x,
-                    y: choosenLocation.positionInGrid.y,
-                  },
-                },
-              ],
-            })
-            notAddingDestiny()
-          } else {
-            onUpdate({
-              ...route,
-              destinos: [
-                ...route.destinos,
-                {
-                  sellerName,
-                  sellingLocation: choosenLocation,
-                  position: choosenLocation.getEntrance(),
-                },
-              ],
-            })
-            notAddingDestiny()
-          }
+          addDestiny(choosenLocation, sellerName)
+          notAddingDestiny()
         }}
       />
     )

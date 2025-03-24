@@ -145,7 +145,7 @@ const GridDrawer = ({
       <MapInfoCollector onUpdateInfo={(newInfo) => setMapInfo(newInfo)} />
       <ImageOverlay
         url={
-          mapInfo && mapInfo.zoom >= 5
+          mapInfo && mapInfo.zoom >= 4
             ? '/grid (detailed).jpg'
             : mapInfo && mapInfo.zoom >= 2
               ? '/grid (medium detail).jpg'
