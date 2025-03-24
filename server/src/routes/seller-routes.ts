@@ -2,11 +2,15 @@ import { Router } from 'express'
 import {
   create,
   destroy,
+  favorite,
   index,
+  indexFavorites,
+  isFavorite,
   search,
   show,
   showByBoxe,
   showByStore,
+  unfavorite,
 } from '../controllers/seller'
 import loginRequired from '../middleware/loginRequired'
 
@@ -15,6 +19,10 @@ router.post('/', loginRequired, create)
 router.get('/', index)
 router.get('/id/:id', show)
 router.delete('/id/:id', loginRequired, destroy)
+router.post('/favorite/:id', loginRequired, favorite)
+router.get('/favorite/:id', loginRequired, isFavorite)
+router.delete('/favorite/:id', loginRequired, unfavorite)
+router.get('/favorite/', loginRequired, indexFavorites)
 router.get('/search', search)
 router.get('/boxe', showByBoxe)
 router.get('/store', showByStore)

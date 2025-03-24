@@ -52,10 +52,10 @@ export default class Seller extends Model {
   @HasMany(() => Store, { onDelete: 'CASCADE' })
   declare stores: Store[]
 
-  @BelongsToMany(
-    () => User,
-    () => UserFavoriteSellers
-  )
+  @BelongsToMany(() => User, {
+    through: () => UserFavoriteSellers,
+    onDelete: 'CASCADE',
+  })
   declare users: User[]
 
   @BelongsToMany(() => ProductCategory, {

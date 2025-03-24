@@ -5,7 +5,7 @@ gsap.registerPlugin(CSSPlugin)
 // biome-ignore lint/suspicious/noShadowRestrictedNames: <explanation>
 import { ArrowLeft, CircleX, Map } from 'lucide-react'
 import { type ComponentProps, useEffect, useRef, useState } from 'react'
-import { searchSeller } from '../../http/api'
+import { getFavorites, searchSeller } from '../../http/api'
 import type { SellerResponse } from '../../http/responses'
 import type { Boxe } from '../../interfaces/Boxe'
 import type { Loja } from '../../interfaces/Loja'
@@ -26,7 +26,18 @@ export function SearchStore({
 }: SearchStoreProps) {
   const [searchTerm, setSearchTerm] = useState('')
   const [sellers, setSellers] = useState<SellerResponse[]>([])
+  const [favoriteSellers, setFavoriteSellers] = useState<SellerResponse[]>([])
   const isFetchingRef = useRef(false)
+
+  async function fetchFavoriteSellers() {
+    const sellers = await getFavorites()
+    setFavoriteSellers(sellers)
+  }
+
+  // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
+  useEffect(() => {
+    fetchFavoriteSellers()
+  }, [])
 
   useEffect(() => {
     if (searchTerm.length < 3) setSellers([])
@@ -106,6 +117,16 @@ export function SearchStore({
           </InputIcon>
         </InputRoot>
         {searchTerm.length === 0 && <ChooseOnMap onClick={onChooseOnMap} />}
+        {searchTerm.length === 0 && favoriteSellers.length > 0 && (
+          <div className="flex flex-col items-center justify-center pt-10">
+            <h2 className="text-xl font-semibold ">Vendedores Favoritos</h2>
+            <SellerList
+              sellers={favoriteSellers}
+              showByLocation
+              onClick={handleSelectSeller}
+            />
+          </div>
+        )}
       </div>
       <div>
         <SellerList

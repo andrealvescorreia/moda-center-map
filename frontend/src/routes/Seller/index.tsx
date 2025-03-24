@@ -1,5 +1,5 @@
 import L from 'leaflet'
-import { ArrowRight, Phone, Trash2 } from 'lucide-react'
+import { ArrowRight, Bookmark, Phone, Trash2 } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import { Rectangle, useMap } from 'react-leaflet'
 import { MapContainer } from 'react-leaflet'
@@ -7,7 +7,13 @@ import { Sheet, type SheetRef } from 'react-modal-sheet'
 import { useNavigate, useParams } from 'react-router-dom'
 import { IconButton } from '../../components/icon-button'
 import { SheetHeaderTitle } from '../../components/sheet-header-title'
-import { deleteSeller, getSeller } from '../../http/api'
+import {
+  deleteSeller,
+  favoriteSeller,
+  getSeller,
+  sellerIsFavorite,
+  unfavoriteSeller,
+} from '../../http/api'
 import type {
   BoxeResponse,
   SellerResponse,
@@ -42,7 +48,8 @@ export default function Seller() {
   >()
   const isMultiLocationSeller = useRef(false)
   const [modalOpen, setModalOpen] = useState(false)
-
+  const [isFavorite, setIsFavorite] = useState(false)
+  const { user } = useUserContext()
   useEffect(() => {
     if (!id) return
     getSeller(id)
@@ -50,6 +57,11 @@ export default function Seller() {
         if (JSON.stringify(seller) !== JSON.stringify(resSeller)) {
           setSeller(resSeller)
         }
+      })
+      .catch(console.error)
+    sellerIsFavorite(id)
+      .then((res) => {
+        setIsFavorite(res.isFavorite)
       })
       .catch(console.error)
   }, [id, seller])
@@ -145,6 +157,24 @@ export default function Seller() {
       console.error(error)
     }
   }
+  async function favoriteSell() {
+    if (!seller) return
+    try {
+      await favoriteSeller(seller.id)
+      setIsFavorite(true)
+    } catch (error) {
+      console.error(error)
+    }
+  }
+  async function unfavoriteSell() {
+    if (!seller) return
+    try {
+      await unfavoriteSeller(seller.id)
+      setIsFavorite(false)
+    } catch (error) {
+      console.error(error)
+    }
+  }
 
   return (
     <div>
@@ -172,7 +202,7 @@ export default function Seller() {
               </h2>
             )}
           </SheetHeaderTitle>
-          <Sheet.Content className="flex gap-3 pl-5 pt-5">
+          <Sheet.Content className="flex gap-3 pl-5 pt-5 md:w-120 ">
             {seller && (
               <SellerCard
                 name={seller.name}
@@ -181,7 +211,30 @@ export default function Seller() {
                     (category) => category.category
                   ) || []
                 ).join(', ')}
-              />
+              >
+                {user && (
+                  <button
+                    type="button"
+                    className="hover:cursor-pointer ml-auto pt-2 pr-3 mb-auto"
+                    onClick={() => {
+                      if (isFavorite) {
+                        unfavoriteSell()
+                      } else {
+                        favoriteSell()
+                      }
+                    }}
+                  >
+                    <Bookmark
+                      size={30}
+                      className={
+                        isFavorite
+                          ? 'fill-green-primary text-green-primary'
+                          : 'text-green-secondary'
+                      }
+                    />
+                  </button>
+                )}
+              </SellerCard>
             )}
             {seller?.phone_number && (
               <div className="flex w-full justify-center items-center text-xl gap-2 text-gray02">
@@ -265,6 +318,7 @@ import DialogActions from '@mui/material/DialogActions'
 import DialogContent from '@mui/material/DialogContent'
 import DialogTitle from '@mui/material/DialogTitle'
 import GridDrawer from '../../components/GridDrawer'
+import { useUserContext } from '../../providers/UserProvider'
 function DialogAction({
   onClose,
   onAccept,

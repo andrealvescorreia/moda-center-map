@@ -6,6 +6,7 @@ import Boxe from '../database/models/boxe'
 import ProductCategory from '../database/models/product-category'
 import Seller from '../database/models/seller'
 import Store from '../database/models/store'
+import User from '../database/models/user'
 import { registerSellerSchema } from '../schemas/sellerSchema'
 import { validateNewSeller } from '../services/seller-validation'
 
@@ -264,6 +265,148 @@ export async function destroy(req: Request, res: Response, next: NextFunction) {
 
     await Seller.destroy({ where: { id: req.params.id } })
     res.status(204).send()
+    return
+  } catch (error) {
+    return next(error)
+  }
+}
+
+export async function favorite(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  try {
+    if (!z.string().uuid().safeParse(req.params.id).success) {
+      res.status(400).json({ message: 'Invalid id' })
+      return
+    }
+
+    const seller = await Seller.findOne({ where: { id: req.params.id } })
+    if (!seller) {
+      res.status(404).json({ message: 'Seller not found' })
+      return
+    }
+
+    const user_id = req.body.userId
+    if (!user_id) {
+      res.status(401).json({ message: 'Unauthorized' })
+      return
+    }
+    const user = await User.findOne({ where: { id: user_id } })
+    if (!user) {
+      res.status(404).json({ message: 'User not found' })
+      return
+    }
+
+    await user.$add('favorite_sellers', seller)
+    res.status(200).json({ message: 'Seller favorited' })
+    return
+  } catch (error) {
+    return next(error)
+  }
+}
+export async function unfavorite(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  try {
+    if (!z.string().uuid().safeParse(req.params.id).success) {
+      res.status(400).json({ message: 'Invalid id' })
+      return
+    }
+
+    const seller = await Seller.findOne({ where: { id: req.params.id } })
+    if (!seller) {
+      res.status(404).json({ message: 'Seller not found' })
+      return
+    }
+
+    const user_id = req.body.userId
+    if (!user_id) {
+      res.status(401).json({ message: 'Unauthorized' })
+      return
+    }
+    const user = await User.findOne({ where: { id: user_id } })
+    if (!user) {
+      res.status(404).json({ message: 'User not found' })
+      return
+    }
+
+    await user.$remove('favorite_sellers', seller)
+    res.status(200).json({ message: 'Seller unfavorited' })
+    return
+  } catch (error) {
+    return next(error)
+  }
+}
+
+export async function indexFavorites(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  try {
+    const user_id = req.body.userId
+    if (!user_id) {
+      res.status(401).json({ message: 'Unauthorized' })
+      return
+    }
+    const user = await User.findOne({ where: { id: user_id } })
+    if (!user) {
+      res.status(404).json({ message: 'User not found' })
+      return
+    }
+
+    const favoriteSellers = await user.$get('favorite_sellers', {
+      include: [
+        { model: Boxe, attributes: { exclude: ['createdAt', 'updatedAt'] } },
+        { model: Store, attributes: { exclude: ['createdAt', 'updatedAt'] } },
+        {
+          model: ProductCategory,
+          attributes: { exclude: ['createdAt', 'updatedAt'] },
+        },
+      ],
+      attributes: { exclude: ['createdAt', 'updatedAt', 'search_vector'] },
+    })
+    res.status(200).json(favoriteSellers)
+    return
+  } catch (error) {
+    return next(error)
+  }
+}
+
+export async function isFavorite(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  try {
+    if (!z.string().uuid().safeParse(req.params.id).success) {
+      res.status(400).json({ message: 'Invalid id' })
+      return
+    }
+
+    const seller = await Seller.findOne({ where: { id: req.params.id } })
+    if (!seller) {
+      res.status(404).json({ message: 'Seller not found' })
+      return
+    }
+
+    const user_id = req.body.userId
+    if (!user_id) {
+      res.status(401).json({ message: 'Unauthorized' })
+      return
+    }
+    const user = await User.findOne({ where: { id: user_id } })
+    if (!user) {
+      res.status(404).json({ message: 'User not found' })
+      return
+    }
+
+    const isFavorite = await user.$has('favorite_sellers', seller)
+    res.status(200).json({ isFavorite })
     return
   } catch (error) {
     return next(error)

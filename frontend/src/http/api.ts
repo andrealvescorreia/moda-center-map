@@ -6,6 +6,7 @@ import type { SellerResponse } from './responses'
 const axiosInstance = axios.create({
   withCredentials: true,
   //baseURL: import.meta.env.VITE_API_URL,
+  //baseURL: 'http://192.168.1.147:3001',//!login não funciona no chrome localmente, mas sim no firefox (mobile)
   baseURL: 'http://localhost:3001',
   headers: { 'Content-Type': 'application/json' },
 })
@@ -92,4 +93,24 @@ interface NewSeller {
 
 export async function createSeller(data: NewSeller) {
   return await axiosInstance.post('seller', data)
+}
+
+export async function favoriteSeller(seller_id: string) {
+  return await axiosInstance.post(`seller/favorite/${seller_id}`)
+}
+
+export async function unfavoriteSeller(seller_id: string) {
+  return await axiosInstance.delete(`seller/favorite/${seller_id}`)
+}
+
+export async function getFavorites() {
+  const response = await axiosInstance.get('seller/favorite')
+  const sellers: SellerResponse[] = response.data
+  return sellers
+}
+
+export async function sellerIsFavorite(id: string) {
+  const response = await axiosInstance.get(`seller/favorite/${id}`)
+  const isFavoriteRes: { isFavorite: boolean } = response.data
+  return isFavoriteRes
 }

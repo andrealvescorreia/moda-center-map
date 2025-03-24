@@ -1,12 +1,27 @@
 import { LogOut } from 'lucide-react'
+import { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { IconButton } from '../../components/icon-button'
 import LandingPage from '../../components/landing-page'
 import NavBar from '../../components/nav'
-import { logoutUser } from '../../http/api'
+import { getFavorites, logoutUser } from '../../http/api'
+import type { SellerResponse } from '../../http/responses'
 import { useUserContext } from '../../providers/UserProvider'
+import SellerList from '../Sellers/seller-list'
 
 export default function UserProfile() {
   const { user, setUser } = useUserContext()
+  const [favoriteSellers, setFavoriteSellers] = useState<SellerResponse[]>([])
+  const navigate = useNavigate()
+  async function fetchFavoriteSellers() {
+    const sellers = await getFavorites()
+    setFavoriteSellers(sellers)
+  }
+
+  // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
+  useEffect(() => {
+    fetchFavoriteSellers()
+  }, [])
 
   async function logOff() {
     await logoutUser()
@@ -27,6 +42,15 @@ export default function UserProfile() {
               Sair
             </IconButton>
           </div>
+          {favoriteSellers.length > 0 && (
+            <div className="flex flex-col items-center justify-center pt-10">
+              <h2 className="text-xl font-semibold ">Vendedores Favoritos</h2>
+              <SellerList
+                sellers={favoriteSellers}
+                onClick={(sellerId) => navigate(`/sellers/${sellerId}`)}
+              />
+            </div>
+          )}
         </span>
       ) : (
         <LandingPage />
