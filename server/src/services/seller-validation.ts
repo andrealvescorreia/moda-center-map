@@ -267,7 +267,7 @@ function boxOverlapsWithFoodCourt(box: {
         box.box_number > 88) ||
       (box.street_letter === 'E' &&
         box.box_number > 88 &&
-        isOdd(box.box_number))
+        !isOdd(box.box_number))
     )
   }
   if (['yellow', 'white'].includes(box.sector_color)) {

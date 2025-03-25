@@ -349,6 +349,28 @@ describe('create seller', () => {
     seller?.should.be.null
   })
 
+  it('should not be able to create a seller when box is invalid -> even box number between 90 and 120 within street letter E, sectors blue, orange, green and red', async () => {
+    const reqBody = {
+      name: 'Desejo de Mulher',
+      sellingLocations: {
+        boxes: [{ sector_color: 'blue', box_number: 90, street_letter: 'E' }],
+      },
+    }
+
+    const response = await postSeller(reqBody)
+    response.status.should.be.equal(400)
+    response.body.should.be.deep.equal({
+      errors: [
+        {
+          code: 'INVALID',
+          field: 'sellingLocations.boxes.0',
+          message:
+            'This box cannot exist inside Moda Center, otherwise it would overlap with food court',
+        },
+      ],
+    })
+  })
+
   it('should not be able to create a seller when name already in use', async () => {
     const reqBody = {
       name: 'Olivia Palito moda feminina',
