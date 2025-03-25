@@ -5,9 +5,7 @@ import type { SellerResponse } from './responses'
 
 const axiosInstance = axios.create({
   withCredentials: true,
-  //baseURL: import.meta.env.VITE_API_URL,
-  //baseURL: 'http://192.168.1.147:3001',//!login não funciona no chrome localmente, mas sim no firefox (mobile)
-  baseURL: 'http://localhost:3001',
+  baseURL: import.meta.env.VITE_API_URL,
   headers: { 'Content-Type': 'application/json' },
 })
 
