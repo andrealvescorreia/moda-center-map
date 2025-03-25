@@ -234,6 +234,7 @@ function RouteFollower({
         snapPoints={[1000, 130]}
         onOpenEnd={() => snapTo(1)}
         initialSnap={1}
+        className="md:max-w-95  md:ml-[50%] md:-translate-x-1/2"
       >
         <Sheet.Container>
           <SheetHeaderTitle onDismiss={onCancel}>
@@ -243,7 +244,7 @@ function RouteFollower({
             </div>
           </SheetHeaderTitle>
           <Sheet.Content className="flex gap-3 pl-5 pt-4">
-            <div className="flex gap-4 overflow-x-auto">
+            <div className="flex gap-4 overflow-x-auto ">
               <IconButton
                 className="shrink-0"
                 type="submit"

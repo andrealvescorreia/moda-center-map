@@ -8,8 +8,13 @@ import type { Route } from '../../interfaces/Route'
 interface DestinyListProps {
   route: Route
   onClickRemoveDestiny: (index: number) => void
+  reducedView?: boolean
 }
-export function DestinyList({ route, onClickRemoveDestiny }: DestinyListProps) {
+export function DestinyList({
+  route,
+  onClickRemoveDestiny,
+  reducedView = false,
+}: DestinyListProps) {
   const listRef = useRef<HTMLUListElement>(null)
 
   useEffect(() => {
@@ -17,12 +22,55 @@ export function DestinyList({ route, onClickRemoveDestiny }: DestinyListProps) {
       listRef.current.scrollTop = listRef.current.scrollHeight
     }
   }, [])
+
+  if (reducedView && route.destinos.length > 2) {
+    const divider = (
+      <div className="bg-gray05 w-full h-[1.2px] absolute bottom-0 rounded-2xl" />
+    )
+    const downardsLine = (
+      <div className=" h-3 absolute bottom-0 border-solid border-[1.4px] border-gray05" />
+    )
+    const upwardsLine = (
+      <div className=" h-3 absolute top-0 border-solid border-[1.4px] border-gray05" />
+    )
+    return (
+      <div className="w-full h-full">
+        <ul className="bg-white  rounded-md py-2" ref={listRef}>
+          {route.inicio && (
+            <DestinyLiItem
+              index={-1}
+              destiny={route.inicio}
+              isStartingPoint
+              isEndingPoint={route.destinos.length === 0}
+            />
+          )}
+
+          <li className="list-none w-full h-14 px-4 gap-1 grid grid-cols-[8%_auto_8%] items-center">
+            <div className="h-full flex justify-center items-center relative">
+              {upwardsLine}
+              <span className="bg-white text-gray02 size-[16px] flex border border-gray02 justify-center items-center rounded-2xl text-xs" />
+              {downardsLine}
+            </div>
+            <div className="h-full flex flex-col relative gap-0 justify-center">
+              <div className="text-xl">{route.destinos.length - 1} paradas</div>
+
+              {divider}
+            </div>
+          </li>
+
+          <DestinyLiItem
+            index={route.destinos.length - 1}
+            destiny={route.destinos[route.destinos.length - 1]}
+            isEndingPoint
+          />
+        </ul>
+      </div>
+    )
+  }
+
   return (
-    <div className="ui absolute w-full flex justify-center items-center top-3">
-      <ul
-        className="w-100 max-h-45 bg-white overflow-auto shadow rounded-md py-2"
-        ref={listRef}
-      >
+    <div className="w-full h-full">
+      <ul className="bg-white  rounded-md py-2" ref={listRef}>
         {route.inicio && (
           <DestinyLiItem
             index={-1}
