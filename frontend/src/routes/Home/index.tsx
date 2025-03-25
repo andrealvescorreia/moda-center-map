@@ -7,6 +7,7 @@ import { useMemo, useRef } from 'react'
 import { Marker } from 'react-leaflet'
 import Logo from '../../assets/logo.png'
 import { ClickPosition } from '../../components/Map/click-position'
+import FlyTo from '../../components/Map/fly-to'
 import RouteDrawer from '../../components/Routing/RouteDrawer'
 import RoutingManager from '../../components/Routing/RoutingManager'
 import CallToLogin from '../../components/call-to-login'
@@ -135,6 +136,7 @@ function App() {
             onUpdatePosition={handleChangeStartPoint}
           />
         )}
+        {route?.inicio && <FlyTo position={route.inicio.position} />}
         <ClickPosition />
       </MapContainer>
     </div>

@@ -1,12 +1,24 @@
-import { useEffect, useState } from 'react'
+import {
+  Check,
+  ChevronRight,
+  MapPinned,
+  MoveUp,
+  PersonStanding,
+} from 'lucide-react'
+import { useEffect, useRef, useState } from 'react'
+import { Sheet, type SheetRef } from 'react-modal-sheet'
+import type { Boxe } from '../../interfaces/Boxe'
 import type { Destiny } from '../../interfaces/Destiny'
+import type { Loja } from '../../interfaces/Loja'
 import type { Position } from '../../interfaces/Position'
 import type { Route } from '../../interfaces/Route'
-import type { ModaCenterGridMap } from '../../models/ModaCenterGridMap'
+import { ModaCenterGridMap } from '../../models/ModaCenterGridMap'
 import { RouteCalculator } from '../../models/RouteCalculator'
 import { TSPSolverNN } from '../../models/TSPSolverNN'
 import { useNavContext } from '../../providers/NavProvider'
 import { useRouteContext } from '../../providers/RouteProvider'
+import { IconButton } from '../icon-button'
+import { SheetHeaderTitle } from '../sheet-header-title'
 import RouteEditor from './RouteEditor'
 import RouteButton from './route-button'
 
@@ -18,6 +30,7 @@ const RoutingManager = ({ gridMap }: RoutingManager) => {
   const { setShow } = useNavContext()
   const { route, setRoute } = useRouteContext()
   const [isCreatingRoute, setIsCreatingRoute] = useState(false)
+  const [isFollowingRoute, setIsFollowingRoute] = useState(false)
 
   const [bestRoute, setBestRoute] = useState<Route>({
     inicio: null,
@@ -28,6 +41,15 @@ const RoutingManager = ({ gridMap }: RoutingManager) => {
     if (!newRoute) return
     let destinosMelhorOrdem: Destiny[] = []
     let melhoresPassos: Position[] = []
+
+    const removeDuplicates = (arr: Destiny[]) => {
+      const seen = new Set()
+      return arr.filter((item) => {
+        const key = JSON.stringify(item)
+        return seen.has(key) ? false : seen.add(key)
+      })
+    }
+    newRoute.destinos = removeDuplicates(newRoute.destinos)
 
     if (newRoute.inicio && newRoute.destinos.length > 0) {
       const routeCalculator = new RouteCalculator({
@@ -78,6 +100,7 @@ const RoutingManager = ({ gridMap }: RoutingManager) => {
 
   function cancelRoute() {
     setIsCreatingRoute(false)
+    setIsFollowingRoute(false)
     setRoute({
       inicio: null,
       destinos: [],
@@ -87,14 +110,15 @@ const RoutingManager = ({ gridMap }: RoutingManager) => {
 
   return (
     <div>
-      {!isCreatingRoute ? (
+      {!isCreatingRoute && (
         <span className="absolute 100dvh 100dvw ui bottom-29 right-5">
           <RouteButton
             onClick={() => setIsCreatingRoute(true)}
             className="relative"
           />
         </span>
-      ) : (
+      )}
+      {isCreatingRoute && !isFollowingRoute && (
         <RouteEditor
           gridMap={gridMap}
           route={route || { inicio: null, destinos: [] }}
@@ -103,8 +127,147 @@ const RoutingManager = ({ gridMap }: RoutingManager) => {
             handleUpdate(newRoute)
           }}
           onCancel={cancelRoute}
+          onStart={() => setIsFollowingRoute(true)}
         />
       )}
+      {isFollowingRoute && (
+        <RouteFollower
+          onCancel={() => cancelRoute()}
+          onFinish={() => cancelRoute()}
+          onChooseToEdit={() => {
+            setIsCreatingRoute(true)
+            setIsFollowingRoute(false)
+          }}
+          gridMap={gridMap}
+        />
+      )}
+    </div>
+  )
+}
+
+function RouteFollower({
+  onCancel,
+  onFinish,
+  onChooseToEdit,
+  gridMap,
+}: {
+  onCancel: () => void
+  onFinish: () => void
+  onChooseToEdit: () => void
+  gridMap: ModaCenterGridMap
+}) {
+  const { route, setRoute } = useRouteContext()
+  const ref = useRef<SheetRef>(null)
+
+  if (!route) return null
+
+  function locationToText(sellingLocation: Boxe | Loja | null | undefined) {
+    if (!sellingLocation) return ''
+
+    if ('rua' in sellingLocation) {
+      const { rua, numero, setor } = sellingLocation
+      return `Setor ${setor}, Rua ${rua}, Boxe ${numero}`
+    }
+    const { bloco, numLoja, setor } = sellingLocation
+    return `Setor ${setor}, Bloco ${bloco}, Loja ${numLoja}`
+  }
+
+  const inicioText = locationToText(route.inicio?.sellingLocation)
+  function gerNearestFreePath(position: Position) {
+    const grid = gridMap.getGrid()
+    const { x, y } = position
+    const isCaminho = (lat: number, lng: number) =>
+      grid[lat][lng] === ModaCenterGridMap.CAMINHO
+
+    if (isCaminho(y, x)) return { x, y }
+    if (isCaminho(y, x + 1)) return { x: x + 1, y }
+    if (isCaminho(y, x - 1)) return { x: x - 1, y }
+    if (isCaminho(y + 1, x)) return { x, y: y + 1 }
+    if (isCaminho(y - 1, x)) return { x, y: y - 1 }
+
+    return { x, y }
+  }
+
+  const currentDestiny = route.destinos[0]
+  const nextDestiny = route.destinos.length > 1 ? route.destinos[1] : null
+
+  function handleNextDestiny() {
+    if (!route) return
+    const newRoute = { ...route }
+    newRoute.inicio = {
+      position: gerNearestFreePath(currentDestiny.position),
+      sellingLocation: currentDestiny.sellingLocation,
+    }
+    newRoute.destinos = newRoute.destinos.slice(1)
+    setRoute(newRoute)
+  }
+
+  const snapTo = (i: number) => ref.current?.snapTo(i)
+  return (
+    <div>
+      <div className="ui absolute top-0 w-[90%] md:max-w-110 ml-[50%] mt-4 -translate-x-1/2">
+        <div className="w-full bg-[#4CA866] text-white  flex items-center p-2 rounded-t-2xl rounded-br-2xl gap-2">
+          <MoveUp size={40} strokeWidth={3} />
+          <span>
+            <h2 className="text-2xl font-semibold">
+              {currentDestiny.sellerName}
+            </h2>
+            <p className="text-lg -mt-1 font-light">
+              {locationToText(currentDestiny.sellingLocation)}
+            </p>
+          </span>
+        </div>
+        {nextDestiny && (
+          <div className="bg-green-secondary text-white p-2 w-[70%] px-3 rounded-b-2xl">
+            <p className="font-light">
+              Depois, <b> {nextDestiny.sellerName}</b>{' '}
+            </p>
+            <p className="text-sm -mt-1.5 text-gray06 font-light">
+              {locationToText(nextDestiny.sellingLocation)}
+            </p>
+          </div>
+        )}
+      </div>
+      <Sheet
+        ref={ref}
+        isOpen={true}
+        onClose={onCancel}
+        snapPoints={[1000, 130]}
+        onOpenEnd={() => snapTo(1)}
+        initialSnap={1}
+      >
+        <Sheet.Container>
+          <SheetHeaderTitle onDismiss={onCancel}>
+            <div className="pl-2 flex items-center gap-1 text-gray02">
+              <PersonStanding size={20} />
+              <h2 className="text-lg"> {inicioText} </h2>
+            </div>
+          </SheetHeaderTitle>
+          <Sheet.Content className="flex gap-3 pl-5 pt-4">
+            <div className="flex gap-4 overflow-x-auto">
+              <IconButton
+                className="shrink-0"
+                type="submit"
+                onClick={
+                  route.destinos.length > 1 ? handleNextDestiny : onFinish
+                }
+              >
+                {route.destinos.length > 1 ? (
+                  <ChevronRight strokeWidth={4} size={25} />
+                ) : (
+                  <Check strokeWidth={4} size={25} />
+                )}
+                {route.destinos.length > 1 ? 'Avançar' : 'Finalizar'}
+              </IconButton>
+
+              <IconButton className="shrink-0" onClick={onChooseToEdit}>
+                <MapPinned size={25} />
+                Editar rota
+              </IconButton>
+            </div>
+          </Sheet.Content>
+        </Sheet.Container>
+      </Sheet>
     </div>
   )
 }

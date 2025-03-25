@@ -1,7 +1,7 @@
 import L from 'leaflet'
 import { ArrowRight, Bookmark, Phone, Trash2 } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
-import { Rectangle, useMap } from 'react-leaflet'
+import { Rectangle } from 'react-leaflet'
 import { MapContainer } from 'react-leaflet'
 import { Sheet, type SheetRef } from 'react-modal-sheet'
 import { useNavigate, useParams } from 'react-router-dom'
@@ -21,7 +21,6 @@ import type {
 } from '../../http/responses'
 import type { Boxe } from '../../interfaces/Boxe'
 import type { Loja } from '../../interfaces/Loja'
-import type { Position } from '../../interfaces/Position'
 import { ModaCenterGridMap } from '../../models/ModaCenterGridMap'
 import {
   colorMap,
@@ -31,13 +30,6 @@ import {
 import SellerCard from './seller-card'
 
 const modaCenterGridMap = new ModaCenterGridMap()
-
-function SetView({ position }: { position: Position }) {
-  const map = useMap()
-  if (!position) return null
-  map.setView(L.latLng(position.y, position.x), 5)
-  return null
-}
 
 export default function Seller() {
   const { id } = useParams<{ id: string }>()
@@ -175,7 +167,6 @@ export default function Seller() {
       console.error(error)
     }
   }
-
   return (
     <div>
       <Sheet
@@ -297,12 +288,19 @@ export default function Seller() {
       >
         <GridDrawer gridMap={modaCenterGridMap} />
         {activeSellingLocation && (
-          <SetView
+          <FlyTo
             position={
               'rua' in activeSellingLocation
-                ? activeSellingLocation.positionInGrid
-                : activeSellingLocation.getEntrance()
+                ? {
+                    ...activeSellingLocation.positionInGrid,
+                    y: activeSellingLocation.positionInGrid.y - 4,
+                  }
+                : {
+                    ...activeSellingLocation.getEntrance(),
+                    y: activeSellingLocation.getEntrance().y - 4,
+                  }
             }
+            zoom={5}
           />
         )}
 
@@ -318,6 +316,7 @@ import DialogActions from '@mui/material/DialogActions'
 import DialogContent from '@mui/material/DialogContent'
 import DialogTitle from '@mui/material/DialogTitle'
 import GridDrawer from '../../components/GridDrawer'
+import FlyTo from '../../components/Map/fly-to'
 import { useUserContext } from '../../providers/UserProvider'
 function DialogAction({
   onClose,

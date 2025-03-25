@@ -20,6 +20,7 @@ interface RouteEditorProps {
   bestRoute: Route
   onUpdate: (route: Route) => void
   onCancel: () => void
+  onStart: () => void
 }
 
 const RouteEditor = ({
@@ -28,8 +29,11 @@ const RouteEditor = ({
   bestRoute,
   onUpdate,
   onCancel,
+  onStart,
 }: RouteEditorProps) => {
-  const [isEditingMarcadorInicio, setIsEditingMarcadorInicio] = useState(true)
+  const [isEditingMarcadorInicio, setIsEditingMarcadorInicio] = useState(
+    route.inicio === null
+  )
   const [isAddingDestiny, setIsAddingDestiny] = useState(false)
   const [isAddingDestinyFromMap, setIsAddingDestinyFromMap] = useState(false)
   const { clickLocation } = useClickContext()
@@ -240,7 +244,7 @@ const RouteEditor = ({
                 <IconButton
                   className="shrink-0"
                   type="submit"
-                  onClick={() => console.log('TODO')}
+                  onClick={onStart}
                   disabled={route.destinos.length === 0}
                 >
                   <Navigation size={20} />
