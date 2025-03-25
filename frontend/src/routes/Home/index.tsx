@@ -1,4 +1,4 @@
-import { MapContainer } from 'react-leaflet'
+import { MapContainer, useMap } from 'react-leaflet'
 import GridDrawer from '../../components/GridDrawer'
 import 'leaflet/dist/leaflet.css'
 import L from 'leaflet'
@@ -82,6 +82,25 @@ function App() {
     setInitialPosition([y, adjustedX])
   }
 
+  function MapMaxBoundsUpdater() {
+    const map = useMap()
+    map.on('zoom', () => {
+      const zoomLevel = map.getZoom()
+      const offset = 5 + 2.4 ** (7 - zoomLevel)
+      map.setMaxBounds([
+        [
+          modaCenterGridMap.getBounds()[0][0] - offset,
+          modaCenterGridMap.getBounds()[0][1] - offset / 2,
+        ],
+        [
+          modaCenterGridMap.getBounds()[1][0] + offset,
+          modaCenterGridMap.getBounds()[1][1] + offset / 2,
+        ],
+      ])
+    })
+    return null
+  }
+
   return (
     <div>
       <NavBar />
@@ -109,12 +128,12 @@ function App() {
         bounds={modaCenterGridMap.getBounds()}
         maxBounds={[
           [
-            modaCenterGridMap.getBounds()[0][0] - 60, //TODO: multiply by zoom level
-            modaCenterGridMap.getBounds()[0][1] - 60,
+            modaCenterGridMap.getBounds()[0][0] - 85,
+            modaCenterGridMap.getBounds()[0][1] - 85 / 2,
           ],
           [
-            modaCenterGridMap.getBounds()[1][0] + 60,
-            modaCenterGridMap.getBounds()[1][1] + 60,
+            modaCenterGridMap.getBounds()[1][0] + 85,
+            modaCenterGridMap.getBounds()[1][1] + 85 / 2,
           ],
         ]}
         maxZoom={6}
@@ -123,6 +142,7 @@ function App() {
         zoom={2}
         preferCanvas={true}
       >
+        <MapMaxBoundsUpdater />
         <GridDrawer
           gridMap={modaCenterGridMap}
           minZoomLevelToRenderMarkers={minZoomLevelToRenderMarkers}
