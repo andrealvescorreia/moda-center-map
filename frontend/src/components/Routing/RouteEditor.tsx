@@ -244,7 +244,7 @@ const RouteEditor = ({
               <h2 className="pl-6 md:text-lg">Minha rota</h2>
             </SheetHeaderTitle>
             <Sheet.Content className="flex gap-3 pl-5 pt-4 md:pl-2">
-              <div className="flex gap-4 overflow-x-auto pb-3 md:flex-col md:pr-3">
+              <div className="flex gap-4 overflow-x-auto pb-3 md:flex-col md:pr-3 md:h-38">
                 <IconButton
                   className="shrink-0 md:h-7  md:text-xs"
                   type="submit"
@@ -278,7 +278,7 @@ const RouteEditor = ({
                 </IconButton>
               </div>
 
-              <div className="pt-2">
+              <div className="pt-2 md:pt-0 overflow-y-auto max-w-[97%] md:text-xs">
                 <DestinyList
                   route={{ ...bestRoute, inicio: route.inicio }}
                   onClickRemoveDestiny={removeDestiny}

@@ -34,7 +34,7 @@ export function DestinyList({
       <div className=" h-3 absolute top-0 border-solid border-[1.4px] border-gray05" />
     )
     return (
-      <div className="w-full h-full">
+      <div className="w-full h-full ">
         <ul className="bg-white  rounded-md py-2" ref={listRef}>
           {route.inicio && (
             <DestinyLiItem
@@ -154,7 +154,7 @@ function DestinyLiItem({
   return (
     <li
       key={`${destiny.sellingLocation.setor}-${destiny.position.x}-${destiny.position.y}`}
-      className="list-none w-full h-14
+      className="list-none w-full h-14 md:h-12
        px-4 gap-1 grid grid-cols-[8%_auto_8%] items-center"
     >
       <div className="h-full flex justify-center items-center relative">
@@ -163,8 +163,8 @@ function DestinyLiItem({
         {!isEndingPoint && downardsLine}
       </div>
       <div className="h-full flex flex-col relative gap-0">
-        <div className="text-xl">{locationName}</div>
-        <div className="text-base -mt-1">{location}</div>
+        <div className="text-xl md:text-sm">{locationName}</div>
+        <div className="text-base -mt-1 md:text-xs">{location}</div>
         {!isEndingPoint && divider}
       </div>
       {!isStartingPoint && (

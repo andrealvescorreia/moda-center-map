@@ -231,9 +231,9 @@ function RouteFollower({
         ref={ref}
         isOpen={true}
         onClose={onCancel}
-        snapPoints={[1000, 130]}
-        onOpenEnd={() => snapTo(1)}
-        initialSnap={1}
+        snapPoints={[120]}
+        onOpenEnd={() => snapTo(0)}
+        initialSnap={0}
         className="md:max-w-95  md:ml-[50%] md:-translate-x-1/2"
       >
         <Sheet.Container>
