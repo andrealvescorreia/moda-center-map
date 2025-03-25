@@ -230,8 +230,8 @@ function RouteFollower({
       <Sheet
         ref={ref}
         isOpen={true}
-        onClose={onCancel}
         snapPoints={[120]}
+        onClose={() => snapTo(0)}
         onOpenEnd={() => snapTo(0)}
         initialSnap={0}
         className="md:max-w-95  md:ml-[50%] md:-translate-x-1/2"

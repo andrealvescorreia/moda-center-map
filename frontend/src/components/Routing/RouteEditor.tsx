@@ -232,12 +232,11 @@ const RouteEditor = ({
         <Sheet
           ref={ref}
           isOpen={bottomSheetOpen}
-          onClose={cancel}
-          snapPoints={[1200, 130]}
-          onCloseEnd={cancel}
+          onClose={() => snapTo(1)}
+          snapPoints={[1, 130]}
           onOpenEnd={() => snapTo(window.innerWidth > 768 ? 0 : 1)}
           initialSnap={window.innerWidth > 768 ? 0 : 1} // Adjust initial snap based on screen size
-          className="md:max-w-80 "
+          className="md:max-w-80"
         >
           <Sheet.Container>
             <SheetHeaderTitle onDismiss={cancel}>
