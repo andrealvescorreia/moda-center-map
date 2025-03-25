@@ -61,7 +61,10 @@ export function SearchStore({
   }, [])
 
   function handleSelectSeller(sellerId: string, locationId?: string) {
-    const seller = sellers.find((seller) => seller.id === sellerId)
+    let seller = sellers.find((seller) => seller.id === sellerId)
+    if (!seller) {
+      seller = favoriteSellers.find((seller) => seller.id === sellerId)
+    }
     if (!seller) return
     const location =
       seller.boxes.find((box) => box.id === locationId) ||
