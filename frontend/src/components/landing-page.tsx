@@ -25,6 +25,17 @@ export default function LandingPage() {
           </Button>
         </NavLink>
       </div>
+      <p className="text-sm text-gray04 absolute bottom-5 ">
+        Criado por{' '}
+        <a
+          href="https://github.com/andrealvescorreia"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-green-secondary hover:underline "
+        >
+          @andrealvescorreia
+        </a>
+      </p>
     </div>
   )
 }
