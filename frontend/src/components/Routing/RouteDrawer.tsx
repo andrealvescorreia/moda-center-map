@@ -26,6 +26,7 @@ const RouteDrawer = ({ /*inicio,*/ destinos, passos }: RouteDrawerProps) => {
               x={destino.position.x}
               y={destino.position.y}
               innerText={(index + 1).toString()}
+              isEnd={index === destinos.length - 1}
             />
           )
       })}

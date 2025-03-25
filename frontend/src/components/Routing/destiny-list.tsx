@@ -1,4 +1,6 @@
-import { Navigation, X } from 'lucide-react'
+import { faPerson } from '@fortawesome/free-solid-svg-icons'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { X } from 'lucide-react'
 import { useEffect, useRef } from 'react'
 import type { Destiny } from '../../interfaces/Destiny'
 import type { Route } from '../../interfaces/Route'
@@ -74,7 +76,9 @@ function DestinyLiItem({
   }
 
   if (isStartingPoint) {
-    leftIcon = <Navigation size={20} />
+    leftIcon = (
+      <FontAwesomeIcon icon={faPerson} className="size-10 text-gray02" />
+    )
   } else if (isEndingPoint) {
     leftIcon = (
       <span className="bg-gray02 text-white size-[16px] flex border border-gray03 justify-center items-center rounded-2xl text-xs">

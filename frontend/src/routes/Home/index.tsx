@@ -164,12 +164,19 @@ function DraggableMarker({
     [onUpdatePosition]
   )
 
+  const personIcon = L.icon({
+    iconUrl: 'src/assets/person.png',
+    iconSize: [31, 50],
+    iconAnchor: [16, 30], // point of the icon which will correspond to marker's location
+  })
+
   return (
     <Marker
       draggable={true}
       eventHandlers={eventHandlers}
       position={[position.y + 0.5, position.x + 0.5]}
       ref={markerRef}
+      icon={personIcon}
     />
   )
 }

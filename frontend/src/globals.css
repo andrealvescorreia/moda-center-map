@@ -23,5 +23,8 @@
   --color-green-secondary: #4B9460;
   --color-white: #FFFFFF;
 
+  --color-purple01: #9B51E0;
+  --color-purple02: #BB6BD9;
+
   --radius-xl: 0.625rem;/* 10px (0.625 * 16). Subescreve o radius-xl do tailwind*/
 }

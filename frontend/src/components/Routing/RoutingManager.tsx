@@ -1,10 +1,9 @@
 import {
-  Check,
-  ChevronRight,
-  MapPinned,
-  MoveUp,
-  PersonStanding,
-} from 'lucide-react'
+  faPerson,
+  faPersonWalkingArrowRight,
+} from '@fortawesome/free-solid-svg-icons'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { Check, MapPinned, MoveUp } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import { Sheet, type SheetRef } from 'react-modal-sheet'
 import type { Boxe } from '../../interfaces/Boxe'
@@ -238,8 +237,8 @@ function RouteFollower({
       >
         <Sheet.Container>
           <SheetHeaderTitle onDismiss={onCancel}>
-            <div className="pl-2 flex items-center gap-1 text-gray02">
-              <PersonStanding size={20} />
+            <div className="pl-2 flex items-center gap-1.5 text-gray02">
+              <FontAwesomeIcon icon={faPerson} className="size-3" />
               <h2 className="text-lg"> {inicioText} </h2>
             </div>
           </SheetHeaderTitle>
@@ -253,7 +252,7 @@ function RouteFollower({
                 }
               >
                 {route.destinos.length > 1 ? (
-                  <ChevronRight strokeWidth={4} size={25} />
+                  <FontAwesomeIcon icon={faPersonWalkingArrowRight} />
                 ) : (
                   <Check strokeWidth={4} size={25} />
                 )}
