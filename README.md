@@ -17,6 +17,7 @@ A aplicação pode ser acessada em <a href="https://moda-center-map.vercel.app">
   - [Requisitos](#requisitos)
   - [Configuração do Frontend](#configuração-do-frontend)
   - [Configuração do Backend](#configuração-do-backend)
+- [Limitações Conhecidas](#limitações-conhecidas)
 - [Plataformas Utilizadas para o Deploy](#plataformas-utilizadas-para-o-deploy)
 
 ---
@@ -98,11 +99,20 @@ npm run dev
 
 ---
 
+## Limitações Conhecidas
+- Navegação no mapa apresenta baixa performance no aplicativo de Android Kiwi Browser. O motivo ainda é desconhecido, mas provavelmente está relacionado ao React Leaflet.
+
+- A interface de usuário apresenta baixa responsividade ao ser acessada em computadores. Como o foco principal do Moda Center Map são dispositivos móveis, não planejo tratar essa limitação no momento.
+
+---
+
 ## Plataformas Utilizadas para o Deploy
 - **Frontend React:** [Vercel](https://vercel.com/)
 - **API Backend NodeJS:** [Shiper](https://shiper.app/)
 - **Banco de Dados PostgreSQL:** [Neon.tech](https://neon.tech/)
 
 ---
+
+## Agradecimentos
 
 Agradecimentos especiais para Artur Dantas, Arthur Medeiros, Meljael Daniel, Wellyngton da Nobrega e Weslley Almeida, pela contribuição no documento de requisitos do Moda Center Map, criado durante a disciplina de Análise e Projeto de Sistemas.
