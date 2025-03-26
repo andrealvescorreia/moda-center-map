@@ -7,6 +7,7 @@ import pCategoriesRoutes from './routes/product-categories-routes'
 import sellerRoutes from './routes/seller-routes'
 import sellingLocationRoutes from './routes/selling-location-routes'
 import userRoutes from './routes/user-routes'
+import { env } from './env'
 class App {
   app: express.Application
 
@@ -25,8 +26,8 @@ class App {
   }
   middlewares() {
     const allowedOrigins = [
+      env.WEB_URL,
       'http://localhost:5173',
-      'http://192.168.1.147:5173',
     ]
     this.app.use(
       cors({
