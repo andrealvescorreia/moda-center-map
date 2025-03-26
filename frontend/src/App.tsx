@@ -6,7 +6,9 @@ import Home from './routes/Home'
 import Login from './routes/Login'
 import Register from './routes/Register'
 import './App.css'
+import LoadingOverlay from './components/loading-overlay'
 import NavBar from './components/nav'
+import { useLoadingContext } from './providers/LoadingProvider'
 import RouteProvider from './providers/RouteProvider'
 import NewSeller from './routes/NewSeller'
 import Seller from './routes/Seller'
@@ -23,37 +25,44 @@ function NotFound() {
 }
 export default function App() {
   const { setUser } = useUserContext()
+  const { loading, setLoading } = useLoadingContext()
 
   useEffect(() => {
     const fetchUser = async () => {
       try {
+        setLoading(true)
         const response = await getUser()
         setUser(response.data)
       } catch (error) {
         setUser(undefined)
         console.log(error)
+      } finally {
+        setLoading(false)
       }
     }
     fetchUser()
-  }, [setUser])
+  }, [setUser, setLoading])
 
   return (
-    <Routes>
-      <Route
-        path=""
-        element={
-          <RouteProvider>
-            <Home />
-          </RouteProvider>
-        }
-      />
-      <Route path="register" element={<Register />} />
-      <Route path="login" element={<Login />} />
-      <Route path="sellers" element={<Sellers />} />
-      <Route path="sellers/:id" element={<Seller />} />
-      <Route path="new-seller" element={<NewSeller />} />
-      <Route path="user" element={<UserProfile />} />
-      <Route path="*" element={<NotFound />} />
-    </Routes>
+    <>
+      {loading && <LoadingOverlay />}
+      <Routes>
+        <Route
+          path=""
+          element={
+            <RouteProvider>
+              <Home />
+            </RouteProvider>
+          }
+        />
+        <Route path="register" element={<Register />} />
+        <Route path="login" element={<Login />} />
+        <Route path="sellers" element={<Sellers />} />
+        <Route path="sellers/:id" element={<Seller />} />
+        <Route path="new-seller" element={<NewSeller />} />
+        <Route path="user" element={<UserProfile />} />
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+    </>
   )
 }

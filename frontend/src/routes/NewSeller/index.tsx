@@ -1,4 +1,3 @@
-import CircularProgress from '@mui/material/CircularProgress'
 import { AxiosError } from 'axios'
 import { SnackbarProvider, enqueueSnackbar } from 'notistack'
 import { useState } from 'react'
@@ -7,6 +6,7 @@ import errorsCode from '../../../../shared/operation-errors'
 import AlertDialog from '../../components/alert-dialog'
 import LandingPage from '../../components/landing-page'
 import { createSeller } from '../../http/api'
+import { useLoadingContext } from '../../providers/LoadingProvider'
 import { useUserContext } from '../../providers/UserProvider'
 import type { BoxeSchema } from '../../schemas/box'
 import sellerSchema from '../../schemas/seller'
@@ -20,8 +20,8 @@ export default function NewSeller() {
   const [phone_number, setPhoneNumber] = useState<string | undefined>('')
   const [dialogOpen, setDialogOpen] = useState(false)
   const [errors, setErrors] = useState<Array<string>>([])
-  const [isFetching, setIsFetching] = useState(false)
   const { user } = useUserContext()
+  const { setLoading } = useLoadingContext()
   const navigate = useNavigate()
 
   interface StepOne {
@@ -60,7 +60,7 @@ export default function NewSeller() {
     }
 
     try {
-      setIsFetching(true)
+      setLoading(true)
       await createSeller(seller)
       enqueueSnackbar('Vendedor criado com sucesso', { variant: 'success' })
       setTimeout(() => {
@@ -100,7 +100,7 @@ export default function NewSeller() {
       setErrors(errorMessages)
       setDialogOpen(true)
     } finally {
-      setIsFetching(false)
+      setLoading(false)
     }
   }
 
@@ -127,12 +127,6 @@ export default function NewSeller() {
               </ul>
             }
           </AlertDialog>
-        )}
-        {isFetching && (
-          <div className="fixed top-0 left-0 w-full h-full flex justify-center items-center ">
-            <div className=" bg-gray04 opacity-70" />
-            <CircularProgress className="opacity-100" />
-          </div>
         )}
         {(() => {
           switch (currentStep) {

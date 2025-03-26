@@ -42,8 +42,10 @@ export default function Seller() {
   const [modalOpen, setModalOpen] = useState(false)
   const [isFavorite, setIsFavorite] = useState(false)
   const { user } = useUserContext()
+  const { setLoading } = useLoadingContext()
   useEffect(() => {
     if (!id) return
+    setLoading(true)
     getSeller(id)
       .then((resSeller) => {
         if (JSON.stringify(seller) !== JSON.stringify(resSeller)) {
@@ -51,12 +53,13 @@ export default function Seller() {
         }
       })
       .catch(console.error)
+      .finally(() => setLoading(false))
     sellerIsFavorite(id)
       .then((res) => {
         setIsFavorite(res.isFavorite)
       })
       .catch(console.error)
-  }, [id, seller])
+  }, [id, seller, setLoading])
 
   useEffect(() => {
     if (!seller) return
@@ -142,29 +145,38 @@ export default function Seller() {
   async function deleteSell() {
     if (!seller) return
     try {
+      setLoading(true)
       await deleteSeller(seller.id)
       alert('Vendedor deletado com sucesso')
       navigate('/sellers')
     } catch (error) {
       console.error(error)
+    } finally {
+      setLoading(false)
     }
   }
   async function favoriteSell() {
     if (!seller) return
     try {
+      setLoading(true)
       await favoriteSeller(seller.id)
       setIsFavorite(true)
     } catch (error) {
       console.error(error)
+    } finally {
+      setLoading(false)
     }
   }
   async function unfavoriteSell() {
     if (!seller) return
     try {
+      setLoading(true)
       await unfavoriteSeller(seller.id)
       setIsFavorite(false)
     } catch (error) {
       console.error(error)
+    } finally {
+      setLoading(false)
     }
   }
   return (
@@ -317,6 +329,7 @@ import DialogContent from '@mui/material/DialogContent'
 import DialogTitle from '@mui/material/DialogTitle'
 import GridDrawer from '../../components/GridDrawer'
 import FlyTo from '../../components/Map/fly-to'
+import { useLoadingContext } from '../../providers/LoadingProvider'
 import { useUserContext } from '../../providers/UserProvider'
 function DialogAction({
   onClose,

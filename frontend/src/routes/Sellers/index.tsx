@@ -5,21 +5,23 @@ import { IconButton } from '../../components/icon-button'
 import NavBar from '../../components/nav'
 import { getSellers } from '../../http/api'
 import type { SellerResponse } from '../../http/responses'
+import { useLoadingContext } from '../../providers/LoadingProvider'
 import SellerList from './seller-list'
 
 export default function Sellers() {
   const [sellers, setSellers] = useState<SellerResponse[]>([])
-  const [loading, setLoading] = useState(true)
+  const { loading, setLoading } = useLoadingContext()
   const navigate = useNavigate()
 
   useEffect(() => {
     const fetchSellers = async () => {
+      setLoading(true)
       const sellers = await getSellers()
       setSellers(sellers)
       setLoading(false)
     }
     fetchSellers()
-  }, [])
+  }, [setLoading])
 
   return (
     <div className="relative h-full w-full">

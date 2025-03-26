@@ -9,6 +9,7 @@ import errorsCode from '../../../../shared/operation-errors'
 import { Button } from '../../components/button'
 import { InputField, InputIcon, InputRoot } from '../../components/input'
 import { registerUser } from '../../http/api'
+import { useLoadingContext } from '../../providers/LoadingProvider'
 import { useUserContext } from '../../providers/UserProvider'
 
 const registrationSchema = z.object({
@@ -37,11 +38,13 @@ export default function RegistrationForm() {
 
   const [showPassword, setShowPassword] = useState(false)
   const [isFetching, setIsFetching] = useState(false)
+  const { setLoading } = useLoadingContext()
   const navigate = useNavigate()
 
   async function onRegister({ username, password }: RegistrationSchema) {
     try {
       setIsFetching(true)
+      setLoading(true)
       const response = await registerUser({ username, password })
       setUser(response.data)
       if (response.status === 201) {
@@ -59,6 +62,7 @@ export default function RegistrationForm() {
       }
     } finally {
       setIsFetching(false)
+      setLoading(false)
     }
   }
 

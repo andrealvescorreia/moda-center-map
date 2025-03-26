@@ -4,6 +4,7 @@ import { BrowserRouter } from 'react-router-dom'
 import './globals.css'
 import App from './App.tsx'
 import ClickProvider from './providers/ClickProvider.tsx'
+import LoadingProvider from './providers/LoadingProvider.tsx'
 import NavProvider from './providers/NavProvider.tsx'
 import UserProvider from './providers/UserProvider.tsx'
 
@@ -14,7 +15,9 @@ createRoot(document.getElementById('root')!).render(
       <UserProvider>
         <NavProvider>
           <ClickProvider>
-            <App />
+            <LoadingProvider>
+              <App />
+            </LoadingProvider>
           </ClickProvider>
         </NavProvider>
       </UserProvider>

@@ -8,6 +8,7 @@ import { z } from 'zod'
 import { Button } from '../../components/button'
 import { InputField, InputIcon, InputRoot } from '../../components/input'
 import { loginUser } from '../../http/api'
+import { useLoadingContext } from '../../providers/LoadingProvider'
 import { useUserContext } from '../../providers/UserProvider'
 const loginSchema = z.object({
   username: z.string(),
@@ -29,11 +30,13 @@ export default function LoginForm() {
 
   const [showPassword, setShowPassword] = useState(false)
   const [isFetching, setIsFetching] = useState(false)
+  const { setLoading } = useLoadingContext()
   const navigate = useNavigate()
 
   async function onLogin({ username, password }: RegistrationSchema) {
     try {
       setIsFetching(true)
+      setLoading(true)
       const response = await loginUser({ username, password })
       setUser(response.data)
       navigate('/user')
@@ -62,6 +65,7 @@ export default function LoginForm() {
       }
     } finally {
       setIsFetching(false)
+      setLoading(false)
     }
   }
 

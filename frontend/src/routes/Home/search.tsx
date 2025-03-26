@@ -1,5 +1,5 @@
 import { ArrowLeft, CircleX } from 'lucide-react'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { InputField, InputIcon, InputRoot } from '../../components/input'
 import { searchSeller } from '../../http/api'
@@ -12,18 +12,20 @@ interface SearchProps {
 export default function Search({ onCancel }: SearchProps) {
   const [searchTerm, setSearchTerm] = useState('')
   const [sellers, setSellers] = useState<SellerResponse[]>([])
-  const isFetchingRef = useRef(false)
+  const [isFetching, setIsFetching] = useState(false)
   const navigate = useNavigate()
 
   useEffect(() => {
-    if (isFetchingRef.current || searchTerm.length < 3) return
-    isFetchingRef.current = true
+    if (searchTerm.length < 3) return
+    setIsFetching(true)
     searchSeller(searchTerm)
       .then((res) => {
-        isFetchingRef.current = false
         setSellers(res)
       })
       .catch(console.error)
+      .finally(() => {
+        setIsFetching(false)
+      })
   }, [searchTerm])
 
   return (
@@ -57,7 +59,7 @@ export default function Search({ onCancel }: SearchProps) {
           }}
         />
       </div>
-      {sellers.length === 0 && searchTerm.length >= 3 && (
+      {sellers.length === 0 && searchTerm.length >= 3 && !isFetching && (
         <div className="flex justify-center items-center h-20">
           <p className="text-gray-03">Nenhum resultado encontrado</p>
         </div>
