@@ -42,6 +42,8 @@ export async function authenticate(
     })
     res.cookie('authtoken', token, {
       httpOnly: true,
+      secure: true, // Ensure the cookie is sent only over HTTPS
+      sameSite: 'strict', // Prevent CSRF attacks
       maxAge: ms(env.TOKEN_EXPIRATION as StringValue),
     })
     res.status(200).json({ id, username })
