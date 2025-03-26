@@ -1,8 +1,10 @@
 # Moda Center Map
 
-[![Moda Center Map](shared/screen.jpg)](https://nlw-connect.on.shiper.app/invites/0ed14984-337e-42c5-9660-6310817b0302)
+<a href="https://moda-center-map.vercel.app"><img src="shared/screen.jpg" alt="drawing" width="700"/></a>
 
 ### Uma aplicação web com intuito de melhorar a experiência de navegar dentro do Moda Center.
+
+A aplicação pode ser acessada em <a href="https://moda-center-map.vercel.app">moda-center-map.vercel.app<a>.
 
 ## Sumário
 - [Sobre o Moda Center](#sobre-o-moda-center)
@@ -97,10 +99,10 @@ npm run dev
 ---
 
 ## Plataformas Utilizadas para o Deploy
-- **Frontend React:** [Github Pages](https://pages.github.com/)
+- **Frontend React:** [Vercel](https://vercel.com/)
 - **API Backend NodeJS:** [Shiper](https://shiper.app/)
 - **Banco de Dados PostgreSQL:** [Neon.tech](https://neon.tech/)
 
 ---
 
-Feito com 💜 por André Alves Correia.
+Agradecimentos especiais para Artur Dantas, Arthur Medeiros, Meljael Daniel, Wellyngton da Nobrega e Weslley Almeida, pela contribuição no documento de requisitos do Moda Center Map, criado durante a disciplina de Análise e Projeto de Sistemas.
