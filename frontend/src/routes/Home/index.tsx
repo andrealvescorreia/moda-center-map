@@ -6,6 +6,7 @@ import { useState } from 'react'
 import { useMemo, useRef } from 'react'
 import { Marker } from 'react-leaflet'
 import Logo from '../../assets/logo.png'
+import PersonMarker from '../../assets/person.png'
 import { ClickPosition } from '../../components/Map/click-position'
 import FlyTo from '../../components/Map/fly-to'
 import RouteDrawer from '../../components/Routing/RouteDrawer'
@@ -185,7 +186,7 @@ function DraggableMarker({
   )
 
   const personIcon = L.icon({
-    iconUrl: 'src/assets/person.png',
+    iconUrl: PersonMarker,
     iconSize: [31, 50],
     iconAnchor: [16, 30], // point of the icon which will correspond to marker's location
   })
