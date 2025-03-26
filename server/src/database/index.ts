@@ -1,26 +1,41 @@
 import type { Dialect } from 'sequelize'
 import { Sequelize } from 'sequelize-typescript'
 import configs from '../config/database'
-import ProductCategory from './models/product-category'
 import { env } from '../env'
+import Boxe from './models/boxe'
+import ProductCategory from './models/product-category'
+import Seller from './models/seller'
+import SellerProductCategories from './models/seller-product-categories'
+import Store from './models/store'
+import User from './models/user'
+import UserFavoriteSellers from './models/user-favorite-sellers'
+
+const models = [
+  ProductCategory,
+  Seller,
+  User,
+  Boxe,
+  Store,
+  UserFavoriteSellers,
+  SellerProductCategories,
+]
 
 let sequelize: Sequelize
 if (process.env.NODE_ENV !== 'test') {
   sequelize = new Sequelize(env.POSTGRES_URL, {
     ...configs,
-    models: [`${__dirname}/models`],
+    models,
   })
 } else {
   sequelize = new Sequelize({
     dialect: 'sqlite' as Dialect,
     storage: ':memory:',
     logging: false,
-    models: [`${__dirname}/models`],
+    models,
   })
 }
+export default sequelize
 
-
-//!dev
 async function sync() {
   await sequelize.sync({ alter: true })
 }
@@ -94,5 +109,3 @@ export async function setup() {
       )
   }
 }
-
-export default sequelize
