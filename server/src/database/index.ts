@@ -6,7 +6,7 @@ import { env } from '../env'
 
 let sequelize: Sequelize
 if (process.env.NODE_ENV !== 'test') {
-  sequelize = new Sequelize(env.DATABASE_URL, {
+  sequelize = new Sequelize(env.POSTGRES_URL, {
     ...configs,
     models: [`${__dirname}/models`],
   })
