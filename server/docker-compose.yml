@@ -1,5 +1,6 @@
 services:
   service-pg:
+    container_name: mcm-pg-container
     image: bitnami/postgresql
     ports:
       - '5432:5432'

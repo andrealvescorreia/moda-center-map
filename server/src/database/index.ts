@@ -2,20 +2,23 @@ import type { Dialect } from 'sequelize'
 import { Sequelize } from 'sequelize-typescript'
 import configs from '../config/database'
 import ProductCategory from './models/product-category'
+import { env } from '../env'
 
-const envConfigs =
-  process.env.NODE_ENV === 'test'
-    ? {
-        dialect: 'sqlite' as Dialect,
-        storage: ':memory:',
-        logging: false,
-      }
-    : configs
+let sequelize: Sequelize
+if (process.env.NODE_ENV !== 'test') {
+  sequelize = new Sequelize(env.DATABASE_URL, {
+    ...configs,
+    models: [`${__dirname}/models`],
+  })
+} else {
+  sequelize = new Sequelize({
+    dialect: 'sqlite' as Dialect,
+    storage: ':memory:',
+    logging: false,
+    models: [`${__dirname}/models`],
+  })
+}
 
-const sequelize = new Sequelize({
-  ...envConfigs,
-  models: [`${__dirname}/models`],
-})
 
 //!dev
 async function sync() {
