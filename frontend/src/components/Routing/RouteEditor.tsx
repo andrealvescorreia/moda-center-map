@@ -209,7 +209,10 @@ const RouteEditor = ({
             title="Informe o local de início"
             text="Clique em um ponto caminhável no mapa"
             onAccept={() => setIsEditingMarcadorInicio(false)}
-            onCancel={() => setIsEditingMarcadorInicio(false)}
+            onCancel={() => {
+              setIsEditingMarcadorInicio(false)
+              if (route.inicio === null) cancel()
+            }}
             acceptEnabled={route.inicio !== null}
           />
         </span>
