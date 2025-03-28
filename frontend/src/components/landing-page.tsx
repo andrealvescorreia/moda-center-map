@@ -4,7 +4,7 @@ import { Button } from './button'
 
 export default function LandingPage() {
   return (
-    <div className=" w-full h-full flex-col flex items-center justify-center p-2 gap-20 md:gap-10">
+    <div className=" w-full flex-col flex items-center justify-center p-2 gap-20 md:gap-10 h-[100dvh]">
       <NavLink className="flex pt-4" to="/">
         <img src={Logo} alt="Logo" className="w-6" />
         <h1 className="text-3xl font-bold text-green-secondary italic font-plus-jakarta-sans text-center">
@@ -25,7 +25,7 @@ export default function LandingPage() {
           </Button>
         </NavLink>
       </div>
-      <p className="text-sm text-gray04 absolute bottom-5 ">
+      <p className="text-sm text-gray04  bottom-5 ">
         Criado por{' '}
         <a
           href="https://github.com/andrealvescorreia"
