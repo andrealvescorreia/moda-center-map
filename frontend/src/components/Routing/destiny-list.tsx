@@ -45,14 +45,16 @@ export function DestinyList({
             />
           )}
 
-          <li className="list-none w-full h-14 px-4 gap-1 grid grid-cols-[8%_auto_8%] items-center">
+          <li className="list-none w-full h-10 px-2 gap-1 grid grid-cols-[8%_auto_8%] items-center">
             <div className="h-full flex justify-center items-center relative">
               {upwardsLine}
               <span className="bg-white text-gray02 size-[16px] flex border border-gray02 justify-center items-center rounded-2xl text-xs" />
               {downardsLine}
             </div>
             <div className="h-full flex flex-col relative gap-0 justify-center">
-              <div className="text-xl">{route.destinos.length - 1} paradas</div>
+              <div className="text-base">
+                {route.destinos.length - 1} paradas
+              </div>
 
               {divider}
             </div>
@@ -154,8 +156,8 @@ function DestinyLiItem({
   return (
     <li
       key={`${destiny.sellingLocation.setor}-${destiny.position.x}-${destiny.position.y}`}
-      className="list-none w-full h-14 md:h-12
-       px-4 gap-1 grid grid-cols-[8%_auto_8%] items-center"
+      className="list-none w-full h-10 md:h-12
+       px-2 gap-1 grid grid-cols-[8%_auto_8%] items-center"
     >
       <div className="h-full flex justify-center items-center relative">
         {!isStartingPoint && upwardsLine}
@@ -163,8 +165,8 @@ function DestinyLiItem({
         {!isEndingPoint && downardsLine}
       </div>
       <div className="h-full flex flex-col relative gap-0">
-        <div className="text-xl md:text-sm">{locationName}</div>
-        <div className="text-base -mt-1 md:text-xs">{location}</div>
+        <p className="text-base md:text-sm">{locationName}</p>
+        <p className="text-sm -mt-2 md:text-xs text-gray04">{location}</p>
         {!isEndingPoint && divider}
       </div>
       {!isStartingPoint && (
@@ -173,7 +175,7 @@ function DestinyLiItem({
           className="ml-auto"
           onClick={() => onClickRemoveDestiny?.(index)}
         >
-          <X size={20} className="hover:cursor-pointer" />
+          <X size={16} className="hover:cursor-pointer" />
         </button>
       )}
     </li>

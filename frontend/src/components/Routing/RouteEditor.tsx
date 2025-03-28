@@ -224,7 +224,7 @@ const RouteEditor = ({
   if (!isAddingDestiny && route.inicio) {
     return (
       <span>
-        <div className="ui ml-[50%] -translate-x-1/2 absolute w-[90%] flex justify-center items-center top-3 shadow max-h-45 overflow-auto md:size-0">
+        <div className="ui ml-[50%] -translate-x-1/2 absolute w-[95%] flex justify-center items-center top-1 shadow max-h-45 overflow-auto md:size-0">
           <DestinyList
             route={{ ...bestRoute, inicio: route.inicio }}
             onClickRemoveDestiny={removeDestiny}
