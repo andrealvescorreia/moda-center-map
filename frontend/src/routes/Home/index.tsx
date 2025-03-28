@@ -2,7 +2,7 @@ import { MapContainer, useMap } from 'react-leaflet'
 import GridDrawer from '../../components/GridDrawer'
 import 'leaflet/dist/leaflet.css'
 import L from 'leaflet'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useMemo, useRef } from 'react'
 import { Marker } from 'react-leaflet'
 import Logo from '../../assets/logo.png'
@@ -23,12 +23,14 @@ import Search from './search'
 const modaCenterGridMap = new ModaCenterGridMap()
 const minZoomLevelToRenderMarkers = 5
 
-function App() {
+function Home() {
   const { route, setRoute } = useRouteContext()
-  const { show } = useNavContext()
+  const { show, setShow } = useNavContext()
   const { user } = useUserContext()
   const [isSearching, setIsSearching] = useState(false)
-
+  useEffect(() => {
+    setShow(true)
+  }, [setShow])
   if (isSearching) {
     return <Search onCancel={() => setIsSearching(false)} />
   }
@@ -202,4 +204,4 @@ function DraggableMarker({
   )
 }
 
-export default App
+export default Home

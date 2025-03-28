@@ -6,12 +6,17 @@ import NavBar from '../../components/nav'
 import { getSellers } from '../../http/api'
 import type { SellerResponse } from '../../http/responses'
 import { useLoadingContext } from '../../providers/LoadingProvider'
+import { useNavContext } from '../../providers/NavProvider'
 import SellerList from './seller-list'
 
 export default function Sellers() {
   const [sellers, setSellers] = useState<SellerResponse[]>([])
   const { loading, setLoading } = useLoadingContext()
+  const { setShow } = useNavContext()
   const navigate = useNavigate()
+  useEffect(() => {
+    setShow(true)
+  }, [setShow])
 
   useEffect(() => {
     const fetchSellers = async () => {

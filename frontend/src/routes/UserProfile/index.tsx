@@ -6,6 +6,7 @@ import LandingPage from '../../components/landing-page'
 import NavBar from '../../components/nav'
 import { getFavorites, logoutUser } from '../../http/api'
 import type { SellerResponse } from '../../http/responses'
+import { useNavContext } from '../../providers/NavProvider'
 import { useUserContext } from '../../providers/UserProvider'
 import SellerList from '../Sellers/seller-list'
 
@@ -13,6 +14,10 @@ export default function UserProfile() {
   const { user, setUser } = useUserContext()
   const [favoriteSellers, setFavoriteSellers] = useState<SellerResponse[]>([])
   const navigate = useNavigate()
+  const { setShow } = useNavContext()
+  useEffect(() => {
+    setShow(true)
+  }, [setShow])
   async function fetchFavoriteSellers() {
     const sellers = await getFavorites()
     setFavoriteSellers(sellers)
