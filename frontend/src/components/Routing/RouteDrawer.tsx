@@ -15,6 +15,10 @@ const positionListToLatLngList = (positions: Position[]) => {
 }
 
 const RouteDrawer = ({ /*inicio,*/ destinos, passos }: RouteDrawerProps) => {
+  const adjustedPassos = passos.map((p) => ({
+    x: p.x + 0.2,
+    y: p.y,
+  }))
   return (
     <>
       {/*inicio && <Marker position={[inicio.y + 0.5, inicio.x + 0.5]} />*/}
@@ -32,7 +36,7 @@ const RouteDrawer = ({ /*inicio,*/ destinos, passos }: RouteDrawerProps) => {
       })}
       {passos.length > 0 && (
         <AntPath
-          positions={positionListToLatLngList(passos)}
+          positions={positionListToLatLngList(adjustedPassos)}
           options={{ color: 'purple' }}
         />
       )}

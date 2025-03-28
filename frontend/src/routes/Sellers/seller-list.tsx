@@ -22,7 +22,7 @@ function SellerItem(props: SellerItemProps) {
           <p className="text-gray03 text-sm whitespace-nowrap overflow-hidden text-ellipsis max-w-[70vw]">
             {props.description}
           </p>
-          <hr className="w-[80%] md:text-white py-[0.5px] text-gray05 absolute bottom-0" />
+          <hr className="w-[75%] md:text-white py-[0.5px] text-gray05 absolute bottom-0" />
         </div>
       </div>
     </button>

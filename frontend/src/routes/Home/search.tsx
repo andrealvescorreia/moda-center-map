@@ -29,8 +29,8 @@ export default function Search({ onCancel }: SearchProps) {
   }, [searchTerm])
 
   return (
-    <div className="ui absolute 100dvh 100dvw w-full h-full bg-white">
-      <div className="md:absolute md:mt-0 mt-5   w-full px-5 md:max-w-125 md:top-0 ml-[50%] transform -translate-x-1/2">
+    <div className="ui absolute h-[100dvh] w-[100dvw]  bg-white">
+      <div className="md:absolute md:mt-0 mt-2 w-full px-2 md:max-w-125 md:top-0 ml-[50%] transform -translate-x-1/2">
         <InputRoot>
           <InputIcon>
             <ArrowLeft className="cursor-pointer" onClick={onCancel} />

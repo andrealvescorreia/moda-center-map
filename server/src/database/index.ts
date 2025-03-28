@@ -75,8 +75,15 @@ async function setupSellerSearch() {
 async function setupProductCategories() {
   // evite remover categorias existentes, apenas adicionar caso necessário
   for (const category of [
-    'Acessórios',
+    'Calças',
+    'Camisetas',
+    'Shorts',
+    'Saias',
+    'Vestidos',
+    'Blusas',
     'Bebês',
+    'Jeans',
+    'Acessórios',
     'Beleza',
     'Calçados',
     'Casa',
@@ -85,7 +92,6 @@ async function setupProductCategories() {
     'Fitness',
     'Infantil',
     'Íntima',
-    'Jeans',
     'Plus Size',
     'Praia',
     'Sleepwear',

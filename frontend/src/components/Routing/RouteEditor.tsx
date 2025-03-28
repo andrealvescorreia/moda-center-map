@@ -224,7 +224,7 @@ const RouteEditor = ({
   if (!isAddingDestiny && route.inicio) {
     return (
       <span>
-        <div className="ui ml-[50%] -translate-x-1/2 absolute w-[90%] flex justify-center items-center top-3 shadow max-h-45 overflow-auto md:size-0">
+        <div className="ui ml-[50%] -translate-x-1/2 absolute w-[95%] flex justify-center items-center top-1 shadow max-h-45 overflow-auto md:size-0">
           <DestinyList
             route={{ ...bestRoute, inicio: route.inicio }}
             onClickRemoveDestiny={removeDestiny}
@@ -236,19 +236,19 @@ const RouteEditor = ({
           ref={ref}
           isOpen={bottomSheetOpen}
           onClose={() => snapTo(1)}
-          snapPoints={[1, 130]}
+          snapPoints={[1, 85]}
           onOpenEnd={() => snapTo(window.innerWidth > 768 ? 0 : 1)}
           initialSnap={window.innerWidth > 768 ? 0 : 1} // Adjust initial snap based on screen size
           className="md:max-w-80"
         >
           <Sheet.Container>
             <SheetHeaderTitle onDismiss={cancel}>
-              <h2 className="pl-6 md:text-lg">Minha rota</h2>
+              <h2 className="pl-4 text-[1.3rem] md:text-lg">Minha rota</h2>
             </SheetHeaderTitle>
-            <Sheet.Content className="flex gap-3 pl-5 pt-4 md:pl-2">
-              <div className="flex gap-4 overflow-x-auto pb-3 md:flex-col md:pr-3 md:h-38">
+            <Sheet.Content className="flex gap-3 pl-5 pt-2.5 md:pl-2">
+              <div className="flex gap-3 overflow-x-auto pb-3 md:flex-col md:pr-3 md:h-38">
                 <IconButton
-                  className="shrink-0 md:h-7  md:text-xs"
+                  className="shrink-0 md:h-7 text-sm  md:text-xs"
                   type="submit"
                   onClick={onStart}
                   disabled={route.destinos.length === 0}
@@ -258,7 +258,7 @@ const RouteEditor = ({
                 </IconButton>
 
                 <IconButton
-                  className="shrink-0  md:h-7  md:text-xs"
+                  className="shrink-0  md:h-7 text-sm  md:text-xs"
                   onClick={() => {
                     setIsAddingDestiny(true)
                     setIsEditingMarcadorInicio(false)
@@ -269,14 +269,14 @@ const RouteEditor = ({
                 </IconButton>
 
                 <IconButton
-                  className="shrink-0  md:h-7 md:text-xs"
+                  className="shrink-0 text-sm md:h-7 md:text-xs"
                   onClick={() => {
                     setIsEditingMarcadorInicio(true)
                     notAddingDestiny()
                   }}
                 >
                   <PersonStanding size={20} />
-                  Mudar ponto inicial
+                  Mudar inicio
                 </IconButton>
               </div>
 
