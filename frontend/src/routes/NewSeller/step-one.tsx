@@ -73,7 +73,7 @@ export default function SellerFormStepOne({
           <InputRoot>
             <InputField
               id="phone"
-              {...registerWithMask('phone_number', ['99 9999-9999'])}
+              {...registerWithMask('phone_number', ['99 99999-9999'])}
             />
           </InputRoot>
           {errors?.phone_number && (
