@@ -197,7 +197,7 @@ export default function Seller() {
         <Sheet.Container>
           <SheetHeaderTitle onDismiss={onClose}>
             {activeSellingLocation && (
-              <h2 className="text-lg text-center text-gray02 pt-4 w-80 absolute p-0 ml-[50%] -translate-x-1/2">
+              <h2 className="text-base text-center text-gray02 pt-4 w-80 max-w-[70%] absolute p-0 ml-[50%] -translate-x-1/2">
                 Setor {activeSellingLocation.setor} -{' '}
                 {'numero' in activeSellingLocation
                   ? `Rua ${activeSellingLocation.rua} - Box ${activeSellingLocation.numero}`
