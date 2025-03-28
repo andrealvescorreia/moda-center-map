@@ -43,7 +43,7 @@ export async function authenticate(
     res.cookie('authtoken', token, {
       httpOnly: true,
       secure: true, // Ensure the cookie is sent only over HTTPS
-      sameSite: 'none',
+      sameSite: 'lax',
       maxAge: ms(env.TOKEN_EXPIRATION as StringValue),
     })
     res.status(200).json({ id, username })
