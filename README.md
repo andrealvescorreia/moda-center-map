@@ -104,7 +104,7 @@ npm run dev
 
 - A interface de usuário apresenta baixa responsividade ao ser acessada em computadores. Como o foco principal do Moda Center Map são dispositivos móveis, não planejo tratar essa limitação no momento.
 
-- Não é possível fazer login usando o aplicativo "Samsung Internet", e também no modo anônimo do Chrome. Isso devido políticas dos navegadores que bloqueiam cookies de terceiros, impedindo armazenamento do cookie de autenticação. Para resolver isso seria necessário que o front e back fossem hospedados sob o mesmo domínio, o que no momento não é possível visto que as hospedagens gratuitas que utilizo não oferecem essa função. 
+- Em breve o recurso de login pode parar de funcionar no Chrome. Isso devido políticas do navegador que pode bloquear cookies de terceiros, impedindo armazenamento do cookie de autenticação. Para resolver isso seria necessário que o front e back fossem hospedados sob o mesmo domínio, o que no momento não é possível visto que as hospedagens gratuitas que utilizo não oferecem essa função. 
 
 ---
 
