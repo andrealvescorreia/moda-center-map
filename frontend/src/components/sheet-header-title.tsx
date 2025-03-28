@@ -16,10 +16,10 @@ export function SheetHeaderTitle({
         {children}
         <button
           type="button"
-          className="ml-auto w-2 pr-8 hover:cursor-pointer"
+          className="ml-auto w-2 pr-6 hover:cursor-pointer -mt-3.5"
           onClick={onDismiss}
         >
-          <X size={22} />
+          <X size={18} />
         </button>
       </div>
     </Sheet.Header>

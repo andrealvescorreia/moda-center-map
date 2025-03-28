@@ -166,7 +166,9 @@ function DestinyLiItem({
       </div>
       <div className="h-full flex flex-col relative gap-0">
         <p className="text-base md:text-sm">{locationName}</p>
-        <p className="text-sm -mt-2 md:text-xs text-gray04">{location}</p>
+        <p className="text-sm -mt-2 md:mt-0 md:text-xs text-gray04">
+          {location}
+        </p>
         {!isEndingPoint && divider}
       </div>
       {!isStartingPoint && (
