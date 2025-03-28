@@ -205,7 +205,7 @@ export default function Seller() {
               </h2>
             )}
           </SheetHeaderTitle>
-          <Sheet.Content className="flex gap-3 pl-5 pt-5 md:w-120 ">
+          <Sheet.Content className="flex gap-3 pl-5 mt-4 md:w-120 ">
             {seller && (
               <SellerCard
                 name={seller.name}
