@@ -5,7 +5,7 @@ gsap.registerPlugin(CSSPlugin)
 // biome-ignore lint/suspicious/noShadowRestrictedNames: <explanation>
 import { ArrowLeft, CircleX, Map } from 'lucide-react'
 import { type ComponentProps, useEffect, useRef, useState } from 'react'
-import { getFavorites, searchSeller } from '../../http/api'
+import { getFavorites, getSellers, searchSeller } from '../../http/api'
 import type { SellerResponse } from '../../http/responses'
 import type { Boxe } from '../../interfaces/Boxe'
 import type { Loja } from '../../interfaces/Loja'
@@ -25,8 +25,10 @@ export function SearchStore({
   onSellectSeller,
 }: SearchStoreProps) {
   const [searchTerm, setSearchTerm] = useState('')
-  const [sellers, setSellers] = useState<SellerResponse[]>([])
+  const [searchedSellers, setSearchedSellers] = useState<SellerResponse[]>([])
   const [favoriteSellers, setFavoriteSellers] = useState<SellerResponse[]>([])
+  const [allSellers, setAllSellers] = useState<SellerResponse[]>([])
+
   const isFetchingRef = useRef(false)
 
   async function fetchFavoriteSellers() {
@@ -34,19 +36,36 @@ export function SearchStore({
     setFavoriteSellers(sellers)
   }
 
+  async function fetchAllSellers() {
+    let sellers = await getSellers('order_by=name&order=asc')
+    sellers = sellers.filter((seller) => {
+      for (const favSeller of favoriteSellers) {
+        if (seller.name === favSeller.name) return false
+      }
+      return true
+    })
+    setAllSellers(sellers)
+  }
+
   // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
   useEffect(() => {
     fetchFavoriteSellers()
   }, [])
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
   useEffect(() => {
-    if (searchTerm.length < 3) setSellers([])
+    fetchAllSellers()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [favoriteSellers])
+
+  useEffect(() => {
+    if (searchTerm.length < 3) setSearchedSellers([])
     if (isFetchingRef.current || searchTerm.length < 3) return
     isFetchingRef.current = true
     searchSeller(searchTerm)
       .then((res) => {
         isFetchingRef.current = false
-        setSellers(res)
+        setSearchedSellers(res)
       })
       .catch(console.error)
   }, [searchTerm])
@@ -61,7 +80,7 @@ export function SearchStore({
   }, [])
 
   function handleSelectSeller(sellerId: string, locationId?: string) {
-    let seller = sellers.find((seller) => seller.id === sellerId)
+    let seller = searchedSellers.find((seller) => seller.id === sellerId)
     if (!seller) {
       seller = favoriteSellers.find((seller) => seller.id === sellerId)
     }
@@ -130,15 +149,27 @@ export function SearchStore({
             />
           </div>
         )}
+        {searchTerm.length === 0 && allSellers.length > 0 && (
+          <div className="flex flex-col items-center justify-center pt-10">
+            <h2 className="text-xl font-semibold ">
+              {favoriteSellers.length > 0 ? 'Outros Vendedores' : 'Vendedores'}
+            </h2>
+            <SellerList
+              sellers={allSellers}
+              showByLocation
+              onClick={handleSelectSeller}
+            />
+          </div>
+        )}
       </div>
       <div>
         <SellerList
-          sellers={sellers}
+          sellers={searchedSellers}
           showByLocation
           onClick={handleSelectSeller}
         />
       </div>
-      {sellers.length === 0 && searchTerm.length >= 3 && (
+      {searchedSellers.length === 0 && searchTerm.length >= 3 && (
         <div className="flex justify-center items-center h-20">
           <p className="text-gray-03">Nenhum resultado encontrado</p>
         </div>
