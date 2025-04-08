@@ -19,7 +19,7 @@ import { ModaCenterGridMap } from '../../models/ModaCenterGridMap'
 import { useNavContext } from '../../providers/NavProvider'
 import { useRouteContext } from '../../providers/RouteProvider'
 import { useUserContext } from '../../providers/UserProvider'
-import Search from './search'
+import SearchSeller from './search-seller'
 const modaCenterGridMap = new ModaCenterGridMap()
 const minZoomLevelToRenderMarkers = 5
 
@@ -32,7 +32,7 @@ function Home() {
     setShow(true)
   }, [setShow])
   if (isSearching) {
-    return <Search onCancel={() => setIsSearching(false)} />
+    return <SearchSeller onCancel={() => setIsSearching(false)} />
   }
 
   function setInitialPosition(position: [number, number]) {
