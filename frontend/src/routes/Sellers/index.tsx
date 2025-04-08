@@ -21,7 +21,7 @@ export default function Sellers() {
   useEffect(() => {
     const fetchSellers = async () => {
       setLoading(true)
-      const sellers = await getSellers()
+      const sellers = await getSellers('order_by=name&order=asc')
       setSellers(sellers)
       setLoading(false)
     }

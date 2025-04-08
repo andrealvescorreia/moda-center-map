@@ -31,8 +31,11 @@ export async function getUser() {
   return await axiosInstance.get('user')
 }
 
-export async function getSellers() {
-  const response = await axiosInstance.get('seller')
+export async function getSellers(queryParams: string | undefined) {
+  let url = 'seller'
+  if (queryParams) url = `seller?${queryParams}`
+
+  const response = await axiosInstance.get(url)
   const sellers: SellerResponse[] = response.data
   return sellers
 }
