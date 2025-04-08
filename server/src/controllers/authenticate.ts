@@ -60,7 +60,12 @@ export async function logout(
   next: NextFunction
 ): Promise<void> {
   try {
-    res.clearCookie('authtoken')
+    res.clearCookie('authtoken', {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'none',
+      partitioned: true,
+    })
     res.send('logged out!')
     return
   } catch (error) {
