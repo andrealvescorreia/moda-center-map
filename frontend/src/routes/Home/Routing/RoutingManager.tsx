@@ -35,12 +35,15 @@ const RoutingManager = ({ gridMap, onStopManagingRoute }: RoutingManager) => {
   })
 
   const handleUpdate = (newRoute: Route) => {
-    if (newRoute.inicio === null && newRoute.destinos.length === 0) {
+    if (!newRoute) return
+    if (newRoute.destinos.length === 0) {
       setRoute(newRoute)
+      setBestRoute(newRoute)
       return
     }
-    if (!newRoute) return
     if (!newRoute?.inicio && newRoute?.destinos.length >= 0) {
+      setRoute(newRoute)
+      setBestRoute(newRoute)
       return
     }
     let destinosMelhorOrdem: Destiny[] = []
