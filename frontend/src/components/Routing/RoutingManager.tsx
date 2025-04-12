@@ -14,7 +14,6 @@ import type { Route } from '../../interfaces/Route'
 import { ModaCenterGridMap } from '../../models/ModaCenterGridMap'
 import { RouteCalculator } from '../../models/RouteCalculator'
 import { TSPSolverNN } from '../../models/TSPSolverNN'
-import { useNavContext } from '../../providers/NavProvider'
 import { useRouteContext } from '../../providers/RouteProvider'
 import { IconButton } from '../icon-button'
 import { SheetHeaderTitle } from '../sheet-header-title'
@@ -25,33 +24,38 @@ interface RoutingManager {
   onStopManagingRoute: () => void
 }
 
-const RoutingManager = ({
-  gridMap,
-  onStopManagingRoute: onStopEditingRoute,
-}: RoutingManager) => {
-  const { setShow } = useNavContext()
+const RoutingManager = ({ gridMap, onStopManagingRoute }: RoutingManager) => {
   const { route, setRoute } = useRouteContext()
   const [isCreatingRoute, setIsCreatingRoute] = useState(true)
   const [isFollowingRoute, setIsFollowingRoute] = useState(false)
 
   const [bestRoute, setBestRoute] = useState<Route>({
     inicio: null,
-    destinos: [],
+    destinos: route?.destinos || [],
   })
 
   const handleUpdate = (newRoute: Route) => {
+    if (newRoute.inicio === null && newRoute.destinos.length === 0) {
+      setRoute(newRoute)
+      return
+    }
     if (!newRoute) return
+    if (!newRoute?.inicio && newRoute?.destinos.length >= 0) {
+      return
+    }
     let destinosMelhorOrdem: Destiny[] = []
     let melhoresPassos: Position[] = []
 
     const removeDuplicates = (arr: Destiny[]) => {
       const seen = new Set()
       return arr.filter((item) => {
-        const key = JSON.stringify(item)
+        const key = JSON.stringify(item.position)
         return seen.has(key) ? false : seen.add(key)
       })
     }
-    newRoute.destinos = removeDuplicates(newRoute.destinos)
+    if (newRoute.destinos.length > 0) {
+      newRoute.destinos = removeDuplicates(newRoute.destinos)
+    }
 
     if (newRoute.inicio && newRoute.destinos.length > 0) {
       const routeCalculator = new RouteCalculator({
@@ -70,11 +74,6 @@ const RoutingManager = ({
         inicio: newRoute.inicio,
         destinos: destinosMelhorOrdem.slice(1),
       })
-    } else {
-      setBestRoute({
-        inicio: null,
-        destinos: [],
-      })
     }
     const newBestRoute = {
       inicio: newRoute.inicio,
@@ -92,18 +91,10 @@ const RoutingManager = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [route])
 
-  useEffect(() => {
-    if (!isCreatingRoute) {
-      setShow(true)
-    } else {
-      setShow(false)
-    }
-  }, [isCreatingRoute, setShow])
-
   function cancelRoute() {
     setIsCreatingRoute(false)
-    onStopEditingRoute()
     setIsFollowingRoute(false)
+    onStopManagingRoute()
   }
 
   return (

@@ -1,3 +1,8 @@
+import Button from '@mui/material/Button'
+import Dialog from '@mui/material/Dialog'
+import DialogActions from '@mui/material/DialogActions'
+import DialogContent from '@mui/material/DialogContent'
+import DialogTitle from '@mui/material/DialogTitle'
 import L from 'leaflet'
 import { ArrowRight, Bookmark, Phone, Plus, Trash2 } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
@@ -5,6 +10,8 @@ import { Rectangle } from 'react-leaflet'
 import { MapContainer } from 'react-leaflet'
 import { Sheet, type SheetRef } from 'react-modal-sheet'
 import { useNavigate, useParams } from 'react-router-dom'
+import GridDrawer from '../../components/GridDrawer'
+import FlyTo from '../../components/Map/fly-to'
 import { IconButton } from '../../components/icon-button'
 import { SheetHeaderTitle } from '../../components/sheet-header-title'
 import {
@@ -22,7 +29,6 @@ import type {
 import type { Boxe } from '../../interfaces/Boxe'
 import type { Destiny } from '../../interfaces/Destiny'
 import type { Loja } from '../../interfaces/Loja'
-import type { Route } from '../../interfaces/Route'
 import { ModaCenterGridMap } from '../../models/ModaCenterGridMap'
 import {
   colorMap,
@@ -30,6 +36,10 @@ import {
   sellingLocationToText,
 } from '../../utils/utils'
 import SellerCard from './seller-card'
+
+import { useLoadingContext } from '../../providers/LoadingProvider'
+import { useRouteContext } from '../../providers/RouteProvider'
+import { useUserContext } from '../../providers/UserProvider'
 
 const modaCenterGridMap = new ModaCenterGridMap()
 
@@ -44,6 +54,7 @@ export default function Seller() {
   const [modalOpen, setModalOpen] = useState(false)
   const [isFavorite, setIsFavorite] = useState(false)
   const { user } = useUserContext()
+  const { route, setRoute } = useRouteContext()
   const { setLoading } = useLoadingContext()
   useEffect(() => {
     if (!id) return
@@ -181,11 +192,8 @@ export default function Seller() {
       setLoading(false)
     }
   }
-  function addToRoute() {
+  function sellerToDestiny() {
     if (activeSellingLocation && seller) {
-      const storedRoute = JSON.parse(
-        localStorage.getItem('route') || '{}'
-      ) as Route
       const newDestiny: Destiny = {
         position: { x: 0, y: 0 },
         sellingLocation: activeSellingLocation,
@@ -196,15 +204,32 @@ export default function Seller() {
       } else {
         newDestiny.position = activeSellingLocation.getEntrance()
       }
-      const newRoute = {
-        ...storedRoute,
-        destinos: [...storedRoute.destinos, newDestiny],
-      }
-      localStorage.setItem('route', JSON.stringify(newRoute))
+      return newDestiny
+    }
+    return null
+  }
 
+  function addToRoute() {
+    if (activeSellingLocation && seller && route) {
+      const newDestiny = sellerToDestiny()
+      if (!newDestiny) return
+      const found = route.destinos.find(
+        (destiny: Destiny) => destiny.position === newDestiny.position
+      )
+      if (found) {
+        alert('Esse local já está na rota "Minha rota"')
+        return
+      }
+
+      const newRoute = {
+        ...route,
+        destinos: [...route.destinos, newDestiny],
+      }
+      setRoute(newRoute)
       alert('adicionado à "Minha rota"')
     }
   }
+
   return (
     <div>
       <Sheet
@@ -353,93 +378,82 @@ export default function Seller() {
       </MapContainer>
     </div>
   )
-}
-
-import Button from '@mui/material/Button'
-import Dialog from '@mui/material/Dialog'
-import DialogActions from '@mui/material/DialogActions'
-import DialogContent from '@mui/material/DialogContent'
-import DialogTitle from '@mui/material/DialogTitle'
-import GridDrawer from '../../components/GridDrawer'
-import FlyTo from '../../components/Map/fly-to'
-
-import { useLoadingContext } from '../../providers/LoadingProvider'
-import { useUserContext } from '../../providers/UserProvider'
-function DialogAction({
-  onClose,
-  onAccept,
-  title,
-  children,
-}: {
-  onClose: () => void
-  onAccept: () => void
-  title: string
-  children?: React.ReactNode
-}) {
-  const handleClose = () => {
-    onClose()
+  function DialogAction({
+    onClose,
+    onAccept,
+    title,
+    children,
+  }: {
+    onClose: () => void
+    onAccept: () => void
+    title: string
+    children?: React.ReactNode
+  }) {
+    const handleClose = () => {
+      onClose()
+    }
+    const handleAccept = () => {
+      onAccept()
+    }
+    return (
+      <Dialog
+        open
+        onClose={handleClose}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">{title}</DialogTitle>
+        <DialogContent>{children}</DialogContent>
+        <DialogActions>
+          <Button onClick={handleClose} autoFocus>
+            CANCELAR
+          </Button>
+          <Button onClick={handleAccept} autoFocus>
+            OK
+          </Button>
+        </DialogActions>
+      </Dialog>
+    )
   }
-  const handleAccept = () => {
-    onAccept()
-  }
-  return (
-    <Dialog
-      open
-      onClose={handleClose}
-      aria-labelledby="alert-dialog-title"
-      aria-describedby="alert-dialog-description"
-    >
-      <DialogTitle id="alert-dialog-title">{title}</DialogTitle>
-      <DialogContent>{children}</DialogContent>
-      <DialogActions>
-        <Button onClick={handleClose} autoFocus>
-          CANCELAR
-        </Button>
-        <Button onClick={handleAccept} autoFocus>
-          OK
-        </Button>
-      </DialogActions>
-    </Dialog>
-  )
-}
 
-function DeleteButton({ onClick }: { onClick: () => void }) {
-  return (
-    <IconButton
-      className="opacity-65 text-danger border-danger h-7 text-sm p-2"
-      onClick={onClick}
-    >
-      <Trash2 size={18} />
-      Deletar
-    </IconButton>
-  )
-}
-
-function AddToRouteButton({ onClick }: { onClick: () => void }) {
-  return (
-    <IconButton onClick={onClick} className="opacity-75 h-7 text-sm p-2">
-      <Plus size={18} />
-      Adicionar à rota
-    </IconButton>
-  )
-}
-
-function LocationItem({
-  location,
-  onClick,
-}: { location: BoxeResponse | StoreResponse; onClick?: () => void }) {
-  const text = sellingLocationToText(location)
-
-  return (
-    <li className="text-gray02 py-1.5 pr-3 flex items-center">
-      {text}{' '}
-      <button
-        type="button"
-        className="bg-gray06 rounded-2xl p-0.5 ml-auto hover:cursor-pointer"
+  function DeleteButton({ onClick }: { onClick: () => void }) {
+    return (
+      <IconButton
+        className="opacity-65 text-danger border-danger h-7 text-sm p-2"
         onClick={onClick}
       >
-        <ArrowRight size={26} className="text-green-primary" />
-      </button>
-    </li>
-  )
+        <Trash2 size={18} />
+        Deletar
+      </IconButton>
+    )
+  }
+
+  function AddToRouteButton({ onClick }: { onClick: () => void }) {
+    return (
+      <IconButton onClick={onClick} className="opacity-75 h-7 text-sm p-2">
+        <Plus size={18} />
+        Adicionar à rota
+      </IconButton>
+    )
+  }
+
+  function LocationItem({
+    location,
+    onClick,
+  }: { location: BoxeResponse | StoreResponse; onClick?: () => void }) {
+    const text = sellingLocationToText(location)
+
+    return (
+      <li className="text-gray02 py-1.5 pr-3 flex items-center">
+        {text}{' '}
+        <button
+          type="button"
+          className="bg-gray06 rounded-2xl p-0.5 ml-auto hover:cursor-pointer"
+          onClick={onClick}
+        >
+          <ArrowRight size={26} className="text-green-primary" />
+        </button>
+      </li>
+    )
+  }
 }

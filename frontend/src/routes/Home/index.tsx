@@ -30,16 +30,6 @@ function Home() {
   const { user } = useUserContext()
   const [isSearching, setIsSearching] = useState(false)
   const [isManagingRoute, setIsManagingRoute] = useState(false)
-  useEffect(() => {
-    const storedRoute = JSON.parse(localStorage.getItem('route') ?? 'null')
-    if (storedRoute) setRoute(storedRoute)
-  }, [setRoute])
-
-  useEffect(() => {
-    if (route) {
-      localStorage.setItem('route', JSON.stringify(route))
-    }
-  }, [route])
 
   useEffect(() => {
     if (isManagingRoute) {

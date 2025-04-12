@@ -185,8 +185,8 @@ const RouteEditor = ({
     const position =
       'rua' in sellingLocation
         ? {
-            x: sellingLocation.positionInGrid.x,
             y: sellingLocation.positionInGrid.y,
+            x: sellingLocation.positionInGrid.x,
           }
         : sellingLocation.getEntrance()
 
