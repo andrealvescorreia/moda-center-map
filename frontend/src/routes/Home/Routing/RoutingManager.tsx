@@ -120,7 +120,10 @@ const RoutingManager = ({ gridMap, onStopManagingRoute }: RoutingManager) => {
       {isFollowingRoute && (
         <RouteFollower
           onCancel={() => cancelRoute()}
-          onFinish={() => cancelRoute()}
+          onFinish={() => {
+            handleUpdate({ inicio: null, destinos: [] })
+            cancelRoute()
+          }}
           onChooseToEdit={() => {
             setIsCreatingRoute(true)
             setIsFollowingRoute(false)
