@@ -11,6 +11,7 @@ import { ClickPosition } from '../../components/Map/click-position'
 import FlyTo from '../../components/Map/fly-to'
 import RouteDrawer from '../../components/Routing/RouteDrawer'
 import RoutingManager from '../../components/Routing/RoutingManager'
+import RouteButton from '../../components/Routing/route-button'
 import CallToLogin from '../../components/call-to-login'
 import { InputField, InputIcon, InputRoot } from '../../components/input'
 import NavBar from '../../components/nav'
@@ -28,6 +29,26 @@ function Home() {
   const { show, setShow } = useNavContext()
   const { user } = useUserContext()
   const [isSearching, setIsSearching] = useState(false)
+  const [isManagingRoute, setIsManagingRoute] = useState(false)
+  useEffect(() => {
+    const storedRoute = JSON.parse(localStorage.getItem('route') ?? 'null')
+    if (storedRoute) setRoute(storedRoute)
+  }, [setRoute])
+
+  useEffect(() => {
+    if (route) {
+      localStorage.setItem('route', JSON.stringify(route))
+    }
+  }, [route])
+
+  useEffect(() => {
+    if (isManagingRoute) {
+      setShow(false)
+    } else {
+      setShow(true)
+    }
+  }, [isManagingRoute, setShow])
+
   useEffect(() => {
     setShow(true)
   }, [setShow])
@@ -125,7 +146,20 @@ function Home() {
         )}
       </div>
 
-      <RoutingManager gridMap={modaCenterGridMap} />
+      {!isManagingRoute ? (
+        <span className="absolute  ui bottom-20 right-5">
+          <RouteButton
+            onClick={() => setIsManagingRoute(true)}
+            className="relative"
+          />
+        </span>
+      ) : (
+        <RoutingManager
+          gridMap={modaCenterGridMap}
+          onStopManagingRoute={() => setIsManagingRoute(false)}
+        />
+      )}
+
       <MapContainer
         crs={L.CRS.Simple}
         bounds={modaCenterGridMap.getBounds()}
@@ -143,23 +177,30 @@ function Home() {
         minZoom={1}
         center={modaCenterGridMap.getCenter()}
         zoom={2}
-        preferCanvas={true}
+        //preferCanvas={true}
       >
         <MapMaxBoundsUpdater />
         <GridDrawer
           gridMap={modaCenterGridMap}
           minZoomLevelToRenderMarkers={minZoomLevelToRenderMarkers}
         />
-        {route && (
-          <RouteDrawer destinos={route.destinos} passos={route.passos ?? []} />
+        {isManagingRoute && (
+          <span>
+            {route && (
+              <RouteDrawer
+                destinos={route.destinos}
+                passos={route.passos ?? []}
+              />
+            )}
+            {route?.inicio && (
+              <DraggableMarker
+                position={route.inicio.position}
+                onUpdatePosition={handleChangeStartPoint}
+              />
+            )}
+            {route?.inicio && <FlyTo position={route.inicio.position} />}
+          </span>
         )}
-        {route?.inicio && (
-          <DraggableMarker
-            position={route.inicio.position}
-            onUpdatePosition={handleChangeStartPoint}
-          />
-        )}
-        {route?.inicio && <FlyTo position={route.inicio.position} />}
         <ClickPosition />
       </MapContainer>
     </div>

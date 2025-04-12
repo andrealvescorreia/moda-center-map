@@ -19,16 +19,19 @@ import { useRouteContext } from '../../providers/RouteProvider'
 import { IconButton } from '../icon-button'
 import { SheetHeaderTitle } from '../sheet-header-title'
 import RouteEditor from './RouteEditor'
-import RouteButton from './route-button'
 
 interface RoutingManager {
   gridMap: ModaCenterGridMap
+  onStopManagingRoute: () => void
 }
 
-const RoutingManager = ({ gridMap }: RoutingManager) => {
+const RoutingManager = ({
+  gridMap,
+  onStopManagingRoute: onStopEditingRoute,
+}: RoutingManager) => {
   const { setShow } = useNavContext()
   const { route, setRoute } = useRouteContext()
-  const [isCreatingRoute, setIsCreatingRoute] = useState(false)
+  const [isCreatingRoute, setIsCreatingRoute] = useState(true)
   const [isFollowingRoute, setIsFollowingRoute] = useState(false)
 
   const [bestRoute, setBestRoute] = useState<Route>({
@@ -99,24 +102,12 @@ const RoutingManager = ({ gridMap }: RoutingManager) => {
 
   function cancelRoute() {
     setIsCreatingRoute(false)
+    onStopEditingRoute()
     setIsFollowingRoute(false)
-    setRoute({
-      inicio: null,
-      destinos: [],
-      passos: [],
-    })
   }
 
   return (
     <div>
-      {!isCreatingRoute && (
-        <span className="absolute  ui bottom-20 right-5">
-          <RouteButton
-            onClick={() => setIsCreatingRoute(true)}
-            className="relative"
-          />
-        </span>
-      )}
       {isCreatingRoute && !isFollowingRoute && (
         <RouteEditor
           gridMap={gridMap}
