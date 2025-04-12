@@ -37,7 +37,10 @@ const RoutingManager = ({ gridMap, onStopManagingRoute }: RoutingManager) => {
   const handleUpdate = (newRoute: Route) => {
     if (!newRoute) return
     if (newRoute.destinos.length === 0) {
-      setRoute(newRoute)
+      const newBestRoute = { ...newRoute, passos: [] }
+      if (JSON.stringify(route) !== JSON.stringify(newBestRoute)) {
+        setRoute(newBestRoute)
+      }
       setBestRoute(newRoute)
       return
     }
