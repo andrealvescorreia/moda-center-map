@@ -1,3 +1,8 @@
+import Button from '@mui/material/Button'
+import Dialog from '@mui/material/Dialog'
+import DialogActions from '@mui/material/DialogActions'
+import DialogContent from '@mui/material/DialogContent'
+import DialogTitle from '@mui/material/DialogTitle'
 import L from 'leaflet'
 import { ArrowRight, Bookmark, Phone, Plus, Trash2 } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
@@ -32,7 +37,6 @@ import {
 } from '../../utils/utils'
 import SellerCard from './seller-card'
 
-import DialogModal from '../../components/dialog-modal'
 import { useLoadingContext } from '../../providers/LoadingProvider'
 import { useRouteContext } from '../../providers/RouteProvider'
 import { useUserContext } from '../../providers/UserProvider'
@@ -47,6 +51,9 @@ export default function Seller() {
     Boxe | Loja | undefined
   >()
   const isMultiLocationSeller = useRef(false)
+  const [ModalComponent, setModalComponent] = useState<JSX.Element | null>(
+    <div className="ui absolute text-black">aA AAAAAAAAAAAAAAAAAAAAAAAAAa</div>
+  )
   const [modalOpen, setModalOpen] = useState(false)
   const [isFavorite, setIsFavorite] = useState(false)
   const { user } = useUserContext()
@@ -156,8 +163,12 @@ export default function Seller() {
     try {
       setLoading(true)
       await deleteSeller(seller.id)
-      alert('Vendedor deletado com sucesso')
-      navigate('/sellers')
+      setModalComponent(
+        OkModal(`Vendedor ${seller.name} deletado com sucesso`, () => {
+          navigate('/sellers')
+        })
+      )
+      setModalOpen(true)
     } catch (error) {
       console.error(error)
     } finally {
@@ -213,7 +224,8 @@ export default function Seller() {
         (destiny: Destiny) => destiny.position === newDestiny.position
       )
       if (found) {
-        alert('Esse local já está na rota "Minha rota"')
+        setModalComponent(OkModal(`Esse local já está na rota "Minha rota"`))
+        setModalOpen(true)
         return
       }
 
@@ -222,12 +234,62 @@ export default function Seller() {
         destinos: [...route.destinos, newDestiny],
       }
       setRoute(newRoute)
-      alert('adicionado à "Minha rota"')
+      setModalComponent(
+        OkModal(`Vendedor ${seller.name} adicionado à "Minha rota"`)
+      )
+      setModalOpen(true)
     }
+  }
+
+  function DeleteSellerModal() {
+    return (
+      <Dialog
+        open={true}
+        onClose={() => setModalOpen(false)}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">Deletar Vendedor</DialogTitle>
+        <DialogContent>
+          <p className="text-gray02">
+            Tem certeza que deseja deletar o vendedor {seller?.name}?
+          </p>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setModalOpen(false)} autoFocus>
+            CANCELAR
+          </Button>
+          <Button onClick={() => deleteSell()} autoFocus>
+            OK
+          </Button>
+        </DialogActions>
+      </Dialog>
+    )
+  }
+  function OkModal(text: string, onOK?: () => void) {
+    return (
+      <Dialog open={true} onClose={() => setModalOpen(false)}>
+        <DialogContent>
+          <p className="text-gray02">{text}</p>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            onClick={() => {
+              setModalOpen(false)
+              if (onOK) onOK()
+            }}
+            autoFocus
+          >
+            OK
+          </Button>
+        </DialogActions>
+      </Dialog>
+    )
   }
 
   return (
     <div>
+      {modalOpen && ModalComponent}
       <Sheet
         ref={ref}
         isOpen={true}
@@ -302,23 +364,11 @@ export default function Seller() {
               <DeleteButton
                 onClick={() => {
                   snapTo(2)
+                  setModalComponent(DeleteSellerModal())
                   setModalOpen(true)
                 }}
               />
             </div>
-            {modalOpen && (
-              <DialogModal
-                title="Deseja realmente deletar esse vendedor?"
-                onCancel={() => {
-                  snapTo(1)
-                  setModalOpen(false)
-                }}
-                onAccept={() => {
-                  deleteSell()
-                  setModalOpen(false)
-                }}
-              />
-            )}
             {isMultiLocationSeller.current && (
               <div className="pt-5">
                 <h3 className="text-lg font-semibold text-gray02">
