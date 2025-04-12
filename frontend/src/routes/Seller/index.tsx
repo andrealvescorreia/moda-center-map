@@ -1,5 +1,5 @@
 import L from 'leaflet'
-import { ArrowRight, Bookmark, Phone, Trash2 } from 'lucide-react'
+import { ArrowRight, Bookmark, Phone, Plus, Trash2 } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import { Rectangle } from 'react-leaflet'
 import { MapContainer } from 'react-leaflet'
@@ -20,7 +20,9 @@ import type {
   StoreResponse,
 } from '../../http/responses'
 import type { Boxe } from '../../interfaces/Boxe'
+import type { Destiny } from '../../interfaces/Destiny'
 import type { Loja } from '../../interfaces/Loja'
+import type { Route } from '../../interfaces/Route'
 import { ModaCenterGridMap } from '../../models/ModaCenterGridMap'
 import {
   colorMap,
@@ -179,6 +181,30 @@ export default function Seller() {
       setLoading(false)
     }
   }
+  function addToRoute() {
+    if (activeSellingLocation && seller) {
+      const storedRoute = JSON.parse(
+        localStorage.getItem('route') || '{}'
+      ) as Route
+      const newDestiny: Destiny = {
+        position: { x: 0, y: 0 },
+        sellingLocation: activeSellingLocation,
+        sellerName: seller.name,
+      }
+      if ('rua' in activeSellingLocation) {
+        newDestiny.position = activeSellingLocation.positionInGrid
+      } else {
+        newDestiny.position = activeSellingLocation.getEntrance()
+      }
+      const newRoute = {
+        ...storedRoute,
+        destinos: [...storedRoute.destinos, newDestiny],
+      }
+      localStorage.setItem('route', JSON.stringify(newRoute))
+
+      alert('adicionado à "Minha rota"')
+    }
+  }
   return (
     <div>
       <Sheet
@@ -246,12 +272,19 @@ export default function Seller() {
               </div>
             )}
 
-            <DeleteButton
-              onClick={() => {
-                snapTo(2)
-                setModalOpen(true)
-              }}
-            />
+            <div className="flex justify-baseline gap-6">
+              <AddToRouteButton
+                onClick={() => {
+                  addToRoute()
+                }}
+              />
+              <DeleteButton
+                onClick={() => {
+                  snapTo(2)
+                  setModalOpen(true)
+                }}
+              />
+            </div>
             {modalOpen && (
               <DialogAction
                 title="Deseja realmente deletar esse vendedor?"
@@ -329,6 +362,7 @@ import DialogContent from '@mui/material/DialogContent'
 import DialogTitle from '@mui/material/DialogTitle'
 import GridDrawer from '../../components/GridDrawer'
 import FlyTo from '../../components/Map/fly-to'
+
 import { useLoadingContext } from '../../providers/LoadingProvider'
 import { useUserContext } from '../../providers/UserProvider'
 function DialogAction({
@@ -372,11 +406,20 @@ function DialogAction({
 function DeleteButton({ onClick }: { onClick: () => void }) {
   return (
     <IconButton
-      className="mr-auto opacity-65 text-danger border-danger h-7 text-sm p-2"
+      className="opacity-65 text-danger border-danger h-7 text-sm p-2"
       onClick={onClick}
     >
       <Trash2 size={18} />
       Deletar
+    </IconButton>
+  )
+}
+
+function AddToRouteButton({ onClick }: { onClick: () => void }) {
+  return (
+    <IconButton onClick={onClick} className="opacity-75 h-7 text-sm p-2">
+      <Plus size={18} />
+      Adicionar à rota
     </IconButton>
   )
 }
