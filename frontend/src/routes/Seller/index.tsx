@@ -163,6 +163,7 @@ export default function Seller() {
     try {
       setLoading(true)
       await deleteSeller(seller.id)
+      removeFromRoute()
       setModalComponent(
         OkModal(`Vendedor ${seller.name} deletado com sucesso`, () => {
           navigate('/sellers')
@@ -238,6 +239,20 @@ export default function Seller() {
         OkModal(`Vendedor ${seller.name} adicionado à "Minha rota"`)
       )
       setModalOpen(true)
+    }
+  }
+
+  function removeFromRoute() {
+    if (activeSellingLocation && seller && route) {
+      const destinyToRemove = sellerToDestiny()
+      if (!destinyToRemove) return
+
+      setRoute({
+        ...route,
+        destinos: route.destinos.filter(
+          (destiny) => destiny.sellerName !== destinyToRemove.sellerName
+        ),
+      })
     }
   }
 
