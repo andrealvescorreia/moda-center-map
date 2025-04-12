@@ -1,8 +1,8 @@
+import AntPath from '../../../components/Routing/ant-path'
+import DestinyMarker from '../../../components/Routing/destiny-marker'
 //import { Marker } from 'react-leaflet'
-import type { Destiny } from '../../interfaces/Destiny'
-import type { Position } from '../../interfaces/Position'
-import AntPath from './ant-path'
-import DestinyMarker from './destiny-marker'
+import type { Destiny } from '../../../interfaces/Destiny'
+import type { Position } from '../../../interfaces/Position'
 
 interface RouteDrawerProps {
   //inicio: Position

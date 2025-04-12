@@ -5,13 +5,13 @@ gsap.registerPlugin(CSSPlugin)
 // biome-ignore lint/suspicious/noShadowRestrictedNames: <explanation>
 import { ArrowLeft, CircleX, Map } from 'lucide-react'
 import { type ComponentProps, useEffect, useRef, useState } from 'react'
-import { getFavorites, getSellers, searchSeller } from '../../http/api'
-import type { SellerResponse } from '../../http/responses'
-import type { Boxe } from '../../interfaces/Boxe'
-import type { Loja } from '../../interfaces/Loja'
-import SellerList from '../../routes/Sellers/seller-list'
-import { colorMap } from '../../utils/utils'
-import { InputField, InputIcon, InputRoot } from '../input'
+import { InputField, InputIcon, InputRoot } from '../../../components/input'
+import { getFavorites, getSellers, searchSeller } from '../../../http/api'
+import type { SellerResponse } from '../../../http/responses'
+import type { Boxe } from '../../../interfaces/Boxe'
+import type { Loja } from '../../../interfaces/Loja'
+import { colorMap } from '../../../utils/utils'
+import SellerList from '../../Sellers/seller-list'
 
 interface SearchStoreProps {
   onCancel?: () => void
