@@ -1,8 +1,3 @@
-import Button from '@mui/material/Button'
-import Dialog from '@mui/material/Dialog'
-import DialogActions from '@mui/material/DialogActions'
-import DialogContent from '@mui/material/DialogContent'
-import DialogTitle from '@mui/material/DialogTitle'
 import L from 'leaflet'
 import { ArrowRight, Bookmark, Phone, Plus, Trash2 } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
@@ -37,6 +32,7 @@ import {
 } from '../../utils/utils'
 import SellerCard from './seller-card'
 
+import DialogModal from '../../components/dialog-modal'
 import { useLoadingContext } from '../../providers/LoadingProvider'
 import { useRouteContext } from '../../providers/RouteProvider'
 import { useUserContext } from '../../providers/UserProvider'
@@ -311,9 +307,9 @@ export default function Seller() {
               />
             </div>
             {modalOpen && (
-              <DialogAction
+              <DialogModal
                 title="Deseja realmente deletar esse vendedor?"
-                onClose={() => {
+                onCancel={() => {
                   snapTo(1)
                   setModalOpen(false)
                 }}
@@ -378,43 +374,6 @@ export default function Seller() {
       </MapContainer>
     </div>
   )
-  function DialogAction({
-    onClose,
-    onAccept,
-    title,
-    children,
-  }: {
-    onClose: () => void
-    onAccept: () => void
-    title: string
-    children?: React.ReactNode
-  }) {
-    const handleClose = () => {
-      onClose()
-    }
-    const handleAccept = () => {
-      onAccept()
-    }
-    return (
-      <Dialog
-        open
-        onClose={handleClose}
-        aria-labelledby="alert-dialog-title"
-        aria-describedby="alert-dialog-description"
-      >
-        <DialogTitle id="alert-dialog-title">{title}</DialogTitle>
-        <DialogContent>{children}</DialogContent>
-        <DialogActions>
-          <Button onClick={handleClose} autoFocus>
-            CANCELAR
-          </Button>
-          <Button onClick={handleAccept} autoFocus>
-            OK
-          </Button>
-        </DialogActions>
-      </Dialog>
-    )
-  }
 
   function DeleteButton({ onClick }: { onClick: () => void }) {
     return (
