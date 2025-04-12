@@ -9,7 +9,7 @@ interface SearchProps {
   onCancel?: () => void
 }
 
-export default function Search({ onCancel }: SearchProps) {
+export default function SearchSeller({ onCancel }: SearchProps) {
   const [searchTerm, setSearchTerm] = useState('')
   const [sellers, setSellers] = useState<SellerResponse[]>([])
   const [isFetching, setIsFetching] = useState(false)

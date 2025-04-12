@@ -1,18 +1,21 @@
-import { Plus } from 'lucide-react'
+import { Plus, Search } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { NavLink, useNavigate } from 'react-router-dom'
 import { IconButton } from '../../components/icon-button'
+import { InputField, InputIcon, InputRoot } from '../../components/input'
 import NavBar from '../../components/nav'
 import { getSellers } from '../../http/api'
 import type { SellerResponse } from '../../http/responses'
 import { useLoadingContext } from '../../providers/LoadingProvider'
 import { useNavContext } from '../../providers/NavProvider'
+import SearchSeller from '../Home/search-seller'
 import SellerList from './seller-list'
 
 export default function Sellers() {
   const [sellers, setSellers] = useState<SellerResponse[]>([])
   const { loading, setLoading } = useLoadingContext()
   const { setShow } = useNavContext()
+  const [isSearching, setIsSearching] = useState(false)
   const navigate = useNavigate()
   useEffect(() => {
     setShow(true)
@@ -21,13 +24,16 @@ export default function Sellers() {
   useEffect(() => {
     const fetchSellers = async () => {
       setLoading(true)
-      const sellers = await getSellers()
+      const sellers = await getSellers('order_by=name&order=asc')
       setSellers(sellers)
       setLoading(false)
     }
     fetchSellers()
   }, [setLoading])
 
+  if (isSearching) {
+    return <SearchSeller onCancel={() => setIsSearching(false)} />
+  }
   return (
     <div className="h-[100dvh] w-[100dvw]">
       <NavBar />
@@ -36,6 +42,18 @@ export default function Sellers() {
         <div className="flex justify-center items-center h-18">
           <h1 className="text-2xl font-semibold">Vendedores</h1>
         </div>
+        <div className="pb-4 md:absolute md:mt-0 mt-2 w-full px-2 md:max-w-125 md:top-0 ml-[50%] transform -translate-x-1/2">
+          <InputRoot>
+            <InputIcon>
+              <Search />
+            </InputIcon>
+            <InputField
+              placeholder="Buscar"
+              onClick={() => setIsSearching(true)}
+            />
+          </InputRoot>
+        </div>
+
         {sellers.length === 0 && !loading && (
           <div className="flex justify-center items-center h-full">
             <p className="text-gray02 text-2xl pt-10">

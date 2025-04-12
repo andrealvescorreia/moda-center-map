@@ -39,7 +39,7 @@ export default function LoginForm() {
       setLoading(true)
       const response = await loginUser({ username, password })
       setUser(response.data)
-      navigate('/user')
+      navigate(-1)
     } catch (error) {
       if (error instanceof AxiosError) {
         if (error.response?.status === 401) {

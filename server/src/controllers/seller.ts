@@ -11,8 +11,19 @@ import { registerSellerSchema } from '../schemas/sellerSchema'
 import { validateNewSeller } from '../services/seller-validation'
 
 export async function index(req: Request, res: Response, next: NextFunction) {
+  const optionalParams = z.object({
+    order_by: z.string().optional(),
+    order: z.enum(['ASC', 'DESC', 'asc', 'desc']).optional(),
+  })
   try {
+    const parsed = optionalParams.parse(req.query)
     const sellers = await Seller.findAll({
+      order: [
+        [
+          parsed.order_by ? parsed.order_by : 'createdAt',
+          parsed.order ? parsed.order : 'DESC',
+        ],
+      ],
       include: [
         { model: Boxe, attributes: { exclude: ['createdAt', 'updatedAt'] } },
         { model: Store, attributes: { exclude: ['createdAt', 'updatedAt'] } },
@@ -21,7 +32,7 @@ export async function index(req: Request, res: Response, next: NextFunction) {
           attributes: { exclude: ['createdAt', 'updatedAt'] },
         },
       ],
-      attributes: { exclude: ['createdAt', 'updatedAt', 'search_vector'] },
+      attributes: { exclude: ['updatedAt', 'search_vector'] },
     })
     res.status(200).json(sellers)
     return

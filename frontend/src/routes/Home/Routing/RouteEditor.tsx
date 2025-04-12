@@ -1,19 +1,19 @@
 import { useEffect, useRef, useState } from 'react'
-import type { Loja } from '../../interfaces/Loja'
-import type { Route } from '../../interfaces/Route'
-import { ModaCenterGridMap } from '../../models/ModaCenterGridMap'
-import { useClickContext } from '../../providers/ClickProvider'
+import { DestinyList } from '../../../components/Routing/destiny-list'
+import type { Loja } from '../../../interfaces/Loja'
+import type { Route } from '../../../interfaces/Route'
+import { ModaCenterGridMap } from '../../../models/ModaCenterGridMap'
+import { useClickContext } from '../../../providers/ClickProvider'
 import { SearchStore } from './SearchSellingPoint'
-import { DestinyList } from './destiny-list'
 
-import { MapPinPlus, Navigation, PersonStanding } from 'lucide-react'
+import { MapPinPlus, Navigation, PersonStanding, Trash } from 'lucide-react'
 import { Sheet, type SheetRef } from 'react-modal-sheet'
-import { getSellerByBox, getSellerByStore } from '../../http/api'
-import type { Boxe } from '../../interfaces/Boxe'
-import { colorToEnglishMap } from '../../utils/utils'
-import { IconButton } from '../icon-button'
-import { SheetHeaderTitle } from '../sheet-header-title'
-import { DialogAction } from './dialog-action'
+import { DialogAction } from '../../../components/Routing/dialog-action'
+import { IconButton } from '../../../components/icon-button'
+import { SheetHeaderTitle } from '../../../components/sheet-header-title'
+import { getSellerByBox, getSellerByStore } from '../../../http/api'
+import type { Boxe } from '../../../interfaces/Boxe'
+import { colorToEnglishMap } from '../../../utils/utils'
 interface RouteEditorProps {
   gridMap: ModaCenterGridMap
   route: Route
@@ -70,6 +70,14 @@ const RouteEditor = ({
         position: { x: adjustedX, y },
         sellingLocation: gridMap.findNearestBoxe(y, adjustedX),
       },
+    })
+  }
+
+  function deleteRoute() {
+    onUpdate({
+      inicio: null,
+      destinos: [],
+      passos: [],
     })
   }
 
@@ -177,8 +185,8 @@ const RouteEditor = ({
     const position =
       'rua' in sellingLocation
         ? {
-            x: sellingLocation.positionInGrid.x,
             y: sellingLocation.positionInGrid.y,
+            x: sellingLocation.positionInGrid.x,
           }
         : sellingLocation.getEntrance()
 
@@ -277,6 +285,18 @@ const RouteEditor = ({
                 >
                   <PersonStanding size={20} />
                   Mudar inicio
+                </IconButton>
+
+                <IconButton
+                  className="shrink-0 text-sm md:h-7 md:text-xs"
+                  type="reset"
+                  onClick={() => {
+                    deleteRoute()
+                    onCancel()
+                  }}
+                >
+                  <Trash size={20} />
+                  Excluir
                 </IconButton>
               </div>
 

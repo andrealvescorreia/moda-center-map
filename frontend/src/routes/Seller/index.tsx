@@ -1,10 +1,17 @@
+import Button from '@mui/material/Button'
+import Dialog from '@mui/material/Dialog'
+import DialogActions from '@mui/material/DialogActions'
+import DialogContent from '@mui/material/DialogContent'
+import DialogTitle from '@mui/material/DialogTitle'
 import L from 'leaflet'
-import { ArrowRight, Bookmark, Phone, Trash2 } from 'lucide-react'
+import { ArrowRight, Bookmark, Phone, Plus, Trash2 } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import { Rectangle } from 'react-leaflet'
 import { MapContainer } from 'react-leaflet'
 import { Sheet, type SheetRef } from 'react-modal-sheet'
 import { useNavigate, useParams } from 'react-router-dom'
+import FlyTo from '../../components/Map/fly-to'
+import MapDrawer from '../../components/MapDrawer'
 import { IconButton } from '../../components/icon-button'
 import { SheetHeaderTitle } from '../../components/sheet-header-title'
 import {
@@ -20,6 +27,7 @@ import type {
   StoreResponse,
 } from '../../http/responses'
 import type { Boxe } from '../../interfaces/Boxe'
+import type { Destiny } from '../../interfaces/Destiny'
 import type { Loja } from '../../interfaces/Loja'
 import { ModaCenterGridMap } from '../../models/ModaCenterGridMap'
 import {
@@ -28,6 +36,10 @@ import {
   sellingLocationToText,
 } from '../../utils/utils'
 import SellerCard from './seller-card'
+
+import { useLoadingContext } from '../../providers/LoadingProvider'
+import { useRouteContext } from '../../providers/RouteProvider'
+import { useUserContext } from '../../providers/UserProvider'
 
 const modaCenterGridMap = new ModaCenterGridMap()
 
@@ -39,9 +51,13 @@ export default function Seller() {
     Boxe | Loja | undefined
   >()
   const isMultiLocationSeller = useRef(false)
+  const [ModalComponent, setModalComponent] = useState<JSX.Element | null>(
+    <div className="ui absolute text-black">aA AAAAAAAAAAAAAAAAAAAAAAAAAa</div>
+  )
   const [modalOpen, setModalOpen] = useState(false)
   const [isFavorite, setIsFavorite] = useState(false)
   const { user } = useUserContext()
+  const { route, setRoute } = useRouteContext()
   const { setLoading } = useLoadingContext()
   useEffect(() => {
     if (!id) return
@@ -147,8 +163,13 @@ export default function Seller() {
     try {
       setLoading(true)
       await deleteSeller(seller.id)
-      alert('Vendedor deletado com sucesso')
-      navigate('/sellers')
+      removeFromRoute()
+      setModalComponent(
+        OkModal(`Vendedor ${seller.name} deletado com sucesso`, () => {
+          navigate('/sellers')
+        })
+      )
+      setModalOpen(true)
     } catch (error) {
       console.error(error)
     } finally {
@@ -179,8 +200,113 @@ export default function Seller() {
       setLoading(false)
     }
   }
+  function sellerToDestiny() {
+    if (activeSellingLocation && seller) {
+      const newDestiny: Destiny = {
+        position: { x: 0, y: 0 },
+        sellingLocation: activeSellingLocation,
+        sellerName: seller.name,
+      }
+      if ('rua' in activeSellingLocation) {
+        newDestiny.position = activeSellingLocation.positionInGrid
+      } else {
+        newDestiny.position = activeSellingLocation.getEntrance()
+      }
+      return newDestiny
+    }
+    return null
+  }
+
+  function addToRoute() {
+    if (activeSellingLocation && seller && route) {
+      const newDestiny = sellerToDestiny()
+      if (!newDestiny) return
+      const found = route.destinos.find(
+        (destiny: Destiny) =>
+          JSON.stringify(destiny.position) ===
+          JSON.stringify(newDestiny.position)
+      )
+      if (found) {
+        setModalComponent(OkModal(`Esse local já está na rota "Minha rota"`))
+        setModalOpen(true)
+        return
+      }
+
+      const newRoute = {
+        ...route,
+        destinos: [...route.destinos, newDestiny],
+      }
+      setRoute(newRoute)
+      setModalComponent(
+        OkModal(`Vendedor ${seller.name} adicionado à "Minha rota"`)
+      )
+      setModalOpen(true)
+    }
+  }
+
+  function removeFromRoute() {
+    if (activeSellingLocation && seller && route) {
+      const destinyToRemove = sellerToDestiny()
+      if (!destinyToRemove) return
+
+      setRoute({
+        ...route,
+        destinos: route.destinos.filter(
+          (destiny) => destiny.sellerName !== destinyToRemove.sellerName
+        ),
+      })
+    }
+  }
+
+  function DeleteSellerModal() {
+    return (
+      <Dialog
+        open={true}
+        onClose={() => setModalOpen(false)}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">Deletar Vendedor</DialogTitle>
+        <DialogContent>
+          <p className="text-gray02">
+            Tem certeza que deseja deletar o vendedor {seller?.name}?
+          </p>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setModalOpen(false)} autoFocus>
+            CANCELAR
+          </Button>
+          <Button onClick={() => deleteSell()} autoFocus>
+            OK
+          </Button>
+        </DialogActions>
+      </Dialog>
+    )
+  }
+  function OkModal(text: string, onOK?: () => void) {
+    return (
+      <Dialog open={true} onClose={() => setModalOpen(false)}>
+        <DialogContent>
+          <p className="text-gray02">{text}</p>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            onClick={() => {
+              setModalOpen(false)
+              if (onOK) onOK()
+            }}
+            autoFocus
+          >
+            OK
+          </Button>
+        </DialogActions>
+      </Dialog>
+    )
+  }
+
   return (
     <div>
+      {modalOpen && ModalComponent}
       <Sheet
         ref={ref}
         isOpen={true}
@@ -197,7 +323,7 @@ export default function Seller() {
         <Sheet.Container>
           <SheetHeaderTitle onDismiss={onClose}>
             {activeSellingLocation && (
-              <h2 className="text-base text-center text-gray02 pt-4 w-80 max-w-[70%] absolute p-0 ml-[50%] -translate-x-1/2">
+              <h2 className="text-base text-center text-gray02 pt-5 w-80 max-w-[70%] absolute p-0 ml-[50%] -translate-x-1/2">
                 Setor {activeSellingLocation.setor} -{' '}
                 {'numero' in activeSellingLocation
                   ? `Rua ${activeSellingLocation.rua} - Box ${activeSellingLocation.numero}`
@@ -205,7 +331,7 @@ export default function Seller() {
               </h2>
             )}
           </SheetHeaderTitle>
-          <Sheet.Content className="flex gap-3 pl-5 mt-4 md:w-120 ">
+          <Sheet.Content className="flex gap-3 pl-5 pt-2 mt-4 md:w-120 ">
             {seller && (
               <SellerCard
                 name={seller.name}
@@ -246,25 +372,20 @@ export default function Seller() {
               </div>
             )}
 
-            <DeleteButton
-              onClick={() => {
-                snapTo(2)
-                setModalOpen(true)
-              }}
-            />
-            {modalOpen && (
-              <DialogAction
-                title="Deseja realmente deletar esse vendedor?"
-                onClose={() => {
-                  snapTo(1)
-                  setModalOpen(false)
-                }}
-                onAccept={() => {
-                  deleteSell()
-                  setModalOpen(false)
+            <div className="flex justify-baseline gap-6">
+              <AddToRouteButton
+                onClick={() => {
+                  addToRoute()
                 }}
               />
-            )}
+              <DeleteButton
+                onClick={() => {
+                  snapTo(2)
+                  setModalComponent(DeleteSellerModal())
+                  setModalOpen(true)
+                }}
+              />
+            </div>
             {isMultiLocationSeller.current && (
               <div className="pt-5">
                 <h3 className="text-lg font-semibold text-gray02">
@@ -298,7 +419,7 @@ export default function Seller() {
         maxZoom={6}
         minZoom={1}
       >
-        <GridDrawer gridMap={modaCenterGridMap} />
+        <MapDrawer gridMap={modaCenterGridMap} />
         {activeSellingLocation && (
           <FlyTo
             position={
@@ -320,83 +441,45 @@ export default function Seller() {
       </MapContainer>
     </div>
   )
-}
 
-import Button from '@mui/material/Button'
-import Dialog from '@mui/material/Dialog'
-import DialogActions from '@mui/material/DialogActions'
-import DialogContent from '@mui/material/DialogContent'
-import DialogTitle from '@mui/material/DialogTitle'
-import GridDrawer from '../../components/GridDrawer'
-import FlyTo from '../../components/Map/fly-to'
-import { useLoadingContext } from '../../providers/LoadingProvider'
-import { useUserContext } from '../../providers/UserProvider'
-function DialogAction({
-  onClose,
-  onAccept,
-  title,
-  children,
-}: {
-  onClose: () => void
-  onAccept: () => void
-  title: string
-  children?: React.ReactNode
-}) {
-  const handleClose = () => {
-    onClose()
-  }
-  const handleAccept = () => {
-    onAccept()
-  }
-  return (
-    <Dialog
-      open
-      onClose={handleClose}
-      aria-labelledby="alert-dialog-title"
-      aria-describedby="alert-dialog-description"
-    >
-      <DialogTitle id="alert-dialog-title">{title}</DialogTitle>
-      <DialogContent>{children}</DialogContent>
-      <DialogActions>
-        <Button onClick={handleClose} autoFocus>
-          CANCELAR
-        </Button>
-        <Button onClick={handleAccept} autoFocus>
-          OK
-        </Button>
-      </DialogActions>
-    </Dialog>
-  )
-}
-
-function DeleteButton({ onClick }: { onClick: () => void }) {
-  return (
-    <IconButton
-      className="mr-auto opacity-65 text-danger border-danger h-7 text-sm p-2"
-      onClick={onClick}
-    >
-      <Trash2 size={18} />
-      Deletar
-    </IconButton>
-  )
-}
-
-function LocationItem({
-  location,
-  onClick,
-}: { location: BoxeResponse | StoreResponse; onClick?: () => void }) {
-  const text = sellingLocationToText(location)
-
-  return (
-    <li className="text-gray02 py-1.5 pr-3 flex items-center">
-      {text}{' '}
-      <button
-        type="button"
-        className="bg-gray06 rounded-2xl p-0.5 ml-auto hover:cursor-pointer"
+  function DeleteButton({ onClick }: { onClick: () => void }) {
+    return (
+      <IconButton
+        className="opacity-65 text-danger border-danger h-7 text-sm p-2"
         onClick={onClick}
       >
-        <ArrowRight size={26} className="text-green-primary" />
-      </button>
-    </li>
-  )
+        <Trash2 size={18} />
+        Deletar
+      </IconButton>
+    )
+  }
+
+  function AddToRouteButton({ onClick }: { onClick: () => void }) {
+    return (
+      <IconButton onClick={onClick} className="opacity-75 h-7 text-sm p-2">
+        <Plus size={18} />
+        Adicionar à rota
+      </IconButton>
+    )
+  }
+
+  function LocationItem({
+    location,
+    onClick,
+  }: { location: BoxeResponse | StoreResponse; onClick?: () => void }) {
+    const text = sellingLocationToText(location)
+
+    return (
+      <li className="text-gray02 py-1.5 pr-3 flex items-center">
+        {text}{' '}
+        <button
+          type="button"
+          className="bg-gray06 rounded-2xl p-0.5 ml-auto hover:cursor-pointer"
+          onClick={onClick}
+        >
+          <ArrowRight size={26} className="text-green-primary" />
+        </button>
+      </li>
+    )
+  }
 }

@@ -6,49 +6,62 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { Check, MapPinned, MoveUp } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import { Sheet, type SheetRef } from 'react-modal-sheet'
-import type { Boxe } from '../../interfaces/Boxe'
-import type { Destiny } from '../../interfaces/Destiny'
-import type { Loja } from '../../interfaces/Loja'
-import type { Position } from '../../interfaces/Position'
-import type { Route } from '../../interfaces/Route'
-import { ModaCenterGridMap } from '../../models/ModaCenterGridMap'
-import { RouteCalculator } from '../../models/RouteCalculator'
-import { TSPSolverNN } from '../../models/TSPSolverNN'
-import { useNavContext } from '../../providers/NavProvider'
-import { useRouteContext } from '../../providers/RouteProvider'
-import { IconButton } from '../icon-button'
-import { SheetHeaderTitle } from '../sheet-header-title'
+import { IconButton } from '../../../components/icon-button'
+import { SheetHeaderTitle } from '../../../components/sheet-header-title'
+import type { Boxe } from '../../../interfaces/Boxe'
+import type { Destiny } from '../../../interfaces/Destiny'
+import type { Loja } from '../../../interfaces/Loja'
+import type { Position } from '../../../interfaces/Position'
+import type { Route } from '../../../interfaces/Route'
+import { ModaCenterGridMap } from '../../../models/ModaCenterGridMap'
+import { RouteCalculator } from '../../../models/RouteCalculator'
+import { TSPSolverNN } from '../../../models/TSPSolverNN'
+import { useRouteContext } from '../../../providers/RouteProvider'
 import RouteEditor from './RouteEditor'
-import RouteButton from './route-button'
 
 interface RoutingManager {
   gridMap: ModaCenterGridMap
+  onStopManagingRoute: () => void
 }
 
-const RoutingManager = ({ gridMap }: RoutingManager) => {
-  const { setShow } = useNavContext()
+const RoutingManager = ({ gridMap, onStopManagingRoute }: RoutingManager) => {
   const { route, setRoute } = useRouteContext()
-  const [isCreatingRoute, setIsCreatingRoute] = useState(false)
+  const [isCreatingRoute, setIsCreatingRoute] = useState(true)
   const [isFollowingRoute, setIsFollowingRoute] = useState(false)
 
   const [bestRoute, setBestRoute] = useState<Route>({
     inicio: null,
-    destinos: [],
+    destinos: route?.destinos || [],
   })
 
   const handleUpdate = (newRoute: Route) => {
     if (!newRoute) return
+    if (newRoute.destinos.length === 0) {
+      const newBestRoute = { ...newRoute, passos: [] }
+      if (JSON.stringify(route) !== JSON.stringify(newBestRoute)) {
+        setRoute(newBestRoute)
+      }
+      setBestRoute(newRoute)
+      return
+    }
+    if (!newRoute?.inicio && newRoute?.destinos.length >= 0) {
+      setRoute(newRoute)
+      setBestRoute(newRoute)
+      return
+    }
     let destinosMelhorOrdem: Destiny[] = []
     let melhoresPassos: Position[] = []
 
     const removeDuplicates = (arr: Destiny[]) => {
       const seen = new Set()
       return arr.filter((item) => {
-        const key = JSON.stringify(item)
+        const key = JSON.stringify(item.position)
         return seen.has(key) ? false : seen.add(key)
       })
     }
-    newRoute.destinos = removeDuplicates(newRoute.destinos)
+    if (newRoute.destinos.length > 0) {
+      newRoute.destinos = removeDuplicates(newRoute.destinos)
+    }
 
     if (newRoute.inicio && newRoute.destinos.length > 0) {
       const routeCalculator = new RouteCalculator({
@@ -67,11 +80,6 @@ const RoutingManager = ({ gridMap }: RoutingManager) => {
         inicio: newRoute.inicio,
         destinos: destinosMelhorOrdem.slice(1),
       })
-    } else {
-      setBestRoute({
-        inicio: null,
-        destinos: [],
-      })
     }
     const newBestRoute = {
       inicio: newRoute.inicio,
@@ -89,34 +97,14 @@ const RoutingManager = ({ gridMap }: RoutingManager) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [route])
 
-  useEffect(() => {
-    if (!isCreatingRoute) {
-      setShow(true)
-    } else {
-      setShow(false)
-    }
-  }, [isCreatingRoute, setShow])
-
   function cancelRoute() {
     setIsCreatingRoute(false)
     setIsFollowingRoute(false)
-    setRoute({
-      inicio: null,
-      destinos: [],
-      passos: [],
-    })
+    onStopManagingRoute()
   }
 
   return (
     <div>
-      {!isCreatingRoute && (
-        <span className="absolute  ui bottom-20 right-5">
-          <RouteButton
-            onClick={() => setIsCreatingRoute(true)}
-            className="relative"
-          />
-        </span>
-      )}
       {isCreatingRoute && !isFollowingRoute && (
         <RouteEditor
           gridMap={gridMap}
@@ -132,7 +120,10 @@ const RoutingManager = ({ gridMap }: RoutingManager) => {
       {isFollowingRoute && (
         <RouteFollower
           onCancel={() => cancelRoute()}
-          onFinish={() => cancelRoute()}
+          onFinish={() => {
+            handleUpdate({ inicio: null, destinos: [] })
+            cancelRoute()
+          }}
           onChooseToEdit={() => {
             setIsCreatingRoute(true)
             setIsFollowingRoute(false)

@@ -58,7 +58,14 @@ export default function App() {
         <Route path="register" element={<Register />} />
         <Route path="login" element={<Login />} />
         <Route path="sellers" element={<Sellers />} />
-        <Route path="sellers/:id" element={<Seller />} />
+        <Route
+          path="sellers/:id"
+          element={
+            <RouteProvider>
+              <Seller />
+            </RouteProvider>
+          }
+        />
         <Route path="new-seller" element={<NewSeller />} />
         <Route path="user" element={<UserProfile />} />
         <Route path="*" element={<NotFound />} />

@@ -48,9 +48,9 @@ export default function RegistrationForm() {
       const response = await registerUser({ username, password })
       setUser(response.data)
       if (response.status === 201) {
-        alert('Usuário criado com sucesso!')
+        alert('Registrado com sucesso!')
+        navigate(-1)
       }
-      navigate('/user')
     } catch (error) {
       if (error instanceof AxiosError) {
         if (error.response?.data.errors[0].code === errorsCode.ALREADY_IN_USE) {
