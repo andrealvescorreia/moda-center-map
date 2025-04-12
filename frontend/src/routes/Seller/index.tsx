@@ -222,7 +222,9 @@ export default function Seller() {
       const newDestiny = sellerToDestiny()
       if (!newDestiny) return
       const found = route.destinos.find(
-        (destiny: Destiny) => destiny.position === newDestiny.position
+        (destiny: Destiny) =>
+          JSON.stringify(destiny.position) ===
+          JSON.stringify(newDestiny.position)
       )
       if (found) {
         setModalComponent(OkModal(`Esse local já está na rota "Minha rota"`))
