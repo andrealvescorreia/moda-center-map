@@ -84,6 +84,9 @@ export function SearchStore({
     if (!seller) {
       seller = favoriteSellers.find((seller) => seller.id === sellerId)
     }
+    if (!seller) {
+      seller = allSellers.find((seller) => seller.id === sellerId)
+    }
     if (!seller) return
     const location =
       seller.boxes.find((box) => box.id === locationId) ||
@@ -138,28 +141,34 @@ export function SearchStore({
             )}
           </InputIcon>
         </InputRoot>
-        {searchTerm.length === 0 && <ChooseOnMap onClick={onChooseOnMap} />}
-        {searchTerm.length === 0 && favoriteSellers.length > 0 && (
-          <div className="flex flex-col items-center justify-center pt-10">
-            <h2 className="text-xl font-semibold ">Vendedores Favoritos</h2>
-            <SellerList
-              sellers={favoriteSellers}
-              showByLocation
-              onClick={handleSelectSeller}
-            />
-          </div>
-        )}
-        {searchTerm.length === 0 && allSellers.length > 0 && (
-          <div className="flex flex-col items-center justify-center pt-10">
-            <h2 className="text-xl font-semibold ">
-              {favoriteSellers.length > 0 ? 'Outros Vendedores' : 'Vendedores'}
-            </h2>
-            <SellerList
-              sellers={allSellers}
-              showByLocation
-              onClick={handleSelectSeller}
-            />
-          </div>
+        {searchTerm.length === 0 && (
+          <span>
+            <ChooseOnMap onClick={onChooseOnMap} />
+            {favoriteSellers.length > 0 && (
+              <div className="flex flex-col items-center justify-center pt-10">
+                <h2 className="text-xl font-semibold ">Vendedores Favoritos</h2>
+                <SellerList
+                  sellers={favoriteSellers}
+                  showByLocation
+                  onClick={handleSelectSeller}
+                />
+              </div>
+            )}
+            {allSellers.length > 0 && (
+              <div className="flex flex-col items-center justify-center pt-10">
+                <h2 className="text-xl font-semibold ">
+                  {favoriteSellers.length > 0
+                    ? 'Outros Vendedores'
+                    : 'Vendedores'}
+                </h2>
+                <SellerList
+                  sellers={allSellers}
+                  showByLocation
+                  onClick={handleSelectSeller}
+                />
+              </div>
+            )}
+          </span>
         )}
       </div>
       <div>
