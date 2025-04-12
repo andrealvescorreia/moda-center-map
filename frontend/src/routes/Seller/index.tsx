@@ -10,8 +10,8 @@ import { Rectangle } from 'react-leaflet'
 import { MapContainer } from 'react-leaflet'
 import { Sheet, type SheetRef } from 'react-modal-sheet'
 import { useNavigate, useParams } from 'react-router-dom'
-import GridDrawer from '../../components/GridDrawer'
 import FlyTo from '../../components/Map/fly-to'
+import MapDrawer from '../../components/MapDrawer'
 import { IconButton } from '../../components/icon-button'
 import { SheetHeaderTitle } from '../../components/sheet-header-title'
 import {
@@ -356,7 +356,7 @@ export default function Seller() {
         maxZoom={6}
         minZoom={1}
       >
-        <GridDrawer gridMap={modaCenterGridMap} />
+        <MapDrawer gridMap={modaCenterGridMap} />
         {activeSellingLocation && (
           <FlyTo
             position={

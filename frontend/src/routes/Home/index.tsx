@@ -1,5 +1,5 @@
 import { MapContainer, useMap } from 'react-leaflet'
-import GridDrawer from '../../components/GridDrawer'
+import MapDrawer from '../../components/MapDrawer'
 import 'leaflet/dist/leaflet.css'
 import L from 'leaflet'
 import { useEffect, useState } from 'react'
@@ -170,7 +170,7 @@ function Home() {
         //preferCanvas={true}
       >
         <MapMaxBoundsUpdater />
-        <GridDrawer
+        <MapDrawer
           gridMap={modaCenterGridMap}
           minZoomLevelToRenderMarkers={minZoomLevelToRenderMarkers}
         />

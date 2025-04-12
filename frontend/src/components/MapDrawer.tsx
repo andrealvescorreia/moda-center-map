@@ -34,7 +34,7 @@ interface GridDrawerProps {
   minZoomLevelToRenderMarkers?: number
   minZoomLevelToRenderBoxes?: number
 }
-const GridDrawer = ({
+const MapDrawer = ({
   gridMap,
   //minZoomLevelToRenderMarkers = 5,
   minZoomLevelToRenderBoxes = 2,
@@ -159,7 +159,7 @@ const GridDrawer = ({
     </>
   )
 }
-export default GridDrawer
+export default MapDrawer
 
 interface BoxeProps {
   x: number
