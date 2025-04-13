@@ -77,7 +77,7 @@ export default abstract class BoxesSetorBuilder {
 
     const valorY = yOffset * 2 - Number.parseInt((yOffset / 5).toString()) * 2
     const valorX = xOffSet - 3 * Number.parseInt((xOffSet / 3).toString())
-    return valorY - valorX
+    return valorY + valorX - 1
   }
 
   protected getBoxe(y: number, x: number) {
@@ -124,6 +124,13 @@ export default abstract class BoxesSetorBuilder {
       boxe.positionInGrid = {
         y: reflectY ? center.y - (y - center.y) - 1 : y,
         x: reflectX ? center.x - (x - center.x) - 1 : x,
+      }
+      if (reflectX) {
+        if (boxe.numero % 2 === 0) {
+          boxe.numero = boxe.numero - 1
+        } else {
+          boxe.numero = boxe.numero + 1
+        }
       }
     }
   }

@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { colorMap } from '../utils/utils'
 import sector_colors from './sector_colors'
 
 const boxeSchema = z
@@ -27,20 +28,34 @@ const boxeSchema = z
         path: ['box_number'],
       })
     }
-    if (values.street_letter === 'A' && values.box_number % 2 === 0) {
-      ctx.addIssue({
-        message: 'Boxes na rua A devem ser ímpares',
-        code: z.ZodIssueCode.custom,
-        path: ['box_number'],
-      })
+    if (['A', 'P'].includes(values.street_letter)) {
+      const isEven = values.box_number % 2 === 0
+      const evenSectors =
+        values.street_letter === 'A'
+          ? ['blue', 'red', 'yellow']
+          : ['orange', 'green', 'white']
+      const oddSectors =
+        values.street_letter === 'A'
+          ? ['orange', 'green', 'white']
+          : ['blue', 'red', 'yellow']
+
+      if (evenSectors.includes(values.sector_color) && !isEven) {
+        ctx.addIssue({
+          message: `Para o setor ${colorMap[values.sector_color]}, boxes na rua ${values.street_letter} devem ser pares`,
+          code: z.ZodIssueCode.custom,
+          path: ['box_number'],
+        })
+      }
+
+      if (oddSectors.includes(values.sector_color) && isEven) {
+        ctx.addIssue({
+          message: `Para o setor ${colorMap[values.sector_color]}, boxes na rua ${values.street_letter} devem ser ímpares`,
+          code: z.ZodIssueCode.custom,
+          path: ['box_number'],
+        })
+      }
     }
-    if (values.street_letter === 'P' && values.box_number % 2 !== 0) {
-      ctx.addIssue({
-        message: 'Boxes na rua P devem ser pares',
-        code: z.ZodIssueCode.custom,
-        path: ['box_number'],
-      })
-    }
+
     return true
   })
 
