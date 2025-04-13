@@ -2,8 +2,8 @@ import L from 'leaflet'
 import { useState } from 'react'
 import { ImageOverlay, Marker, Rectangle } from 'react-leaflet'
 import type { JSX } from 'react/jsx-runtime'
-import { ModaCenterGridMap } from '../models/ModaCenterGridMap'
-import MapInfoCollector from './Map/map-info-collector'
+import { ModaCenterGridMap } from '../../models/ModaCenterGridMap'
+import MapInfoCollector from './map-info-collector'
 import 'leaflet-extra-markers'
 
 interface MapCameraBounds {

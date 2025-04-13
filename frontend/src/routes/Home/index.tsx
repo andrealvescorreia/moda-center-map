@@ -1,5 +1,5 @@
 import { MapContainer, useMap } from 'react-leaflet'
-import MapDrawer from '../../components/MapDrawer'
+import MapDrawer from '../../components/Map/map-drawer'
 import 'leaflet/dist/leaflet.css'
 import L from 'leaflet'
 import { useEffect, useState } from 'react'
