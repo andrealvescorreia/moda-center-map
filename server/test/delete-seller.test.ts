@@ -1,7 +1,6 @@
 const chai = require('chai')
 const request = require('supertest')
 const should = chai.should()
-import type { Includeable } from 'sequelize'
 import app from '../src/app'
 import sequelize, { setup } from '../src/database'
 import Boxe from '../src/database/models/boxe'

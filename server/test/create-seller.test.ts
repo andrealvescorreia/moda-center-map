@@ -170,7 +170,7 @@ describe('create seller', () => {
     })
   })
 
-  describe('should not be able to create a seller when box is invalid', () => {
+  describe('invalid box', () => {
     it('already occupied box', async () => {
       const reqBody = {
         name: 'Outra Olivia Palito',
@@ -331,7 +331,7 @@ describe('create seller', () => {
       seller?.should.be.null
     })
 
-    it('odd box number and street letter A blue, red and yellow sectors', async () => {
+    it('odd box number, street letter A, blue, red and yellow sectors', async () => {
       const sectors = ['blue', 'red', 'yellow']
       for (const sector of sectors) {
         const reqBody = {
@@ -359,7 +359,7 @@ describe('create seller', () => {
       }
     })
 
-    it('even box number and street letter A orange, green and white sectors', async () => {
+    it('even box number, street letter A, orange, green and white sectors', async () => {
       const sectors = ['orange', 'green', 'white']
       for (const sector of sectors) {
         const reqBody = {
@@ -387,7 +387,7 @@ describe('create seller', () => {
       }
     })
 
-    it('even box number and street letter P blue, red and yellow sectors', async () => {
+    it('even box number, street letter P, blue, red and yellow sectors', async () => {
       const sectors = ['blue', 'red', 'yellow']
       for (const sector of sectors) {
         const reqBody = {
@@ -415,7 +415,7 @@ describe('create seller', () => {
       }
     })
 
-    it('odd box number and street letter P orange, green and white sectors', async () => {
+    it('odd box number, street letter P, orange, green and white sectors', async () => {
       const sectors = ['orange', 'green', 'white']
       for (const sector of sectors) {
         const reqBody = {
@@ -604,63 +604,56 @@ describe('create seller', () => {
       }
     })
 
-    it('(store overlap) 74, K, sector white', async () => {
-      const sectors = ['white']
-      for (const sector of sectors) {
-        const reqBody = {
-          name: 'Desejo de Mulher',
-          sellingLocations: {
-            boxes: [
-              { sector_color: sector, box_number: 74, street_letter: 'K' },
-            ],
-          },
-        }
-
-        const response = await postSeller(reqBody)
-        response.status.should.be.equal(400)
-        response.body.should.be.deep.equal({
-          errors: [
-            {
-              code: 'INVALID',
-              field: 'sellingLocations.boxes.0',
-              message:
-                'This box cannot exist inside Moda Center, otherwise it would overlap with stores',
-            },
-          ],
-        })
-      }
-    })
-
     it('(store overlap) 73, K, sector yellow', async () => {
-      const sectors = ['yellow']
-      for (const sector of sectors) {
-        const reqBody = {
-          name: 'Desejo de Mulher',
-          sellingLocations: {
-            boxes: [
-              { sector_color: sector, box_number: 73, street_letter: 'K' },
-            ],
-          },
-        }
-
-        const response = await postSeller(reqBody)
-        response.status.should.be.equal(400)
-        response.body.should.be.deep.equal({
-          errors: [
-            {
-              code: 'INVALID',
-              field: 'sellingLocations.boxes.0',
-              message:
-                'This box cannot exist inside Moda Center, otherwise it would overlap with stores',
-            },
+      const reqBody = {
+        name: 'Desejo de Mulher',
+        sellingLocations: {
+          boxes: [
+            { sector_color: 'yellow', box_number: 73, street_letter: 'K' },
           ],
-        })
+        },
       }
+
+      const response = await postSeller(reqBody)
+      response.status.should.be.equal(400)
+      response.body.should.be.deep.equal({
+        errors: [
+          {
+            code: 'INVALID',
+            field: 'sellingLocations.boxes.0',
+            message:
+              'This box cannot exist inside Moda Center, otherwise it would overlap with stores',
+          },
+        ],
+      })
+    })
+    it('(store overlap) 74, K, sector white', async () => {
+      const reqBody = {
+        name: 'Desejo de Mulher',
+        sellingLocations: {
+          boxes: [
+            { sector_color: 'white', box_number: 74, street_letter: 'K' },
+          ],
+        },
+      }
+
+      const response = await postSeller(reqBody)
+      response.status.should.be.equal(400)
+      response.body.should.be.deep.equal({
+        errors: [
+          {
+            code: 'INVALID',
+            field: 'sellingLocations.boxes.0',
+            message:
+              'This box cannot exist inside Moda Center, otherwise it would overlap with stores',
+          },
+        ],
+      })
     })
   })
 
-  describe('store', () => {
-    it('should be able to create a seller whith store store_number 15 block_number 7 blue sector', async () => {
+  describe('valid store', () => {
+    it('should be able to create a seller whith store -> store_number 15 block_number 7 blue sector', async () => {
       const reqBody = {
         name: 'Teste teste',
         sellingLocations: {
@@ -685,7 +678,8 @@ describe('create seller', () => {
         response.status.should.be.equal(201)
       }
     })
-
+  })
+  describe('invalid store', () => {
     it('should not be able to create a seller whith invalid store -> block_number 10 and store_number 20', async () => {
       const reqBody = {
         name: 'Teste',

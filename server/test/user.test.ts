@@ -3,7 +3,7 @@ const request = require('supertest')
 const should = chai.should()
 import errorsId from '../../shared/operation-errors'
 import app from '../src/app'
-import sequelize from '../src/database' //executes the database connection
+import sequelize from '../src/database'
 import User from '../src/database/models/user'
 
 describe('user tests', () => {
