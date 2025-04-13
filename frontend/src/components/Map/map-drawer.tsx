@@ -2,8 +2,8 @@ import L from 'leaflet'
 import { useState } from 'react'
 import { ImageOverlay, Marker, Rectangle } from 'react-leaflet'
 import type { JSX } from 'react/jsx-runtime'
-import { ModaCenterGridMap } from '../models/ModaCenterGridMap'
-import MapInfoCollector from './Map/map-info-collector'
+import { ModaCenterGridMap } from '../../models/ModaCenterGridMap'
+import MapInfoCollector from './map-info-collector'
 import 'leaflet-extra-markers'
 
 interface MapCameraBounds {
@@ -45,7 +45,7 @@ const MapDrawer = ({
 
   const [mapInfo, setMapInfo] = useState<MapInfo>()
 
-  const debug = false
+  const DEBUG = false
 
   function drawBoxes() {
     if (!mapInfo || mapInfo.zoom <= minZoomLevelToRenderBoxes) return
@@ -132,7 +132,7 @@ const MapDrawer = ({
     }
   }
 
-  if (debug) {
+  if (DEBUG) {
     drawMarkers()
     drawBoxes()
     drawLojasExternas()
@@ -143,19 +143,22 @@ const MapDrawer = ({
   return (
     <>
       <MapInfoCollector onUpdateInfo={(newInfo) => setMapInfo(newInfo)} />
-      <ImageOverlay
-        url={
-          mapInfo && mapInfo.zoom >= 4
-            ? '/grid (detailed).jpg'
-            : mapInfo && mapInfo.zoom >= 2
-              ? '/grid (medium detail).jpg'
-              : '/grid (no detail).jpg'
-        }
-        bounds={gridMap.getBounds()}
-        alt="mapa moda center"
-        zIndex={-1}
-      />
+      {!DEBUG && (
+        <ImageOverlay
+          url={
+            mapInfo && mapInfo.zoom >= 4
+              ? '/grid (detailed).jpg'
+              : mapInfo && mapInfo.zoom >= 2
+                ? '/grid (medium detail).jpg'
+                : '/grid (no detail).jpg'
+          }
+          bounds={gridMap.getBounds()}
+          alt="mapa moda center"
+          zIndex={-1}
+        />
+      )}
       {components}
+      {markers}
     </>
   )
 }

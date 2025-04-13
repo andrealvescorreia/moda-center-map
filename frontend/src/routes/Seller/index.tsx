@@ -11,7 +11,7 @@ import { MapContainer } from 'react-leaflet'
 import { Sheet, type SheetRef } from 'react-modal-sheet'
 import { useNavigate, useParams } from 'react-router-dom'
 import FlyTo from '../../components/Map/fly-to'
-import MapDrawer from '../../components/MapDrawer'
+import MapDrawer from '../../components/Map/map-drawer'
 import { IconButton } from '../../components/icon-button'
 import { SheetHeaderTitle } from '../../components/sheet-header-title'
 import {

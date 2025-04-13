@@ -1,7 +1,6 @@
 const chai = require('chai')
 const request = require('supertest')
 const should = chai.should()
-import type { Includeable } from 'sequelize'
 import app from '../src/app'
 import sequelize, { setup } from '../src/database'
 import Boxe from '../src/database/models/boxe'
@@ -49,7 +48,7 @@ describe('delete seller', () => {
     const reqBody = {
       name: 'Olivia Palito moda feminina',
       sellingLocations: {
-        boxes: [{ sector_color: 'blue', box_number: 1, street_letter: 'A' }],
+        boxes: [{ sector_color: 'blue', box_number: 2, street_letter: 'A' }],
         stores: [{ sector_color: 'blue', store_number: 1, block_number: 1 }],
       },
       phone_number: '31999999999',

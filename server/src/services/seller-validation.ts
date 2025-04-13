@@ -89,20 +89,8 @@ async function validateBoxes(
       })
     }
 
-    if (box.box_number % 2 === 0 && box.street_letter === 'A') {
-      errors.push({
-        code: errorsIds.INVALID,
-        field: `sellingLocations.boxes.${i}.box_number`,
-        message: 'Street letter A does not have even box numbers',
-      })
-    }
-    if (box.box_number % 2 !== 0 && box.street_letter === 'P') {
-      errors.push({
-        code: errorsIds.INVALID,
-        field: `sellingLocations.boxes.${i}.box_number`,
-        message: 'Street letter P does not have odd box numbers',
-      })
-    }
+    const AorPerror = validateBoxLetterAorP(box, i)
+    if (AorPerror) errors.push(AorPerror)
 
     if (boxOverlapsWithFoodCourt(box)) {
       errors.push({
@@ -145,6 +133,45 @@ async function validateBoxes(
   }
 
   return errors
+}
+
+function validateBoxLetterAorP(
+  box: {
+    sector_color: string
+    box_number: number
+    street_letter: string
+  },
+  index: number
+) {
+  if (['A', 'P'].includes(box.street_letter)) {
+    const isEven = box.box_number % 2 === 0
+    const evenSectors =
+      box.street_letter === 'A'
+        ? ['blue', 'red', 'yellow']
+        : ['orange', 'green', 'white']
+    const oddSectors =
+      box.street_letter === 'A'
+        ? ['orange', 'green', 'white']
+        : ['blue', 'red', 'yellow']
+
+    if (evenSectors.includes(box.sector_color) && !isEven) {
+      return {
+        code: errorsIds.INVALID,
+        field: `sellingLocations.boxes.${index}.box_number`,
+        message: `Street letter ${box.street_letter} of sector ${box.sector_color} must have even box number`,
+      }
+    }
+
+    if (oddSectors.includes(box.sector_color) && isEven) {
+      return {
+        code: errorsIds.INVALID,
+        field: `sellingLocations.boxes.${index}.box_number`,
+        message: `Street letter ${box.street_letter} of sector ${box.sector_color} must have odd box number`,
+      }
+    }
+  }
+
+  return false
 }
 
 async function validateStores(
@@ -235,24 +262,29 @@ function boxOverlapsWithStores(box: {
   box_number: number
   street_letter: string
 }): boolean {
-  if (['blue', 'orange', 'red', 'green'].includes(box.sector_color)) {
+  const overlapConditions = {
+    blue: { range: [33, 56], evenStreet: 'F', oddStreet: 'K' },
+    red: { range: [33, 56], evenStreet: 'F', oddStreet: 'K' },
+    orange: { range: [33, 56], evenStreet: 'K', oddStreet: 'F' },
+    green: { range: [33, 56], evenStreet: 'K', oddStreet: 'F' },
+    white: { range: [73, 96], evenStreet: 'K', oddStreet: 'F' },
+    yellow: { range: [73, 96], evenStreet: 'F', oddStreet: 'K' },
+  }
+
+  const conditions =
+    overlapConditions[box.sector_color as keyof typeof overlapConditions]
+  if (conditions) {
+    const [min, max] = conditions.range
     return (
-      box.box_number > 32 &&
-      box.box_number < 57 &&
+      box.box_number >= min &&
+      box.box_number <= max &&
       (['G', 'H', 'I', 'J'].includes(box.street_letter) ||
-        (box.street_letter === 'F' && isOdd(box.box_number)) ||
-        (box.street_letter === 'K' && !isOdd(box.box_number)))
+        (box.street_letter === conditions.evenStreet &&
+          !isOdd(box.box_number)) ||
+        (box.street_letter === conditions.oddStreet && isOdd(box.box_number)))
     )
   }
-  if (['yellow', 'white'].includes(box.sector_color)) {
-    return (
-      box.box_number > 72 &&
-      box.box_number < 97 &&
-      (['G', 'H', 'I', 'J'].includes(box.street_letter) ||
-        (box.street_letter === 'F' && isOdd(box.box_number)) ||
-        (box.street_letter === 'K' && !isOdd(box.box_number)))
-    )
-  }
+
   return false
 }
 
@@ -261,25 +293,42 @@ function boxOverlapsWithFoodCourt(box: {
   box_number: number
   street_letter: string
 }): boolean {
-  if (['blue', 'orange', 'red', 'green'].includes(box.sector_color)) {
-    return (
-      (['A', 'B', 'C', 'D'].includes(box.street_letter) &&
-        box.box_number > 88) ||
-      (box.street_letter === 'E' &&
-        box.box_number > 88 &&
-        !isOdd(box.box_number))
-    )
+  if (
+    ['blue', 'red', 'orange', 'green'].includes(box.sector_color) &&
+    ['A', 'B', 'C', 'D'].includes(box.street_letter) &&
+    box.box_number > 88
+  ) {
+    return true
   }
-  if (['yellow', 'white'].includes(box.sector_color)) {
-    return (
-      (['A', 'B', 'C', 'D'].includes(box.street_letter) &&
-        box.box_number > 8 &&
-        box.box_number < 41) ||
-      (box.street_letter === 'E' &&
-        box.box_number > 8 &&
-        box.box_number < 41 &&
-        !isOdd(box.box_number))
-    )
+  if (
+    ['blue', 'red', 'orange', 'green'].includes(box.sector_color) &&
+    box.street_letter === 'E' &&
+    box.box_number > 89 &&
+    ((['blue', 'red'].includes(box.sector_color) && isOdd(box.box_number)) ||
+      (['orange', 'green'].includes(box.sector_color) &&
+        !isOdd(box.box_number)))
+  ) {
+    return true
+  }
+
+  if (
+    ['yellow', 'white'].includes(box.sector_color) &&
+    ['A', 'B', 'C', 'D'].includes(box.street_letter) &&
+    box.box_number > 8 &&
+    box.box_number < 41
+  ) {
+    return true
+  }
+  if (
+    ['white', 'yellow'].includes(box.sector_color) &&
+    box.street_letter === 'E' &&
+    box.box_number > 9 &&
+    box.box_number < 41 &&
+    (box.sector_color === 'white'
+      ? !isOdd(box.box_number)
+      : isOdd(box.box_number))
+  ) {
+    return true
   }
   return false
 }
