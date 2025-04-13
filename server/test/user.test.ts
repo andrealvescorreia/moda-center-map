@@ -157,4 +157,52 @@ describe('user tests', () => {
       ],
     })
   })
+  it('should be able to log in with valid credentials', async () => {
+    const response = await request(app).post('/auth').send({
+      username: 'JohnDoe',
+      password: '123456',
+    })
+    response.status.should.be.equal(200)
+    response.headers['set-cookie'].should.satisfy((cookies: string[]) =>
+      cookies.some((cookie) => cookie.includes('authtoken'))
+    )
+  })
+
+  it('should not be able to log in with invalid password', async () => {
+    const response = await request(app).post('/auth').send({
+      username: 'JohnDoe',
+      password: 'wrongpassword',
+    })
+    response.status.should.be.equal(401)
+    response.body.should.be.deep.equal({
+      errors: ['Senha inválida'],
+    })
+  })
+
+  it('should not be able to log in with non-existent username', async () => {
+    const response = await request(app).post('/auth').send({
+      username: 'NonExistentUser',
+      password: '123456',
+    })
+    response.status.should.be.equal(401)
+    response.body.should.be.deep.equal({
+      errors: ['Usuario não existe'],
+    })
+  })
+
+  it('should be able to log out successfully', async () => {
+    const loginResponse = await request(app).post('/auth').send({
+      username: 'JohnDoe',
+      password: '123456',
+    })
+    const cookies = loginResponse.headers['set-cookie']
+
+    const logoutResponse = await request(app)
+      .post('/auth/logout')
+      .set('Cookie', cookies)
+    logoutResponse.status.should.be.equal(200)
+    logoutResponse.headers['set-cookie'].should.satisfy((cookies: string[]) =>
+      cookies.some((cookie) => cookie.includes('authtoken=;'))
+    )
+  })
 })
