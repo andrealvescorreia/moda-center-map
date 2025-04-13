@@ -34,8 +34,8 @@ describe('get sellers', () => {
         phone_number: '83999999999',
         sellingLocations: {
           boxes: [
-            { street_letter: 'A', sector_color: 'blue', box_number: 1 },
             { street_letter: 'P', sector_color: 'orange', box_number: 120 },
+            { street_letter: 'A', sector_color: 'blue', box_number: 2 },
           ],
           stores: [
             { sector_color: 'blue', block_number: 1, store_number: 1 },
@@ -59,7 +59,7 @@ describe('get sellers', () => {
 
   it('should return seller by boxe', async () => {
     const response = await request(app).get(
-      '/seller/boxe?sector_color=blue&street_letter=A&box_number=1'
+      '/seller/boxe?sector_color=orange&street_letter=P&box_number=120'
     )
     response.status.should.be.equal(200)
     response.body.boxes.length.should.be.equal(2)
