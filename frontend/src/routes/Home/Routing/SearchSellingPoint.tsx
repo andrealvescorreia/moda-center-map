@@ -118,35 +118,39 @@ export function SearchStore({
   return (
     <div
       ref={element}
-      className="ui absolute 100dvh 100dvw w-full h-full bg-white"
+      className="ui fixed w-[100dvw] max-w-[100%] h-[100dvh] bg-white"
     >
-      <div className="flex flex-col gap-4 p-4">
-        <InputRoot>
-          <InputIcon>
-            <ArrowLeft className="cursor-pointer" onClick={onCancel} />
-          </InputIcon>
-          <InputField
-            placeholder="Informe o destino"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-          <InputIcon>
-            {searchTerm.length > 0 && (
-              <InputIcon>
-                <CircleX
-                  className="cursor-pointer"
-                  onClick={() => setSearchTerm('')}
-                />
-              </InputIcon>
-            )}
-          </InputIcon>
-        </InputRoot>
+      <div className="flex flex-col bg-white">
+        <div className="p-4">
+          <InputRoot>
+            <InputIcon>
+              <ArrowLeft className="cursor-pointer" onClick={onCancel} />
+            </InputIcon>
+            <InputField
+              placeholder="Informe o destino"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+            <InputIcon>
+              {searchTerm.length > 0 && (
+                <InputIcon>
+                  <CircleX
+                    className="cursor-pointer"
+                    onClick={() => setSearchTerm('')}
+                  />
+                </InputIcon>
+              )}
+            </InputIcon>
+          </InputRoot>
+        </div>
         {searchTerm.length === 0 && (
-          <span>
-            <ChooseOnMap onClick={onChooseOnMap} />
+          <div className="w-full max-h-[90dvh] md:max-h-[85dvh] pb-50 overflow-y-auto">
+            <div className="p-4">
+              <ChooseOnMap onClick={onChooseOnMap} />
+            </div>
             {favoriteSellers.length > 0 && (
               <div className="flex flex-col items-center justify-center pt-10">
-                <h2 className="text-xl font-semibold ">Vendedores Favoritos</h2>
+                <h2 className="text-xl font-semibold">Vendedores Favoritos</h2>
                 <SellerList
                   sellers={favoriteSellers}
                   showByLocation
@@ -168,7 +172,7 @@ export function SearchStore({
                 />
               </div>
             )}
-          </span>
+          </div>
         )}
       </div>
       <div>

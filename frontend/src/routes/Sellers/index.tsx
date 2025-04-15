@@ -1,4 +1,5 @@
-import { Plus, Search } from 'lucide-react'
+import { useNetworkState } from '@uidotdev/usehooks'
+import { CloudOff, Plus, Search } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { NavLink, useNavigate } from 'react-router-dom'
 import { IconButton } from '../../components/icon-button'
@@ -13,10 +14,12 @@ import SellerList from './seller-list'
 
 export default function Sellers() {
   const [sellers, setSellers] = useState<SellerResponse[]>([])
-  const { loading, setLoading } = useLoadingContext()
+  const { setLoading } = useLoadingContext()
+  const [doneFetching, setDoneFetching] = useState(false)
   const { setShow } = useNavContext()
   const [isSearching, setIsSearching] = useState(false)
   const navigate = useNavigate()
+  const network = useNetworkState()
   useEffect(() => {
     setShow(true)
   }, [setShow])
@@ -31,6 +34,7 @@ export default function Sellers() {
         console.error(error)
       } finally {
         setLoading(false)
+        setDoneFetching(true)
       }
     }
     fetchSellers()
@@ -40,7 +44,7 @@ export default function Sellers() {
     return <SearchSeller onCancel={() => setIsSearching(false)} />
   }
   return (
-    <div className="h-[100dvh] w-[100dvw]">
+    <div className="h-[100dvh] w-[100dvw] fixed overflow-y-auto">
       <NavBar />
 
       <div className="w-full">
@@ -59,17 +63,26 @@ export default function Sellers() {
           </InputRoot>
         </div>
 
-        {sellers.length === 0 && !loading && (
+        {sellers.length === 0 && doneFetching && (
           <div className="flex justify-center items-center h-full">
-            <p className="text-gray02 text-2xl pt-10">
-              Nenhum vendedor cadastrado
-            </p>
+            {network.online ? (
+              <p className="text-gray02 text-2xl pt-10">
+                Nenhum vendedor cadastrado
+              </p>
+            ) : (
+              <div className="bg-gray05 p-2 rounded-xl px-4 flex items-center justify-center gap-2">
+                <CloudOff size={24} />
+                <p>Você está offline</p>
+              </div>
+            )}
           </div>
         )}
-        <SellerList
-          sellers={sellers}
-          onClick={(id) => navigate(`/sellers/${id}`)}
-        />
+        <div className="pb-50">
+          <SellerList
+            sellers={sellers}
+            onClick={(id) => navigate(`/sellers/${id}`)}
+          />
+        </div>
         <NavLink
           to="/new-seller"
           className="fixed bottom-18 ml-[50%] transform -translate-x-1/2"

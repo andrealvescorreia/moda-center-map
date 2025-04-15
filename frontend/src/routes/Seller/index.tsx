@@ -37,6 +37,7 @@ import {
 } from '../../utils/utils'
 import SellerCard from './seller-card'
 
+import { useNetworkState } from '@uidotdev/usehooks'
 import OfflineScreen from '../../components/offline-screen'
 import { useLoadingContext } from '../../providers/LoadingProvider'
 import { useRouteContext } from '../../providers/RouteProvider'
@@ -52,18 +53,18 @@ export default function Seller() {
     Boxe | Loja | undefined
   >()
   const isMultiLocationSeller = useRef(false)
-  const [ModalComponent, setModalComponent] = useState<JSX.Element | null>(
-    <div className="ui absolute text-black">aA AAAAAAAAAAAAAAAAAAAAAAAAAa</div>
-  )
+  const [ModalComponent, setModalComponent] = useState<JSX.Element | null>(null)
   const [modalOpen, setModalOpen] = useState(false)
   const [isFavorite, setIsFavorite] = useState(false)
   const { user } = useUserContext()
   const { route, setRoute } = useRouteContext()
   const { setLoading } = useLoadingContext()
-
+  const [doneFetching, setDoneFetching] = useState(false)
+  const network = useNetworkState()
   useEffect(() => {
     if (!id) return
     setLoading(true)
+
     getSeller(id)
       .then((resSeller) => {
         if (JSON.stringify(seller) !== JSON.stringify(resSeller)) {
@@ -71,7 +72,10 @@ export default function Seller() {
         }
       })
       .catch(console.error)
-      .finally(() => setLoading(false))
+      .finally(() => {
+        setLoading(false)
+        setDoneFetching(true)
+      })
     sellerIsFavorite(id)
       .then((res) => {
         setIsFavorite(res.isFavorite)
@@ -306,8 +310,15 @@ export default function Seller() {
     )
   }
 
-  if (!navigator.onLine) {
+  if (!network.online) {
     return <OfflineScreen />
+  }
+  if (!seller && doneFetching) {
+    return (
+      <div className="flex justify-center items-center h-full">
+        <p className="text-gray02 text-2xl pt-10">Vendedor não encontrado</p>
+      </div>
+    )
   }
   return (
     <div>

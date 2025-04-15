@@ -10,7 +10,7 @@ function SellerItem(props: SellerItemProps) {
   return (
     <button
       type="button"
-      className="hover:cursor-pointer h-20 relative flex md:px-10 w-full"
+      className="hover:cursor-pointer h-20 relative flex  w-full"
       {...props}
     >
       <div className="flex items-center justify-between p-4">
