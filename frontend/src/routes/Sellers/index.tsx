@@ -23,10 +23,15 @@ export default function Sellers() {
 
   useEffect(() => {
     const fetchSellers = async () => {
-      setLoading(true)
-      const sellers = await getSellers('order_by=name&order=asc')
-      setSellers(sellers)
-      setLoading(false)
+      try {
+        setLoading(true)
+        const sellers = await getSellers('order_by=name&order=asc')
+        setSellers(sellers)
+      } catch (error) {
+        console.error(error)
+      } finally {
+        setLoading(false)
+      }
     }
     fetchSellers()
   }, [setLoading])
