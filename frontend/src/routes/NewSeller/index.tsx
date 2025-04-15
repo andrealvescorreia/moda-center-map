@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom'
 import errorsCode from '../../../../shared/operation-errors'
 import AlertDialog from '../../components/alert-dialog'
 import LandingPage from '../../components/landing-page'
+import OfflineScreen from '../../components/offline-screen'
 import { createSeller } from '../../http/api'
 import { useLoadingContext } from '../../providers/LoadingProvider'
 import { useUserContext } from '../../providers/UserProvider'
@@ -24,6 +25,9 @@ export default function NewSeller() {
   const { setLoading } = useLoadingContext()
   const navigate = useNavigate()
 
+  if (!navigator.onLine) {
+    return <OfflineScreen />
+  }
   interface StepOne {
     name: string
     phone_number?: string | undefined

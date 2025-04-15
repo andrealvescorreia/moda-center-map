@@ -37,6 +37,7 @@ import {
 } from '../../utils/utils'
 import SellerCard from './seller-card'
 
+import OfflineScreen from '../../components/offline-screen'
 import { useLoadingContext } from '../../providers/LoadingProvider'
 import { useRouteContext } from '../../providers/RouteProvider'
 import { useUserContext } from '../../providers/UserProvider'
@@ -59,6 +60,7 @@ export default function Seller() {
   const { user } = useUserContext()
   const { route, setRoute } = useRouteContext()
   const { setLoading } = useLoadingContext()
+
   useEffect(() => {
     if (!id) return
     setLoading(true)
@@ -304,6 +306,9 @@ export default function Seller() {
     )
   }
 
+  if (!navigator.onLine) {
+    return <OfflineScreen />
+  }
   return (
     <div>
       {modalOpen && ModalComponent}
