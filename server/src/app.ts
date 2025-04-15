@@ -1,13 +1,13 @@
 import cookieParser from 'cookie-parser'
 import cors from 'cors'
 import express from 'express'
+import { env } from './env'
 import errorHandler from './middleware/errorHandler'
 import authRoutes from './routes/auth-routes'
 import pCategoriesRoutes from './routes/product-categories-routes'
 import sellerRoutes from './routes/seller-routes'
 import sellingLocationRoutes from './routes/selling-location-routes'
 import userRoutes from './routes/user-routes'
-import { env } from './env'
 class App {
   app: express.Application
 
@@ -28,6 +28,7 @@ class App {
     const allowedOrigins = [
       env.WEB_URL,
       'http://localhost:5173',
+      'http://localhost:4173',
     ]
     this.app.use(
       cors({
