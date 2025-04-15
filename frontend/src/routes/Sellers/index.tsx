@@ -66,10 +66,12 @@ export default function Sellers() {
             </p>
           </div>
         )}
-        <SellerList
-          sellers={sellers}
-          onClick={(id) => navigate(`/sellers/${id}`)}
-        />
+        <div className="pb-50">
+          <SellerList
+            sellers={sellers}
+            onClick={(id) => navigate(`/sellers/${id}`)}
+          />
+        </div>
         <NavLink
           to="/new-seller"
           className="fixed bottom-18 ml-[50%] transform -translate-x-1/2"

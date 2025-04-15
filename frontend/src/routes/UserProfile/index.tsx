@@ -48,7 +48,7 @@ export default function UserProfile() {
             </IconButton>
           </div>
           {favoriteSellers.length > 0 && (
-            <div className="flex flex-col items-center justify-center pt-10">
+            <div className="flex flex-col items-center justify-center pt-10 pb-50">
               <h2 className="text-xl font-semibold ">Vendedores Favoritos</h2>
               <SellerList
                 sellers={favoriteSellers}

@@ -120,7 +120,7 @@ export function SearchStore({
       ref={element}
       className="ui absolute 100dvh 100dvw w-full h-full bg-white"
     >
-      <div className="flex flex-col gap-4 p-4">
+      <div className="flex flex-col gap-4 p-4  pb-50">
         <InputRoot>
           <InputIcon>
             <ArrowLeft className="cursor-pointer" onClick={onCancel} />
