@@ -1,4 +1,5 @@
-import { Plus, Search } from 'lucide-react'
+import { useNetworkState } from '@uidotdev/usehooks'
+import { CloudOff, Plus, Search } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { NavLink, useNavigate } from 'react-router-dom'
 import { IconButton } from '../../components/icon-button'
@@ -18,6 +19,7 @@ export default function Sellers() {
   const { setShow } = useNavContext()
   const [isSearching, setIsSearching] = useState(false)
   const navigate = useNavigate()
+  const network = useNetworkState()
   useEffect(() => {
     setShow(true)
   }, [setShow])
@@ -63,9 +65,16 @@ export default function Sellers() {
 
         {sellers.length === 0 && doneFetching && (
           <div className="flex justify-center items-center h-full">
-            <p className="text-gray02 text-2xl pt-10">
-              Nenhum vendedor cadastrado
-            </p>
+            {network.online ? (
+              <p className="text-gray02 text-2xl pt-10">
+                Nenhum vendedor cadastrado
+              </p>
+            ) : (
+              <div className="bg-gray05 p-2 rounded-xl px-4 flex items-center justify-center gap-2">
+                <CloudOff size={24} />
+                <p>Você está offline</p>
+              </div>
+            )}
           </div>
         )}
         <div className="pb-50">

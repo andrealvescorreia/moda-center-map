@@ -1,3 +1,4 @@
+import { useNetworkState } from '@uidotdev/usehooks'
 import { AxiosError } from 'axios'
 import { SnackbarProvider, enqueueSnackbar } from 'notistack'
 import { useState } from 'react'
@@ -24,8 +25,9 @@ export default function NewSeller() {
   const { user } = useUserContext()
   const { setLoading } = useLoadingContext()
   const navigate = useNavigate()
+  const network = useNetworkState()
 
-  if (!navigator.onLine) {
+  if (!network.online) {
     return <OfflineScreen />
   }
   interface StepOne {

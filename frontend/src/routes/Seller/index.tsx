@@ -37,6 +37,7 @@ import {
 } from '../../utils/utils'
 import SellerCard from './seller-card'
 
+import { useNetworkState } from '@uidotdev/usehooks'
 import OfflineScreen from '../../components/offline-screen'
 import { useLoadingContext } from '../../providers/LoadingProvider'
 import { useRouteContext } from '../../providers/RouteProvider'
@@ -59,7 +60,7 @@ export default function Seller() {
   const { route, setRoute } = useRouteContext()
   const { setLoading } = useLoadingContext()
   const [doneFetching, setDoneFetching] = useState(false)
-
+  const network = useNetworkState()
   useEffect(() => {
     if (!id) return
     setLoading(true)
@@ -309,7 +310,7 @@ export default function Seller() {
     )
   }
 
-  if (!navigator.onLine) {
+  if (!network.online) {
     return <OfflineScreen />
   }
   if (!seller && doneFetching) {
