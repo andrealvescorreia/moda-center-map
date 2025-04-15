@@ -40,7 +40,7 @@ export default function Sellers() {
     return <SearchSeller onCancel={() => setIsSearching(false)} />
   }
   return (
-    <div className="h-[100dvh] w-[100dvw]">
+    <div className="h-[100dvh] w-[100dvw] fixed overflow-y-auto">
       <NavBar />
 
       <div className="w-full">
