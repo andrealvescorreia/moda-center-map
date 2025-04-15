@@ -1,8 +1,13 @@
-import { NavLink } from 'react-router-dom'
+import { NavLink, Navigate } from 'react-router-dom'
 import Logo from '../../assets/logo.png'
+import { useUserContext } from '../../providers/UserProvider'
 import RegistrationForm from './register-form'
 
 export default function Register() {
+  const { user } = useUserContext()
+  if (user) {
+    return <Navigate to="/user" replace />
+  }
   return (
     <div className="flex md:justify-center md:items-center h-screen flex-col">
       <NavLink className="flex items-center p-2 gap-1" to={'/'}>
