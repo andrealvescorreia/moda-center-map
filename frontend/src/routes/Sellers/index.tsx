@@ -13,7 +13,8 @@ import SellerList from './seller-list'
 
 export default function Sellers() {
   const [sellers, setSellers] = useState<SellerResponse[]>([])
-  const { loading, setLoading } = useLoadingContext()
+  const { setLoading } = useLoadingContext()
+  const [doneFetching, setDoneFetching] = useState(false)
   const { setShow } = useNavContext()
   const [isSearching, setIsSearching] = useState(false)
   const navigate = useNavigate()
@@ -31,6 +32,7 @@ export default function Sellers() {
         console.error(error)
       } finally {
         setLoading(false)
+        setDoneFetching(true)
       }
     }
     fetchSellers()
@@ -59,7 +61,7 @@ export default function Sellers() {
           </InputRoot>
         </div>
 
-        {sellers.length === 0 && !loading && (
+        {sellers.length === 0 && doneFetching && (
           <div className="flex justify-center items-center h-full">
             <p className="text-gray02 text-2xl pt-10">
               Nenhum vendedor cadastrado
