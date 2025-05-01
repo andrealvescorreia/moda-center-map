@@ -3,6 +3,8 @@ import app from './app'
 
 import { setup } from './database/index'
 import { env, serverUrl } from './env'
+import { setupSwaggerDocs } from './swagger'
+setupSwaggerDocs(app)
 
 setup().then(() => {
   app.listen(env.PORT, () => {
