@@ -1,7 +1,7 @@
 import cookieParser from 'cookie-parser'
 import cors from 'cors'
 import express from 'express'
-import { env } from './env'
+import { env, serverUrl } from './env'
 import errorHandler from './middleware/errorHandler'
 import authRoutes from './routes/auth-routes'
 import pCategoriesRoutes from './routes/product-categories-routes'
@@ -27,8 +27,9 @@ class App {
   middlewares() {
     const allowedOrigins = [
       env.WEB_URL,
-      'http://localhost:5173',
-      'http://localhost:4173',
+      serverUrl, // swagger-ui development "Try it out"
+      'http://localhost:5173', // vite development server
+      'http://localhost:4173', // vite preview server
     ]
     this.app.use(
       cors({

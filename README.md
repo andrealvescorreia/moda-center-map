@@ -85,7 +85,9 @@ docker compose up -d
 ```
 Crie um arquivo `.env` na raiz do projeto `server` e adicione, seguindo o exemplo:
 ```env
-PORT=3001
+PORT=3001 # optional
+HOST="my-server.com" # optional
+PROTOCOL="https" # optional
 POSTGRES_URL="postgresql://docker:docker@localhost:5432/moda-center-map"
 WEB_URL="http://localhost:5173"
 TOKEN_EXPIRATION="14d"

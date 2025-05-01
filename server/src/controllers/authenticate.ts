@@ -66,7 +66,7 @@ export async function logout(
       sameSite: 'none',
       partitioned: true,
     })
-    res.send('logged out!')
+    res.status(200).json('logged out!')
     return
   } catch (error) {
     next(error)

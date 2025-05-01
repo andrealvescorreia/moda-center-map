@@ -87,6 +87,25 @@ describe('create seller', () => {
     seller?.product_categories[1].category.should.be.equal('Moda Íntima')
   })
 
+  it('should be able to create a seller with phone number', async () => {
+    const reqBody = {
+      name: 'Giller moda feminina',
+      sellingLocations: {
+        boxes: [
+          { sector_color: 'yellow', box_number: 128, street_letter: 'A' },
+        ],
+      },
+      phone_number: '8399442242',
+    }
+
+    const response = await postSeller(reqBody)
+    response.status.should.be.equal(201)
+
+    const seller = await findSeller(reqBody.name, [ProductCategory])
+    seller?.should.not.be.null
+    seller?.phone_number.should.be.equal(reqBody.phone_number)
+  })
+
   it('should not be able to create a seller with invalid product category', async () => {
     const reqBody = {
       name: 'King Kong moda masculina',

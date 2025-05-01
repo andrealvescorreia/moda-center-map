@@ -190,6 +190,22 @@ describe('user tests', () => {
     })
   })
 
+  it('shoukd be able to retrieve user data when logged in', async () => {
+    const loginResponse = await request(app).post('/auth').send({
+      username: 'JohnDoe',
+      password: '123456',
+    })
+    const cookies = loginResponse.headers['set-cookie']
+    const userId = loginResponse.body.id
+
+    const userResponse = await request(app).get('/user').set('Cookie', cookies)
+    userResponse.status.should.be.equal(200)
+    userResponse.body.should.be.deep.equal({
+      userId,
+      username: 'JohnDoe',
+    })
+  })
+
   it('should be able to log out successfully', async () => {
     const loginResponse = await request(app).post('/auth').send({
       username: 'JohnDoe',

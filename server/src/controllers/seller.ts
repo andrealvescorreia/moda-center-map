@@ -273,7 +273,11 @@ export async function destroy(req: Request, res: Response, next: NextFunction) {
       res.status(400).json({ message: 'Invalid id' })
       return
     }
-
+    const seller = await Seller.findOne({ where: { id: req.params.id } })
+    if (!seller) {
+      res.status(404).json({ message: 'Seller not found' })
+      return
+    }
     await Seller.destroy({ where: { id: req.params.id } })
     res.status(204).send()
     return

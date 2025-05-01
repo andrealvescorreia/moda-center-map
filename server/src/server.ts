@@ -1,12 +1,13 @@
 import './database/index' //executes the database connection
 import app from './app'
-const port = 3001
 
 import { setup } from './database/index'
+import { env, serverUrl } from './env'
+import { setupSwaggerDocs } from './swagger'
+setupSwaggerDocs(app)
 
 setup().then(() => {
-  app.listen(port, () => {
-    console.log()
-    console.log(`Rodando em http://localhost:${port}`)
+  app.listen(env.PORT, () => {
+    console.log(`\nRunning on ${serverUrl}`)
   })
 })
