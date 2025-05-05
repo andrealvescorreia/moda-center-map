@@ -21,7 +21,7 @@ export default defineConfig({
       },
       manifest: {
         name: 'Moda Center Map',
-        short_name: 'MCM',
+        short_name: 'Moda Center Map',
         icons: [
           {
             src: 'pwa-64x64.png',
