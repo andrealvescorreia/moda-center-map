@@ -165,7 +165,9 @@ function DestinyLiItem({
         {!isEndingPoint && downardsLine}
       </div>
       <div className="h-full flex flex-col relative gap-0">
-        <p className="text-base md:text-sm">{locationName}</p>
+        <p className="text-base md:text-sm whitespace-nowrap overflow-hidden text-ellipsis max-w-[70vw]">
+          {locationName}
+        </p>
         <p className="text-sm -mt-2 md:mt-0 md:text-xs text-gray04">
           {location}
         </p>
