@@ -1,0 +1,29 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "frontend-dev",
+      "type": "shell",
+      "command": "cd frontend ; npm run dev"
+    },
+    {
+      "label": "start-docker",
+      "type": "shell",
+      "command": "cd server ; docker-compose up -d"
+    },
+    {
+      "label": "server-dev",
+      "type": "shell",
+      "command": "cd server ; npm run dev",
+      "dependsOn": "start-docker"
+    },
+    {
+      "label": "dev",
+      "dependsOn": [
+        "frontend-dev",
+        "server-dev"
+      ],
+      "problemMatcher": []
+    }
+  ]
+}
