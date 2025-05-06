@@ -89,8 +89,8 @@ async function validateBoxes(
       })
     }
 
-    const AorPerror = validateBoxLetterAorP(box, i)
-    if (AorPerror) errors.push(AorPerror)
+    const letterAorPerror = validateBoxLetterAorP(box, i)
+    if (letterAorPerror) errors.push(letterAorPerror)
 
     if (boxOverlapsWithFoodCourt(box)) {
       errors.push({
@@ -147,12 +147,12 @@ function validateBoxLetterAorP(
     const isEven = box.box_number % 2 === 0
     const evenSectors =
       box.street_letter === 'A'
-        ? ['blue', 'red', 'yellow']
-        : ['orange', 'green', 'white']
+        ? ['blue', 'green', 'yellow']
+        : ['orange', 'red', 'white']
     const oddSectors =
       box.street_letter === 'A'
-        ? ['orange', 'green', 'white']
-        : ['blue', 'red', 'yellow']
+        ? ['orange', 'red', 'white']
+        : ['blue', 'green', 'yellow']
 
     if (evenSectors.includes(box.sector_color) && !isEven) {
       return {
@@ -264,9 +264,9 @@ function boxOverlapsWithStores(box: {
 }): boolean {
   const overlapConditions = {
     blue: { range: [33, 56], evenStreet: 'F', oddStreet: 'K' },
-    red: { range: [33, 56], evenStreet: 'F', oddStreet: 'K' },
+    red: { range: [33, 56], evenStreet: 'K', oddStreet: 'F' },
     orange: { range: [33, 56], evenStreet: 'K', oddStreet: 'F' },
-    green: { range: [33, 56], evenStreet: 'K', oddStreet: 'F' },
+    green: { range: [33, 56], evenStreet: 'F', oddStreet: 'K' },
     white: { range: [73, 96], evenStreet: 'K', oddStreet: 'F' },
     yellow: { range: [73, 96], evenStreet: 'F', oddStreet: 'K' },
   }
@@ -304,9 +304,8 @@ function boxOverlapsWithFoodCourt(box: {
     ['blue', 'red', 'orange', 'green'].includes(box.sector_color) &&
     box.street_letter === 'E' &&
     box.box_number > 89 &&
-    ((['blue', 'red'].includes(box.sector_color) && isOdd(box.box_number)) ||
-      (['orange', 'green'].includes(box.sector_color) &&
-        !isOdd(box.box_number)))
+    ((['blue', 'green'].includes(box.sector_color) && isOdd(box.box_number)) ||
+      (['orange', 'red'].includes(box.sector_color) && !isOdd(box.box_number)))
   ) {
     return true
   }
