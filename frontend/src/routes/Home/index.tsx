@@ -125,7 +125,7 @@ function Home() {
           <div className="md:absolute md:mt-0 mt-2 w-full px-2 md:max-w-125 md:top-0 ml-[50%] transform -translate-x-1/2">
             <InputRoot>
               <InputIcon>
-                <img src={Logo} alt="Logo" className="size-6" />
+                <img src={Logo} alt="Logo" className="h-6" />
               </InputIcon>
               <InputField
                 placeholder="Busque pontos de venda"
