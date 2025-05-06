@@ -32,12 +32,12 @@ const boxeSchema = z
       const isEven = values.box_number % 2 === 0
       const evenSectors =
         values.street_letter === 'A'
-          ? ['blue', 'red', 'yellow']
-          : ['orange', 'green', 'white']
+          ? ['blue', 'green', 'yellow']
+          : ['orange', 'red', 'white']
       const oddSectors =
         values.street_letter === 'A'
-          ? ['orange', 'green', 'white']
-          : ['blue', 'red', 'yellow']
+          ? ['orange', 'red', 'white']
+          : ['blue', 'green', 'yellow']
 
       if (evenSectors.includes(values.sector_color) && !isEven) {
         ctx.addIssue({
