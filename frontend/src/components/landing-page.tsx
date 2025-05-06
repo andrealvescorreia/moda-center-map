@@ -4,17 +4,17 @@ import { Button } from './button'
 
 export default function LandingPage() {
   return (
-    <div className=" w-full flex-col flex items-center justify-center p-2 gap-20 md:gap-10 h-[100dvh]">
+    <div className="w-full flex-col flex items-center justify-center p-2   h-[100dvh] fixed">
       <NavLink className="flex pt-4" to="/">
         <img src={Logo} alt="Logo" className="w-6" />
         <h1 className="text-3xl font-bold text-green-secondary italic font-plus-jakarta-sans text-center">
           ModaCenterMap
         </h1>
       </NavLink>
-      <h2 className="text-3xl text-center md:w-100 text-black px-3">
+      <h2 className="text-3xl text-center md:w-100 text-black px-3 pt-20">
         Entre no <i>ModaCenterMap</i> para salvar seus vendedores favoritos.
       </h2>
-      <div className="w-full flex flex-col gap-4 items-center h-full pt-23 md:pt-2">
+      <div className="w-full flex flex-col gap-4 items-center h-full pt-23 ">
         <NavLink to="/login" className="w-80">
           <Button className="justify-center text-xl">Entrar</Button>
         </NavLink>
