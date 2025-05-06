@@ -8,7 +8,7 @@ const RouteButton = ({ className, ...props }: RouteButtonProps) => {
   return (
     <button
       className={twMerge(
-        'flex items-center justify-center bg-green-primary px-2 h-16 w-16 rounded-md outline-white outline-solid shadow-md hover:bg-green-secondary hover:cursor-pointer transition-colors duration-300 text-white flex-col gap-1',
+        'flex items-center justify-center bg-green-secondary px-2 h-16 w-16 rounded-md outline-white outline-solid shadow-md hover:bg-green-primary hover:cursor-pointer transition-colors duration-300 text-white flex-col gap-1 font-semibold',
         className
       )}
       {...props}
