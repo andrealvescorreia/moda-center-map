@@ -27,25 +27,27 @@ export function DestinyList({
     const divider = (
       <div className="bg-gray05 w-full h-[1.2px] absolute bottom-0 rounded-2xl" />
     )
-    const downardsLine = (
-      <div className=" h-3 absolute bottom-0 border-solid border-[1.4px] border-gray05" />
-    )
     const upwardsLine = (
-      <div className=" h-3 absolute top-0 border-solid border-[1.4px] border-gray05" />
+      <div className="h-[50%] absolute -top-2 border-solid border-[1.4px] border-gray05" />
     )
+    const downardsLine = (
+      <div className="h-[50%] absolute -bottom-2 border-solid border-[1.4px] border-gray05" />
+    )
+
     return (
       <div className="w-full h-full ">
-        <ul className="bg-white  rounded-md py-2" ref={listRef}>
+        <ul className="bg-white  rounded-md py-1" ref={listRef}>
           {route.inicio && (
             <DestinyLiItem
               index={-1}
               destiny={route.inicio}
               isStartingPoint
               isEndingPoint={route.destinos.length === 0}
+              reducedView={reducedView}
             />
           )}
 
-          <li className="list-none w-full h-10 px-2 gap-1 grid grid-cols-[8%_auto_8%] items-center">
+          <li className="list-none w-full h-7 px-2 gap-1 grid grid-cols-[8%_auto_8%] items-center">
             <div className="h-full flex justify-center items-center relative">
               {upwardsLine}
               <span className="bg-white text-gray02 size-[16px] flex border border-gray02 justify-center items-center rounded-2xl text-xs" />
@@ -64,6 +66,7 @@ export function DestinyList({
             index={route.destinos.length - 1}
             destiny={route.destinos[route.destinos.length - 1]}
             isEndingPoint
+            reducedView={reducedView}
           />
         </ul>
       </div>
@@ -79,6 +82,7 @@ export function DestinyList({
             destiny={route.inicio}
             isStartingPoint
             isEndingPoint={route.destinos.length === 0}
+            reducedView={reducedView}
           />
         )}
         {route.destinos.map((destiny, index) => {
@@ -90,6 +94,7 @@ export function DestinyList({
               destiny={destiny}
               onClickRemoveDestiny={onClickRemoveDestiny}
               isEndingPoint={isThisTheLastDestiny}
+              reducedView={reducedView}
             />
           )
         })}
@@ -104,6 +109,7 @@ interface DestinyLiItemProps {
   isStartingPoint?: boolean
   isEndingPoint?: boolean
   onClickRemoveDestiny?: (index: number) => void
+  reducedView?: boolean
 }
 function DestinyLiItem({
   index,
@@ -111,19 +117,22 @@ function DestinyLiItem({
   isStartingPoint,
   isEndingPoint,
   onClickRemoveDestiny,
+  reducedView = false,
 }: DestinyLiItemProps) {
   if (!destiny.sellingLocation) return null
 
   let location = ''
-  const locationName = isStartingPoint ? 'Seu local' : destiny.sellerName
-  let leftIcon: JSX.Element
-
   if ('rua' in destiny.sellingLocation && 'numero') {
     location = `${destiny.sellingLocation.setor} - Rua ${destiny.sellingLocation.rua} - Boxe ${destiny.sellingLocation.numero}`
   }
   if ('bloco' in destiny.sellingLocation && 'numLoja') {
     location = `${destiny.sellingLocation.setor} - Bloco ${destiny.sellingLocation.bloco} - Loja ${destiny.sellingLocation.numLoja}`
   }
+
+  const locationName = isStartingPoint
+    ? `Seu local ${reducedView ? `- ${location}` : ''}`
+    : destiny.sellerName
+  let leftIcon: JSX.Element
 
   if (isStartingPoint) {
     leftIcon = (
@@ -143,20 +152,20 @@ function DestinyLiItem({
     )
   }
   const divider = (
-    <div className="bg-gray05 w-full h-[1.2px]  absolute bottom-0 rounded-2xl" />
+    <div className="bg-gray05 w-full h-[1.2px]  absolute bottom-0 rounded-2xl -mb-1" />
   )
 
   const upwardsLine = (
-    <div className=" h-3 absolute top-0 border-solid border-[1.4px] border-gray05" />
+    <div className="h-[50%] absolute -top-2 border-solid border-[1.4px] border-gray05" />
   )
   const downardsLine = (
-    <div className=" h-3 absolute bottom-0 border-solid border-[1.4px] border-gray05" />
+    <div className="h-[50%] absolute -bottom-2 border-solid border-[1.4px] border-gray05" />
   )
 
   return (
     <li
       key={`${destiny.sellingLocation.setor}-${destiny.position.x}-${destiny.position.y}`}
-      className="list-none w-full h-10 md:h-12
+      className="list-none w-full py-1.5 max-h-10 md:max-h-12
        px-2 gap-1 grid grid-cols-[8%_auto_8%] items-center"
     >
       <div className="h-full flex justify-center items-center relative">
@@ -165,13 +174,17 @@ function DestinyLiItem({
         {!isEndingPoint && downardsLine}
       </div>
       <div className="h-full flex flex-col relative gap-0">
-        <p className="text-base md:text-sm">{locationName}</p>
-        <p className="text-sm -mt-2 md:mt-0 md:text-xs text-gray04">
-          {location}
+        <p className="text-base md:text-sm whitespace-nowrap overflow-hidden text-ellipsis max-w-[70vw]">
+          {locationName}
         </p>
+        {!reducedView && (
+          <p className="text-sm -mt-1.5 md:mt-0 md:text-xs text-gray04">
+            {location}
+          </p>
+        )}
         {!isEndingPoint && divider}
       </div>
-      {!isStartingPoint && (
+      {!isStartingPoint && !reducedView && (
         <button
           type="button"
           className="ml-auto"

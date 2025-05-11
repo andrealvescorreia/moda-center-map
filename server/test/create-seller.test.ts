@@ -110,7 +110,7 @@ describe('create seller', () => {
     const reqBody = {
       name: 'King Kong moda masculina',
       sellingLocations: {
-        boxes: [{ sector_color: 'green', box_number: 1, street_letter: 'A' }],
+        boxes: [{ sector_color: 'green', box_number: 2, street_letter: 'A' }],
       },
       productCategories: ['Automóveis', 'Moda Íntima'],
     }
@@ -350,11 +350,11 @@ describe('create seller', () => {
       seller?.should.be.null
     })
 
-    it('odd box number, street letter A, blue, red and yellow sectors', async () => {
-      const sectors = ['blue', 'red', 'yellow']
+    it('odd box number, street letter A, blue, green and yellow sectors', async () => {
+      const sectors = ['blue', 'green', 'yellow']
       for (const sector of sectors) {
         const reqBody = {
-          name: 'Desejo de Mulher',
+          name: 'Desejo de Moça',
           sellingLocations: {
             boxes: [
               { sector_color: sector, box_number: 1, street_letter: 'A' },
@@ -378,14 +378,14 @@ describe('create seller', () => {
       }
     })
 
-    it('even box number, street letter A, orange, green and white sectors', async () => {
-      const sectors = ['orange', 'green', 'white']
+    it('even box number, street letter A, orange, red and white sectors', async () => {
+      const sectors = ['orange', 'red', 'white']
       for (const sector of sectors) {
         const reqBody = {
-          name: 'Desejo de Mulher',
+          name: 'Desejo de Moça',
           sellingLocations: {
             boxes: [
-              { sector_color: sector, box_number: 2, street_letter: 'A' },
+              { sector_color: sector, box_number: 4, street_letter: 'A' },
             ],
           },
         }
@@ -406,11 +406,11 @@ describe('create seller', () => {
       }
     })
 
-    it('even box number, street letter P, blue, red and yellow sectors', async () => {
-      const sectors = ['blue', 'red', 'yellow']
+    it('even box number, street letter P, blue, green and yellow sectors', async () => {
+      const sectors = ['blue', 'green', 'yellow']
       for (const sector of sectors) {
         const reqBody = {
-          name: 'Desejo de Mulher',
+          name: 'Desejo de Moça',
           sellingLocations: {
             boxes: [
               { sector_color: sector, box_number: 2, street_letter: 'P' },
@@ -434,11 +434,11 @@ describe('create seller', () => {
       }
     })
 
-    it('odd box number, street letter P, orange, green and white sectors', async () => {
-      const sectors = ['orange', 'green', 'white']
+    it('odd box number, street letter P, orange, red and white sectors', async () => {
+      const sectors = ['orange', 'red', 'white']
       for (const sector of sectors) {
         const reqBody = {
-          name: 'Desejo de Mulher',
+          name: 'Desejo de Moça',
           sellingLocations: {
             boxes: [
               { sector_color: sector, box_number: 1, street_letter: 'P' },
@@ -462,11 +462,11 @@ describe('create seller', () => {
       }
     })
 
-    it('(food court overlap) odd box number between 90 and 120 within street letter E, sectors blue and red', async () => {
-      const sectors = ['blue', 'red']
+    it('(food court overlap) odd box number between 90 and 120 within street letter E, sectors blue and green', async () => {
+      const sectors = ['blue', 'green']
       for (const sector of sectors) {
         const reqBody = {
-          name: 'Desejo de Mulher',
+          name: 'Desejo de Moça',
           sellingLocations: {
             boxes: [
               { sector_color: sector, box_number: 91, street_letter: 'E' },
@@ -489,8 +489,8 @@ describe('create seller', () => {
       }
     })
 
-    it('(food court overlap) even box number between 90 and 120 within street letter E, sectors orange and green', async () => {
-      const sectors = ['orange', 'green']
+    it('(food court overlap) even box number between 90 and 120 within street letter E, sectors orange and red', async () => {
+      const sectors = ['orange', 'red']
       for (const sector of sectors) {
         const reqBody = {
           name: 'Desejo de Mulher',
@@ -570,8 +570,8 @@ describe('create seller', () => {
       }
     })
 
-    it('(store overlap) 35, K, sectors blue and red', async () => {
-      const sectors = ['blue', 'red']
+    it('(store overlap) 35, K, sectors blue and green', async () => {
+      const sectors = ['blue', 'green']
       for (const sector of sectors) {
         const reqBody = {
           name: 'Desejo de Mulher',
@@ -596,8 +596,8 @@ describe('create seller', () => {
         })
       }
     })
-    it('(store overlap) 34, K, sectors orange and green', async () => {
-      const sectors = ['orange', 'green']
+    it('(store overlap) 34, K, sectors orange and red', async () => {
+      const sectors = ['orange', 'red']
       for (const sector of sectors) {
         const reqBody = {
           name: 'Desejo de Mulher',

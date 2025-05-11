@@ -125,6 +125,13 @@ export default abstract class BoxesSetorBuilder {
         y: reflectY ? center.y - (y - center.y) - 1 : y,
         x: reflectX ? center.x - (x - center.x) - 1 : x,
       }
+      if (reflectY) {
+        if (boxe.numero % 2 === 0) {
+          boxe.numero = boxe.numero - 1
+        } else {
+          boxe.numero = boxe.numero + 1
+        }
+      }
       if (reflectX) {
         if (boxe.numero % 2 === 0) {
           boxe.numero = boxe.numero - 1
