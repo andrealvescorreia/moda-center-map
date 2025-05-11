@@ -147,7 +147,7 @@ const MapDrawer = ({
         <ImageOverlay
           url={
             mapInfo && mapInfo.zoom >= 4
-              ? '/grid (detailed).jpg'
+              ? '/grid v2 (detailed).jpg'
               : mapInfo && mapInfo.zoom >= 2
                 ? '/grid (medium detail).jpg'
                 : '/grid (no detail).jpg'
