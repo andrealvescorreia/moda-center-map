@@ -53,7 +53,7 @@ type StoreSchema = z.infer<typeof storeSchema>
 interface StepTwo {
   boxes: BoxeSchema[]
   stores: StoreSchema[]
-  productCategories: string[]
+  product_categories: string[]
 }
 
 interface SellerFormStepTwoProps {
@@ -204,7 +204,9 @@ export default function SellerFormStepTwo({
       <div className="space-y-4 py-30 md:py-5">
         <ButtonRounded
           type="submit"
-          onClick={() => onNext({ boxes, stores, productCategories })}
+          onClick={() =>
+            onNext({ boxes, stores, product_categories: productCategories })
+          }
           disabled={boxes.length === 0 && stores.length === 0}
         >
           Confirmar

@@ -4,9 +4,14 @@ import Boxe from '../database/models/boxe'
 import ProductCategory from '../database/models/product-category'
 import Seller from '../database/models/seller'
 import Store from '../database/models/store'
-import type { registerSellerSchema } from '../schemas/sellerSchema'
+const { Op } = require('sequelize')
+import type {
+  registerSellerSchema,
+  updateSellerSchema,
+} from '../schemas/sellerSchema'
 
 type NewSellerType = z.infer<typeof registerSellerSchema>
+type UpdateSellerType = z.infer<typeof updateSellerSchema>
 type ValidationError = {
   code: string
   field: string
@@ -21,7 +26,7 @@ export async function validateNewSeller({
   name,
   sellingLocations,
   phone_number,
-  productCategories,
+  product_categories: productCategories,
 }: NewSellerType) {
   let errors: ValidationError[] = []
 
@@ -31,10 +36,27 @@ export async function validateNewSeller({
   return errors
 }
 
-async function validateName(name: string) {
+export async function validateSellerUpdate(
+  sellerId: string,
+  { name, boxes, stores, phone_number, product_categories }: UpdateSellerType
+) {
+  let errors: ValidationError[] = []
+
+  errors = errors.concat(await validateName(name, sellerId))
+
+  errors = errors.concat(
+    await validateSellingLocations({ boxes, stores }, sellerId)
+  )
+  errors = errors.concat(await validateProductCategories(product_categories))
+  return errors
+}
+
+async function validateName(name: string, ignoredId?: string) {
   const errors = []
   const seller = await Seller.findOne({
-    where: { name },
+    where: {
+      [Op.and]: [{ name }, ignoredId ? { id: { [Op.ne]: ignoredId } } : {}],
+    },
   })
   if (seller) {
     errors.push({
@@ -47,7 +69,8 @@ async function validateName(name: string) {
 }
 
 async function validateSellingLocations(
-  sellingLocations: NewSellerType['sellingLocations']
+  sellingLocations: NewSellerType['sellingLocations'],
+  ignoredSellerId?: string
 ) {
   let errors: ValidationError[] = []
   const hasNoSellingLocations = !(
@@ -63,13 +86,18 @@ async function validateSellingLocations(
     return errors
   }
 
-  errors = errors.concat(await validateBoxes(sellingLocations.boxes))
-  errors = errors.concat(await validateStores(sellingLocations.stores))
+  errors = errors.concat(
+    await validateBoxes(sellingLocations.boxes, ignoredSellerId)
+  )
+  errors = errors.concat(
+    await validateStores(sellingLocations.stores, ignoredSellerId)
+  )
   return errors
 }
 
 async function validateBoxes(
-  boxes: NewSellerType['sellingLocations']['boxes']
+  boxes: NewSellerType['sellingLocations']['boxes'],
+  ignoredSellerId?: string
 ) {
   const errors = []
   if (!boxes || boxes.length === 0) return []
@@ -113,9 +141,14 @@ async function validateBoxes(
   for (const box of boxes || []) {
     const boxLocation = await Boxe.findOne({
       where: {
-        sector_color: box.sector_color,
-        box_number: box.box_number,
-        street_letter: box.street_letter,
+        [Op.and]: [
+          {
+            sector_color: box.sector_color,
+            box_number: box.box_number,
+            street_letter: box.street_letter,
+          },
+          ignoredSellerId ? { seller_id: { [Op.ne]: ignoredSellerId } } : {},
+        ],
       },
       include: [Seller],
     })
@@ -175,7 +208,8 @@ function validateBoxLetterAorP(
 }
 
 async function validateStores(
-  stores: NewSellerType['sellingLocations']['stores']
+  stores: NewSellerType['sellingLocations']['stores'],
+  ignoredSellerId?: string
 ) {
   const errors = []
   for (const store of stores || []) {
@@ -232,9 +266,14 @@ async function validateStores(
     // verifica se a loja está ocupada
     const storeLocation = await Store.findOne({
       where: {
-        sector_color: store.sector_color,
-        block_number: store.block_number,
-        store_number: store.store_number,
+        [Op.and]: [
+          {
+            sector_color: store.sector_color,
+            block_number: store.block_number,
+            store_number: store.store_number,
+          },
+          ignoredSellerId ? { seller_id: { [Op.ne]: ignoredSellerId } } : {},
+        ],
       },
       include: [Seller],
     })

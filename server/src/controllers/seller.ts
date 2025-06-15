@@ -1,5 +1,5 @@
 import type { NextFunction, Request, Response } from 'express'
-import { Sequelize } from 'sequelize'
+import { Sequelize, type Transaction } from 'sequelize'
 import z from 'zod'
 import sequelize from '../database'
 import Boxe from '../database/models/boxe'
@@ -7,8 +7,18 @@ import ProductCategory from '../database/models/product-category'
 import Seller from '../database/models/seller'
 import Store from '../database/models/store'
 import User from '../database/models/user'
-import { registerSellerSchema } from '../schemas/sellerSchema'
-import { validateNewSeller } from '../services/seller-validation'
+import {
+  registerSellerSchema,
+  updateSellerSchema,
+} from '../schemas/sellerSchema'
+import {
+  boxesChanges,
+  storesChanges,
+} from '../services/sell-location-change-detection'
+import {
+  validateNewSeller,
+  validateSellerUpdate,
+} from '../services/seller-validation'
 
 export async function index(req: Request, res: Response, next: NextFunction) {
   const optionalParams = z.object({
@@ -40,31 +50,40 @@ export async function index(req: Request, res: Response, next: NextFunction) {
     return next(error)
   }
 }
+async function findSellerById(id: string) {
+  return await Seller.findOne({
+    where: { id: id },
+    include: [
+      { model: Boxe, attributes: { exclude: ['createdAt', 'updatedAt'] } },
+      { model: Store, attributes: { exclude: ['createdAt', 'updatedAt'] } },
+      {
+        model: ProductCategory,
+        attributes: { exclude: ['createdAt', 'updatedAt'] },
+      },
+    ],
+    attributes: { exclude: ['createdAt', 'updatedAt', 'search_vector'] },
+  })
+}
+
+async function findSellerByReqId(req: Request, res: Response) {
+  if (!z.string().uuid().safeParse(req.params.id).success) {
+    res.status(400).json({ message: 'Invalid id' })
+    return
+  }
+  const seller = await findSellerById(req.params.id)
+  if (!seller) {
+    res.status(404).json({ message: 'Seller not found' })
+    return
+  }
+  return seller
+}
 
 export async function show(req: Request, res: Response, next: NextFunction) {
   try {
-    if (!z.string().uuid().safeParse(req.params.id).success) {
-      res.status(400).json({ message: 'Invalid id' })
-      return
-    }
-
-    const seller = await Seller.findOne({
-      where: { id: req.params.id },
-      include: [
-        { model: Boxe, attributes: { exclude: ['createdAt', 'updatedAt'] } },
-        { model: Store, attributes: { exclude: ['createdAt', 'updatedAt'] } },
-        {
-          model: ProductCategory,
-          attributes: { exclude: ['createdAt', 'updatedAt'] },
-        },
-      ],
-      attributes: { exclude: ['createdAt', 'updatedAt', 'search_vector'] },
-    })
-    if (!seller) {
-      res.status(404).json({ message: 'Seller not found' })
-      return
-    }
+    const seller = await findSellerByReqId(req, res)
+    if (!seller) return
     res.status(200).json(seller)
+    return
   } catch (error) {
     console.log(error)
     return next(error)
@@ -245,7 +264,7 @@ export async function create(req: Request, res: Response, next: NextFunction) {
       })
 
       const seller_product_categories: ProductCategory[] = []
-      for (const category of parsed.productCategories || []) {
+      for (const category of parsed.product_categories || []) {
         const foundCategory = await ProductCategory.findOne({
           where: { category },
         })
@@ -257,6 +276,102 @@ export async function create(req: Request, res: Response, next: NextFunction) {
 
       await t.commit()
       res.status(201).json(newSeller)
+      return
+    } catch (error) {
+      await t.rollback()
+      return next(error)
+    }
+  } catch (error) {
+    return next(error)
+  }
+}
+
+export async function update(req: Request, res: Response, next: NextFunction) {
+  try {
+    const seller = await findSellerByReqId(req, res)
+    if (!seller) return
+
+    const parsed = updateSellerSchema.parse({
+      ...req.body,
+      phone_number: req.body.phone_number?.replace(/\D/g, '').trim(),
+      name: req.body.name?.trim(),
+    })
+
+    const errors = await validateSellerUpdate(seller?.id, parsed)
+    if (errors.length > 0) {
+      res.status(400).json({ errors })
+      return
+    }
+
+    const t = await sequelize.transaction()
+    try {
+      await Seller.update(
+        {
+          name: parsed.name,
+          phone_number: parsed.phone_number ? parsed.phone_number : null,
+        },
+        { where: { id: req.params.id }, transaction: t }
+      )
+
+      const { addedBoxes, removedBoxes } = await boxesChanges(
+        seller.id,
+        parsed.boxes
+      )
+      const { addedStores, removedStores } = await storesChanges(
+        seller.id,
+        parsed.stores
+      )
+
+      if (addedBoxes.length > 0) {
+        const createdBoxes = await Boxe.bulkCreate(addedBoxes, {
+          transaction: t,
+        })
+        await seller.$add('boxes', createdBoxes, { transaction: t })
+      }
+      if (removedBoxes.length > 0) {
+        await Boxe.destroy({
+          where: { id: removedBoxes.map((box) => box.id) },
+          transaction: t,
+        })
+      }
+      if (addedStores.length > 0) {
+        const createdStores = await Store.bulkCreate(addedStores, {
+          transaction: t,
+        })
+        await seller.$add('stores', createdStores, { transaction: t })
+      }
+      if (removedStores.length > 0) {
+        await Store.destroy({
+          where: { id: removedStores.map((store) => store.id) },
+          transaction: t,
+        })
+      }
+      const newSellerProductCategories: ProductCategory[] = []
+      for (const category of parsed.product_categories || []) {
+        const foundCategory = await ProductCategory.findOne({
+          where: { category },
+        })
+        if (foundCategory) newSellerProductCategories.push(foundCategory)
+      }
+      await seller.$add('product_categories', newSellerProductCategories, {
+        transaction: t,
+      })
+
+      const removedCategories = seller.product_categories.filter(
+        ({ category }) =>
+          !newSellerProductCategories.some((c) => c.category === category)
+      )
+      if (removedCategories.length)
+        await seller.$remove('product_categories', removedCategories, {
+          transaction: t,
+        })
+
+      await t.commit()
+
+      const updatedSeller = await findSellerById(req.params.id)
+      if (!updatedSeller) return
+
+      res.status(200).json({ updatedSeller })
       return
     } catch (error) {
       await t.rollback()

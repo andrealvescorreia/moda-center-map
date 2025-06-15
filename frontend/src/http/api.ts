@@ -89,7 +89,7 @@ interface NewSeller {
   name: string
   phone_number: string | undefined
   sellingLocations: { boxes: BoxeSchema[]; stores: StoreSchema[] }
-  productCategories: string[]
+  product_categories: string[]
 }
 
 export async function createSeller(data: NewSeller) {

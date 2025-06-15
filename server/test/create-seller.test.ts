@@ -74,7 +74,7 @@ describe('create seller', () => {
       sellingLocations: {
         boxes: [{ sector_color: 'white', box_number: 128, street_letter: 'P' }],
       },
-      productCategories: ['Jeans', 'Moda Íntima'],
+      product_categories: ['Jeans', 'Moda Íntima'],
     }
 
     const response = await postSeller(reqBody)
@@ -112,7 +112,7 @@ describe('create seller', () => {
       sellingLocations: {
         boxes: [{ sector_color: 'green', box_number: 2, street_letter: 'A' }],
       },
-      productCategories: ['Automóveis', 'Moda Íntima'],
+      product_categories: ['Automóveis', 'Moda Íntima'],
     }
 
     const response = await postSeller(reqBody)

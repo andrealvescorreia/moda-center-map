@@ -43,19 +43,19 @@ export default function NewSeller() {
   interface StepTwo {
     boxes: BoxeSchema[]
     stores: StoreSchema[]
-    productCategories: string[]
+    product_categories: string[]
   }
   const onSubmitStepTwo = async ({
     boxes,
     stores,
-    productCategories,
+    product_categories,
   }: StepTwo) => {
     const sellingLocations = { boxes, stores }
     const seller = {
       name,
       phone_number: phone_number === '' ? undefined : phone_number,
       sellingLocations,
-      productCategories,
+      product_categories,
     }
 
     const result = sellerSchema.safeParse(seller)

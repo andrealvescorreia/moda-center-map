@@ -42,7 +42,7 @@ describe('get sellers', () => {
             { sector_color: 'yellow', block_number: 5, store_number: 16 },
           ],
         },
-        productCategories: ['Roupas', 'Calçados'],
+        product_categories: ['Roupas', 'Calçados'],
       })
     response.status.should.be.equal(201)
   })
