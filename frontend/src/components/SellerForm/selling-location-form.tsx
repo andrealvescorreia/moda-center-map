@@ -55,7 +55,7 @@ export default function SellingLocationForm({
   function ActionButtons() {
     return (
       <div className="space-y-4 py-4">
-        <ButtonRounded type="submit">Adicionar</ButtonRounded>
+        <ButtonRounded type="submit">Adicionar local</ButtonRounded>
         <button
           type="button"
           className="px-8 py-3 w-full hover:cursor-pointer"

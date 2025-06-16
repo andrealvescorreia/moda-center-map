@@ -4,6 +4,7 @@ import { SnackbarProvider, enqueueSnackbar } from 'notistack'
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import errorsCode from '../../../../shared/operation-errors'
+import SellerForm from '../../components/SellerForm'
 import AlertDialog from '../../components/alert-dialog'
 import LandingPage from '../../components/landing-page'
 import OfflineScreen from '../../components/offline-screen'
@@ -13,16 +14,8 @@ import { useUserContext } from '../../providers/UserProvider'
 import type { BoxeSchema } from '../../schemas/box'
 import sellerSchema from '../../schemas/seller'
 import type { StoreSchema } from '../../schemas/store'
-import SellerFormStepOne from './step-one'
-import SellerFormStepTwo from './step-two'
 
 export default function NewSeller() {
-  const [currentStep, setCurrentStep] = useState(1)
-  const [name, setName] = useState('')
-  const [phone_number, setPhoneNumber] = useState<string | undefined>('')
-  const [boxes, setBoxes] = useState<BoxeSchema[]>([])
-  const [stores, setStores] = useState<StoreSchema[]>([])
-  const [productCategories, setProductCategories] = useState<string[]>([])
   const [dialogOpen, setDialogOpen] = useState(false)
   const [errors, setErrors] = useState<Array<string>>([])
   const { user } = useUserContext()
@@ -35,35 +28,23 @@ export default function NewSeller() {
   }
   if (!user) return <LandingPage />
 
-  interface StepOne {
+  const onSubmit = async (seller: {
     name: string
-    phone_number?: string | undefined
-  }
-  const onSubmitStepOne = ({ name, phone_number }: StepOne) => {
-    setName(name)
-    setPhoneNumber(phone_number)
-    setCurrentStep(2)
-  }
-
-  interface StepTwo {
+    phone_number?: string
     boxes: BoxeSchema[]
     stores: StoreSchema[]
     product_categories: string[]
-  }
-  const onSubmitStepTwo = async ({
-    boxes,
-    stores,
-    product_categories,
-  }: StepTwo) => {
-    const sellingLocations = { boxes, stores }
-    const seller = {
-      name,
-      phone_number: phone_number === '' ? undefined : phone_number,
+  }) => {
+    const sellingLocations = { boxes: seller.boxes, stores: seller.stores }
+    const sellerBody = {
+      name: seller.name,
+      phone_number:
+        seller.phone_number === '' ? undefined : seller.phone_number,
       sellingLocations,
-      product_categories,
+      product_categories: seller.product_categories,
     }
 
-    const result = sellerSchema.safeParse(seller)
+    const result = sellerSchema.safeParse(sellerBody)
     if (!result.success) {
       setErrors(result.error.issues.map((err) => err.message))
       setDialogOpen(true)
@@ -72,10 +53,10 @@ export default function NewSeller() {
 
     try {
       setLoading(true)
-      await createSeller(seller)
+      const createdSeller = await createSeller(sellerBody)
       enqueueSnackbar('Vendedor criado com sucesso', { variant: 'success' })
       setTimeout(() => {
-        navigate('/sellers')
+        navigate(`/sellers/${createdSeller.data.id}`)
       }, 2000)
     } catch (error: unknown) {
       const errorMessages = []
@@ -114,68 +95,33 @@ export default function NewSeller() {
       setLoading(false)
     }
   }
-
   const onCancel = () => {
-    window.history.back()
-  }
-
-  const onGoBackToStepOne = async ({
-    boxes,
-    stores,
-    product_categories,
-  }: StepTwo) => {
-    setBoxes(boxes)
-    setStores(stores)
-    setProductCategories(product_categories)
-    setCurrentStep(1)
+    navigate('/sellers')
   }
 
   return (
-    <div className="flex md:justify-center md:items-center flex-col h-screen">
+    <div className="h-screen flex md:justify-center items-center flex-col w-full ">
       <SnackbarProvider />
-      <div className="md:items-center flex-col h-screen w-full md:w-120 ">
-        {dialogOpen && (
-          <AlertDialog
-            isOpen={true}
-            onClose={() => setDialogOpen(false)}
-            title={'Erro ao Criar Vendedor'}
-          >
-            {
-              <ul className="list-disc space-y-2 p-2">
-                {errors.map((error) => (
-                  <li key={error}>{error}</li>
-                ))}
-              </ul>
-            }
-          </AlertDialog>
-        )}
-        {(() => {
-          switch (currentStep) {
-            case 1:
-              return (
-                <SellerFormStepOne
-                  onNext={onSubmitStepOne}
-                  onBack={onCancel}
-                  defaultValues={{ name, phone_number }}
-                />
-              )
-            case 2:
-              return (
-                <SellerFormStepTwo
-                  onNext={onSubmitStepTwo}
-                  onBack={onGoBackToStepOne}
-                  sellerName={name}
-                  defaultValues={{
-                    boxes,
-                    stores,
-                    product_categories: productCategories,
-                  }}
-                />
-              )
-            default:
-              return <h1>Invalid Step</h1>
+      {dialogOpen && (
+        <AlertDialog
+          isOpen={true}
+          onClose={() => setDialogOpen(false)}
+          title={'Erro ao Criar Vendedor'}
+        >
+          {
+            <ul className="list-disc space-y-2 p-2">
+              {errors.map((error) => (
+                <li key={error}>{error}</li>
+              ))}
+            </ul>
           }
-        })()}
+        </AlertDialog>
+      )}
+      <div className="md:w-1/2 w-full">
+        <h2 className="font-heading text-gray04 font-bold text-2xl pt-4 flex items-center justify-center">
+          Novo Vendedor
+        </h2>
+        <SellerForm onCancel={onCancel} onSubmit={onSubmit} />
       </div>
     </div>
   )

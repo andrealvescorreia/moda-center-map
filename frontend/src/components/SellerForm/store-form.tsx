@@ -1,23 +1,23 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import type { z } from 'zod'
-import { InputField, InputRoot } from '../../components/input'
-import SelectOptions from '../../components/select-options'
-import boxeSchema from '../../schemas/box'
+import storeSchema from '../../schemas/store'
+import { InputField, InputRoot } from '../input'
+import SelectOptions from '../select-options'
 
-type BoxeSchema = z.infer<typeof boxeSchema>
+type StoreSchema = z.infer<typeof storeSchema>
 
-interface BoxeFormProps {
+interface StoreFormProps {
   children: React.ReactNode
-  onSubmit: (data: BoxeSchema) => void
+  onSubmit: (data: StoreSchema) => void
 }
-export default function BoxeForm({ children, onSubmit }: BoxeFormProps) {
+export default function StoreForm({ children, onSubmit }: StoreFormProps) {
   const {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<BoxeSchema>({
-    resolver: zodResolver(boxeSchema),
+  } = useForm<StoreSchema>({
+    resolver: zodResolver(storeSchema),
   })
 
   return (
@@ -34,39 +34,39 @@ export default function BoxeForm({ children, onSubmit }: BoxeFormProps) {
           { value: 'white', label: 'Branco' },
         ]}
       />
-
       {errors?.sector_color && (
         <p className="font-semibold text-xs text-danger">
           {errors.sector_color.message}
         </p>
       )}
 
-      <label htmlFor="street">Rua</label>
-      <InputRoot>
-        <InputField
-          id="street"
-          {...register('street_letter')}
-          placeholder="A-P"
-        />
-      </InputRoot>
-      {errors?.street_letter && (
-        <p className="font-semibold text-xs text-danger">
-          {errors.street_letter.message}
-        </p>
-      )}
-
-      <label htmlFor="box">Box</label>
+      <label htmlFor="block">Bloco</label>
       <InputRoot>
         <InputField
           type="number"
-          id="box"
-          {...register('box_number')}
-          placeholder="1-128"
+          id="block"
+          {...register('block_number')}
+          placeholder="1-9"
         />
       </InputRoot>
-      {errors?.box_number && (
+      {errors?.block_number && (
         <p className="font-semibold text-xs text-danger">
-          {errors.box_number.message}
+          {errors.block_number.message}
+        </p>
+      )}
+
+      <label htmlFor="store">Loja</label>
+      <InputRoot>
+        <InputField
+          type="number"
+          id="store"
+          {...register('store_number')}
+          placeholder="1-19"
+        />
+      </InputRoot>
+      {errors?.store_number && (
+        <p className="font-semibold text-xs text-danger">
+          {errors.store_number.message}
         </p>
       )}
 

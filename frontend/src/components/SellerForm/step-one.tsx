@@ -5,8 +5,8 @@ import { useRef } from 'react'
 import { useForm } from 'react-hook-form'
 import { useHookFormMask } from 'use-mask-input'
 import { z } from 'zod'
-import { InputField, InputRoot } from '../../components/input'
 import sellerSchema from '../../schemas/seller'
+import { InputField, InputRoot } from '../input'
 import ButtonRounded from './button-rounded'
 
 const sellerSchemaStepOne = z.object({
@@ -51,10 +51,6 @@ export default function SellerFormStepOne({
       ref={formRef}
       className="p-8 space-y-6 w-full"
     >
-      <h2 className="font-heading text-gray04 font-bold text-2xl">
-        Novo Vendedor
-      </h2>
-
       <div className="space-y-3 py-4">
         <div className="space-y-2">
           <label htmlFor="name">Nome</label>
@@ -92,7 +88,7 @@ export default function SellerFormStepOne({
           )}
         </div>
       </div>
-      <div className="py-35 mb-0 md:py-3 space-y-3">
+      <div className="py-15 mb-0 md:py-3 space-y-3">
         <ButtonRounded
           type="submit"
           disabled={

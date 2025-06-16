@@ -8,12 +8,12 @@ import { gsap } from 'gsap'
 import { MapPinPlus, X } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import type { z } from 'zod'
-import { IconButton } from '../../components/icon-button'
-import IconOnlyButton from '../../components/icon-only-button'
 import { getProductCategories } from '../../http/api'
 import type boxeSchema from '../../schemas/box'
 import type storeSchema from '../../schemas/store'
 import { colorMap } from '../../utils/utils'
+import { IconButton } from '../icon-button'
+import IconOnlyButton from '../icon-only-button'
 import ButtonRounded from './button-rounded'
 import SellingLocationForm from './selling-location-form'
 
@@ -142,9 +142,6 @@ export default function SellerFormStepTwo({
   }
   return (
     <div className="space-y-4 w-full p-6" ref={formRef}>
-      <h2 className="font-heading text-gray02 font-bold text-2xl">
-        Novo Vendedor
-      </h2>
       <p>{sellerName}</p>
 
       {/* ________________________ */}
@@ -181,7 +178,7 @@ export default function SellerFormStepTwo({
           onClick={() => setIsAddingSellingLocation(true)}
         >
           <MapPinPlus />
-          Adicionar
+          Adicionar local
         </IconButton>
       </section>
 
@@ -218,7 +215,7 @@ export default function SellerFormStepTwo({
           }
           disabled={boxes.length === 0 && stores.length === 0}
         >
-          Confirmar
+          Finalizar
         </ButtonRounded>
         <button
           type="button"
