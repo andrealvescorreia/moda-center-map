@@ -391,6 +391,86 @@ const sellerPaths: OpenAPIV3.PathsObject = {
         },
       },
     },
+    put: {
+      summary: 'Update a seller by id',
+      description: 'Update the seller by id.',
+      tags: ['Seller'],
+      parameters: [
+        {
+          name: 'id',
+          in: 'path',
+          description: 'The id of the seller',
+          required: true,
+          schema: {
+            type: 'string',
+            format: 'uuid',
+          },
+        },
+      ],
+      requestBody: {
+        required: true,
+        content: {
+          'application/json': {
+            schema: {
+              $ref: '#/components/schemas/UpdateSellerBody',
+            },
+          },
+        },
+      },
+      responses: {
+        '200': {
+          description: 'Seller updated successfully.',
+          content: {
+            'application/json': {
+              schema: {
+                $ref: '#/components/schemas/SellerResponse',
+              },
+            },
+          },
+        },
+        '400': {
+          description: 'Bad request, invalid input data',
+          content: {
+            'application/json': {
+              schema: {
+                $ref: '#/components/schemas/ErrorResponse',
+              },
+              example: {
+                errors: [
+                  {
+                    code: 'TOO_SHORT',
+                    field: 'name',
+                    message: 'String must contain at least 3 character(s)',
+                  },
+                ],
+              },
+            },
+          },
+        },
+        '404': {
+          description:
+            'Seller not found. Returns an error message if the seller does not exist.',
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                properties: {
+                  errors: {
+                    type: 'array',
+                    items: {
+                      type: 'string',
+                    },
+                  },
+                },
+                example: {
+                  message: 'Seller not found',
+                },
+              },
+            },
+          },
+        },
+      },
+    },
   },
   '/seller/search': {
     get: {

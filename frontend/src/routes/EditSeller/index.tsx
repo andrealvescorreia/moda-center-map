@@ -1,32 +1,75 @@
 import { useNetworkState } from '@uidotdev/usehooks'
 import { AxiosError } from 'axios'
 import { SnackbarProvider, enqueueSnackbar } from 'notistack'
-import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useEffect, useState } from 'react'
+import { useNavigate, useParams } from 'react-router-dom'
 import errorsCode from '../../../../shared/operation-errors'
 import SellerForm from '../../components/SellerForm'
 import AlertDialog from '../../components/alert-dialog'
 import LandingPage from '../../components/landing-page'
 import OfflineScreen from '../../components/offline-screen'
-import { createSeller } from '../../http/api'
+import { updateSeller } from '../../http/api'
+import { getSeller } from '../../http/api'
+//import type { EditSeller } from '../../http/responses'
 import { useLoadingContext } from '../../providers/LoadingProvider'
 import { useUserContext } from '../../providers/UserProvider'
 import type { BoxeSchema } from '../../schemas/box'
-import newSellerSchema from '../../schemas/seller'
 import type { StoreSchema } from '../../schemas/store'
+import updateSellerSchema from '../../schemas/updateSeller'
 
-export default function NewSeller() {
+export default function EditSeller() {
+  const { id } = useParams<{ id: string }>()
+  const [doneFetching, setDoneFetching] = useState(false)
+
   const [dialogOpen, setDialogOpen] = useState(false)
   const [errors, setErrors] = useState<Array<string>>([])
   const { user } = useUserContext()
   const { setLoading } = useLoadingContext()
   const navigate = useNavigate()
   const network = useNetworkState()
+  const [seller, setSeller] = useState<{
+    name: string
+    phone_number?: string | undefined
+    boxes: BoxeSchema[]
+    stores: StoreSchema[]
+    product_categories: string[]
+  }>()
+
+  useEffect(() => {
+    if (!id) return
+    setLoading(true)
+
+    getSeller(id)
+      .then((resSeller) => {
+        const sellerBody = {
+          ...resSeller,
+          product_categories: resSeller.product_categories.map(
+            (category) => category.category
+          ),
+        }
+        if (JSON.stringify(seller) !== JSON.stringify(sellerBody)) {
+          setSeller(sellerBody)
+        }
+      })
+      .catch(console.error)
+      .finally(() => {
+        setLoading(false)
+        setDoneFetching(true)
+      })
+  }, [id, seller, setLoading])
 
   if (!network.online) {
     return <OfflineScreen />
   }
   if (!user) return <LandingPage />
+
+  if (!seller && doneFetching) {
+    return (
+      <div className="flex justify-center items-center h-full">
+        <p className="text-gray02 text-2xl pt-10">Vendedor não encontrado</p>
+      </div>
+    )
+  }
 
   const onSubmit = async (seller: {
     name: string
@@ -35,16 +78,15 @@ export default function NewSeller() {
     stores: StoreSchema[]
     product_categories: string[]
   }) => {
-    const sellingLocations = { boxes: seller.boxes, stores: seller.stores }
     const sellerBody = {
       name: seller.name,
-      phone_number:
-        seller.phone_number === '' ? undefined : seller.phone_number,
-      sellingLocations,
+      phone_number: seller.phone_number === '' ? null : seller.phone_number,
+      boxes: seller.boxes,
+      stores: seller.stores,
       product_categories: seller.product_categories,
     }
 
-    const result = newSellerSchema.safeParse(sellerBody)
+    const result = updateSellerSchema.safeParse(sellerBody)
     if (!result.success) {
       setErrors(result.error.issues.map((err) => err.message))
       setDialogOpen(true)
@@ -52,11 +94,13 @@ export default function NewSeller() {
     }
 
     try {
+      if (!id) return
       setLoading(true)
-      const createdSeller = await createSeller(sellerBody)
-      enqueueSnackbar('Vendedor criado com sucesso', { variant: 'success' })
+      const updatedSeller = await updateSeller(id, sellerBody)
+      console.log('updatedSeller', updatedSeller)
+      enqueueSnackbar('Vendedor editado com sucesso', { variant: 'success' })
       setTimeout(() => {
-        navigate(`/sellers/${createdSeller.data.id}`)
+        navigate(`/sellers/${updatedSeller.data.id}`)
       }, 2000)
     } catch (error: unknown) {
       const errorMessages = []
@@ -106,7 +150,7 @@ export default function NewSeller() {
         <AlertDialog
           isOpen={true}
           onClose={() => setDialogOpen(false)}
-          title={'Erro ao Criar Vendedor'}
+          title={'Erro ao Editar Vendedor'}
         >
           {
             <ul className="list-disc space-y-2 p-2">
@@ -119,9 +163,15 @@ export default function NewSeller() {
       )}
       <div className="md:w-1/2 w-full">
         <h2 className="font-heading text-gray04 font-bold text-2xl pt-4 flex items-center justify-center">
-          Novo Vendedor
+          Editar Vendedor
         </h2>
-        <SellerForm onCancel={onCancel} onSubmit={onSubmit} />
+        {seller && (
+          <SellerForm
+            onCancel={onCancel}
+            onSubmit={onSubmit}
+            defaultSeller={seller}
+          />
+        )}
       </div>
     </div>
   )

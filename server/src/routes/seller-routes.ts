@@ -11,11 +11,13 @@ import {
   showByBoxe,
   showByStore,
   unfavorite,
+  update,
 } from '../controllers/seller'
 import loginRequired from '../middleware/loginRequired'
 
 const router = Router()
 router.post('/', loginRequired, create)
+router.put('/id/:id', loginRequired, update)
 router.get('/', index)
 router.get('/id/:id', show)
 router.delete('/id/:id', loginRequired, destroy)

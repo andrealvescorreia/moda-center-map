@@ -195,6 +195,38 @@ const swaggerSchemas: OpenAPIV3.ComponentsObject = {
         },
       },
     },
+    UpdateSellerBody: {
+      type: 'object',
+      required: ['name'],
+      properties: {
+        ...sellerBaseSchema.properties,
+
+        boxes: {
+          type: 'array',
+          uniqueItems: true,
+          items: {
+            ...boxeSchema,
+          },
+        },
+        stores: {
+          type: 'array',
+          uniqueItems: true,
+          items: {
+            ...storeSchema,
+          },
+        },
+
+        product_categories: {
+          type: 'array',
+          items: {
+            type: 'string',
+            description:
+              'The categories of products sold by the seller. Must be one of the existing categories in the system',
+            example: ['Jeans', 'Calçados'],
+          },
+        },
+      },
+    },
     SellerResponse: {
       type: 'object',
       properties: {

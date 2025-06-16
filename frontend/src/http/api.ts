@@ -89,11 +89,23 @@ interface NewSeller {
   name: string
   phone_number: string | undefined
   sellingLocations: { boxes: BoxeSchema[]; stores: StoreSchema[] }
-  productCategories: string[]
+  product_categories: string[]
 }
 
 export async function createSeller(data: NewSeller) {
   return await axiosInstance.post('seller', data)
+}
+
+export interface EditSeller {
+  name: string
+  phone_number: string | undefined | null
+  boxes: BoxeSchema[]
+  stores: StoreSchema[]
+  product_categories: string[]
+}
+
+export async function updateSeller(seller_id: string, data: EditSeller) {
+  return await axiosInstance.put(`seller/id/${seller_id}`, data)
 }
 
 export async function favoriteSeller(seller_id: string) {

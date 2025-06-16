@@ -5,24 +5,26 @@ import { useRef } from 'react'
 import { useForm } from 'react-hook-form'
 import { useHookFormMask } from 'use-mask-input'
 import { z } from 'zod'
-import { InputField, InputRoot } from '../../components/input'
-import sellerSchema from '../../schemas/seller'
+import newSellerSchema from '../../schemas/seller'
+import { InputField, InputRoot } from '../input'
 import ButtonRounded from './button-rounded'
 
 const sellerSchemaStepOne = z.object({
-  name: sellerSchema._def.schema.shape.name,
-  phone_number: sellerSchema._def.schema.shape.phone_number,
+  name: newSellerSchema._def.schema.shape.name,
+  phone_number: newSellerSchema._def.schema.shape.phone_number,
 })
 type SellerSchemaStepOne = z.infer<typeof sellerSchemaStepOne>
 
 interface SellerFormStepOneProps {
   onNext: (data: SellerSchemaStepOne) => void
   onBack: () => void
+  defaultValues?: SellerSchemaStepOne
 }
 
 export default function SellerFormStepOne({
   onNext,
   onBack,
+  defaultValues,
 }: SellerFormStepOneProps) {
   const {
     register,
@@ -49,15 +51,17 @@ export default function SellerFormStepOne({
       ref={formRef}
       className="p-8 space-y-6 w-full"
     >
-      <h2 className="font-heading text-gray04 font-bold text-2xl">
-        Novo Vendedor
-      </h2>
-
       <div className="space-y-3 py-4">
         <div className="space-y-2">
           <label htmlFor="name">Nome</label>
           <InputRoot>
-            <InputField id="name" type="text" autoFocus {...register('name')} />
+            <InputField
+              id="name"
+              type="text"
+              autoFocus
+              {...register('name')}
+              defaultValue={defaultValues?.name}
+            />
           </InputRoot>
 
           {errors?.name && (
@@ -74,6 +78,7 @@ export default function SellerFormStepOne({
             <InputField
               id="phone"
               {...registerWithMask('phone_number', ['99 99999-9999'])}
+              defaultValue={defaultValues?.phone_number}
             />
           </InputRoot>
           {errors?.phone_number && (
@@ -83,7 +88,7 @@ export default function SellerFormStepOne({
           )}
         </div>
       </div>
-      <div className="py-35 mb-0 md:py-3 space-y-3">
+      <div className="py-15 mb-0 md:py-3 space-y-3">
         <ButtonRounded
           type="submit"
           disabled={

@@ -39,7 +39,7 @@ describe('create seller', () => {
     authHeader = header
 
     await ProductCategory.bulkCreate([
-      { category: 'Roupas' },
+      { category: 'Jeans' },
       { category: 'Calçados' },
       { category: 'Acessórios' },
       { category: 'Moda Íntima' },
@@ -74,7 +74,7 @@ describe('create seller', () => {
       sellingLocations: {
         boxes: [{ sector_color: 'white', box_number: 128, street_letter: 'P' }],
       },
-      productCategories: ['Roupas', 'Moda Íntima'],
+      product_categories: ['Jeans', 'Moda Íntima'],
     }
 
     const response = await postSeller(reqBody)
@@ -83,7 +83,7 @@ describe('create seller', () => {
     const seller = await findSeller(reqBody.name, [ProductCategory])
     seller?.should.not.be.null
     seller?.product_categories.length.should.be.equal(2)
-    seller?.product_categories[0].category.should.be.equal('Roupas')
+    seller?.product_categories[0].category.should.be.equal('Jeans')
     seller?.product_categories[1].category.should.be.equal('Moda Íntima')
   })
 
@@ -112,7 +112,7 @@ describe('create seller', () => {
       sellingLocations: {
         boxes: [{ sector_color: 'green', box_number: 2, street_letter: 'A' }],
       },
-      productCategories: ['Automóveis', 'Moda Íntima'],
+      product_categories: ['Automóveis', 'Moda Íntima'],
     }
 
     const response = await postSeller(reqBody)

@@ -42,31 +42,28 @@ export default function SellingLocationForm({
 
       {locationType === 'box' ? (
         <BoxeForm onSubmit={onSubmit}>
-          <div className="space-y-4 py-4">
-            <ButtonRounded type="submit">Adicionar</ButtonRounded>
-            <button
-              type="button"
-              className="px-8 py-3 w-full hover:cursor-pointer"
-              onClick={onBack}
-            >
-              Voltar
-            </button>
-          </div>
+          <ActionButtons />
         </BoxeForm>
       ) : (
         <StoreForm onSubmit={onSubmit}>
-          <div className="space-y-4 py-4">
-            <ButtonRounded type="submit">Adicionar</ButtonRounded>
-            <button
-              type="button"
-              className="px-8 py-3 w-full hover:cursor-pointer"
-              onClick={onBack}
-            >
-              Voltar
-            </button>
-          </div>
+          <ActionButtons />
         </StoreForm>
       )}
     </div>
   )
+
+  function ActionButtons() {
+    return (
+      <div className="space-y-4 py-4">
+        <ButtonRounded type="submit">Adicionar local</ButtonRounded>
+        <button
+          type="button"
+          className="px-8 py-3 w-full hover:cursor-pointer"
+          onClick={onBack}
+        >
+          Voltar
+        </button>
+      </div>
+    )
+  }
 }
