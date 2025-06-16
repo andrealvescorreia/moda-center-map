@@ -11,6 +11,7 @@ import LoadingOverlay from './components/loading-overlay'
 import NavBar from './components/nav'
 import { useLoadingContext } from './providers/LoadingProvider'
 import RouteProvider from './providers/RouteProvider'
+import EditSeller from './routes/EditSeller'
 import NewSeller from './routes/NewSeller'
 import Seller from './routes/Seller'
 import Sellers from './routes/Sellers'
@@ -70,6 +71,7 @@ export default function App() {
             </RouteProvider>
           }
         />
+        <Route path="sellers/:id/edit" element={<EditSeller />} />
         <Route path="new-seller" element={<NewSeller />} />
         <Route path="user" element={<UserProfile />} />
         <Route path="*" element={<NotFound />} />

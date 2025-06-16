@@ -5,13 +5,13 @@ import { useRef } from 'react'
 import { useForm } from 'react-hook-form'
 import { useHookFormMask } from 'use-mask-input'
 import { z } from 'zod'
-import sellerSchema from '../../schemas/seller'
+import newSellerSchema from '../../schemas/seller'
 import { InputField, InputRoot } from '../input'
 import ButtonRounded from './button-rounded'
 
 const sellerSchemaStepOne = z.object({
-  name: sellerSchema._def.schema.shape.name,
-  phone_number: sellerSchema._def.schema.shape.phone_number,
+  name: newSellerSchema._def.schema.shape.name,
+  phone_number: newSellerSchema._def.schema.shape.phone_number,
 })
 type SellerSchemaStepOne = z.infer<typeof sellerSchemaStepOne>
 

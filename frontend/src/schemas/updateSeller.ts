@@ -2,7 +2,7 @@ import { z } from 'zod'
 import boxeSchema from './box'
 import storeSchema from './store'
 
-const newSellerSchema = z
+const updateSellerSchema = z
   .object({
     name: z
       .string()
@@ -12,25 +12,23 @@ const newSellerSchema = z
       .string()
       .transform((value) => value.replace(/[^0-9]/g, ''))
       .optional(),
-    sellingLocations: z.object({
-      boxes: z.array(boxeSchema).optional(),
-      stores: z.array(storeSchema).optional(),
-    }),
+
+    boxes: z.array(boxeSchema).optional(),
+    stores: z.array(storeSchema).optional(),
     productCategories: z.array(z.string()).optional(),
   })
   .superRefine((values, ctx) => {
     if (
-      (!values.sellingLocations.boxes && !values.sellingLocations.stores) ||
-      (values.sellingLocations.boxes?.length === 0 &&
-        values.sellingLocations.stores?.length === 0)
+      (!values.boxes && !values.stores) ||
+      (values.boxes?.length === 0 && values.stores?.length === 0)
     ) {
       ctx.addIssue({
         message: 'O vendedor deve ter ao menos um local de venda.',
         code: z.ZodIssueCode.custom,
-        path: ['sellingLocations'],
+        path: ['boxes', 'stores'],
       })
     }
   })
 
-export default newSellerSchema
-export type SellerSchema = z.infer<typeof newSellerSchema>
+export default updateSellerSchema
+export type SellerSchema = z.infer<typeof updateSellerSchema>

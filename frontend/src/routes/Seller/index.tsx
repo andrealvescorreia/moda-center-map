@@ -4,7 +4,7 @@ import DialogActions from '@mui/material/DialogActions'
 import DialogContent from '@mui/material/DialogContent'
 import DialogTitle from '@mui/material/DialogTitle'
 import L from 'leaflet'
-import { ArrowRight, Bookmark, Phone, Plus, Trash2 } from 'lucide-react'
+import { ArrowRight, Bookmark, Pencil, Phone, Plus, Trash2 } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import { Rectangle } from 'react-leaflet'
 import { MapContainer } from 'react-leaflet'
@@ -388,10 +388,16 @@ export default function Seller() {
               </div>
             )}
 
-            <div className="flex justify-baseline gap-6">
+            <div className="flex justify-baseline gap-4">
               <AddToRouteButton
                 onClick={() => {
                   addToRoute()
+                }}
+              />
+              <EditButton
+                onClick={() => {
+                  snapTo(2)
+                  navigate(`/sellers/${seller?.id}/edit`)
                 }}
               />
               <DeleteButton
@@ -458,23 +464,38 @@ export default function Seller() {
     </div>
   )
 
-  function DeleteButton({ onClick }: { onClick: () => void }) {
+  function AddToRouteButton({ onClick }: { onClick: () => void }) {
     return (
       <IconButton
-        className="opacity-65 text-danger border-danger h-7 text-sm p-2"
         onClick={onClick}
+        className="opacity-75 h-8 text-sm p-3 border-none bg-gray06"
       >
-        <Trash2 size={18} />
-        Deletar
+        <Plus size={18} />
+        Adicionar à rota
       </IconButton>
     )
   }
 
-  function AddToRouteButton({ onClick }: { onClick: () => void }) {
+  function EditButton({ onClick }: { onClick: () => void }) {
     return (
-      <IconButton onClick={onClick} className="opacity-75 h-7 text-sm p-2">
-        <Plus size={18} />
-        Adicionar à rota
+      <IconButton
+        onClick={onClick}
+        className="opacity-75 h-8 text-sm p-3 border-none bg-gray06"
+      >
+        <Pencil size={16} />
+        Editar
+      </IconButton>
+    )
+  }
+
+  function DeleteButton({ onClick }: { onClick: () => void }) {
+    return (
+      <IconButton
+        className="opacity-65 text-danger  p-3 border-none bg-gray06 text-sm h-8"
+        onClick={onClick}
+      >
+        <Trash2 size={16} />
+        Deletar
       </IconButton>
     )
   }
@@ -493,7 +514,7 @@ export default function Seller() {
           className="bg-gray06 rounded-2xl p-0.5 ml-auto hover:cursor-pointer"
           onClick={onClick}
         >
-          <ArrowRight size={26} className="text-green-primary" />
+          <ArrowRight size={26} className="text-gray03" />
         </button>
       </li>
     )

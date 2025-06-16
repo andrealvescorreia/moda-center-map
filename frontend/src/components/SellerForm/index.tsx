@@ -17,15 +17,32 @@ export interface SellerFormProps {
     product_categories: string[]
   }) => void
   onCancel: () => void
+  defaultSeller?: {
+    name: string
+    phone_number?: string | undefined
+    boxes: BoxeSchema[]
+    stores: StoreSchema[]
+    product_categories: string[]
+  }
 }
 
-export default function SellerForm({ onSubmit, onCancel }: SellerFormProps) {
+export default function SellerForm({
+  onSubmit,
+  onCancel,
+  defaultSeller,
+}: SellerFormProps) {
   const [currentStep, setCurrentStep] = useState(1)
-  const [name, setName] = useState('')
-  const [phone_number, setPhoneNumber] = useState<string | undefined>('')
-  const [boxes, setBoxes] = useState<BoxeSchema[]>([])
-  const [stores, setStores] = useState<StoreSchema[]>([])
-  const [productCategories, setProductCategories] = useState<string[]>([])
+  const [name, setName] = useState(defaultSeller?.name || '')
+  const [phone_number, setPhoneNumber] = useState<string | undefined>(
+    defaultSeller?.phone_number || ''
+  )
+  const [boxes, setBoxes] = useState<BoxeSchema[]>(defaultSeller?.boxes || [])
+  const [stores, setStores] = useState<StoreSchema[]>(
+    defaultSeller?.stores || []
+  )
+  const [productCategories, setProductCategories] = useState<string[]>(
+    defaultSeller?.product_categories || []
+  )
   const { user } = useUserContext()
 
   const network = useNetworkState()
