@@ -35,11 +35,20 @@ export async function index(req: Request, res: Response, next: NextFunction) {
         ],
       ],
       include: [
-        { model: Boxe, attributes: { exclude: ['createdAt', 'updatedAt'] } },
-        { model: Store, attributes: { exclude: ['createdAt', 'updatedAt'] } },
+        {
+          model: Boxe,
+          attributes: { exclude: ['createdAt', 'updatedAt', 'seller_id'] },
+        },
+        {
+          model: Store,
+          attributes: { exclude: ['createdAt', 'updatedAt', 'seller_id'] },
+        },
         {
           model: ProductCategory,
-          attributes: { exclude: ['createdAt', 'updatedAt'] },
+          attributes: {
+            exclude: ['createdAt', 'updatedAt'],
+          },
+          through: { attributes: [] }, // Exclude the join table attributes (SellerProductCategories)
         },
       ],
       attributes: { exclude: ['updatedAt', 'search_vector'] },
@@ -54,11 +63,20 @@ async function findSellerById(id: string) {
   return await Seller.findOne({
     where: { id: id },
     include: [
-      { model: Boxe, attributes: { exclude: ['createdAt', 'updatedAt'] } },
-      { model: Store, attributes: { exclude: ['createdAt', 'updatedAt'] } },
+      {
+        model: Boxe,
+        attributes: { exclude: ['createdAt', 'updatedAt', 'seller_id'] },
+      },
+      {
+        model: Store,
+        attributes: { exclude: ['createdAt', 'updatedAt', 'seller_id'] },
+      },
       {
         model: ProductCategory,
-        attributes: { exclude: ['createdAt', 'updatedAt'] },
+        attributes: {
+          exclude: ['createdAt', 'updatedAt'],
+        },
+        through: { attributes: [] }, // Exclude the join table attributes (SellerProductCategories)
       },
     ],
     attributes: { exclude: ['createdAt', 'updatedAt', 'search_vector'] },
