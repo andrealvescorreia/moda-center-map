@@ -20,6 +20,9 @@ export default function NewSeller() {
   const [currentStep, setCurrentStep] = useState(1)
   const [name, setName] = useState('')
   const [phone_number, setPhoneNumber] = useState<string | undefined>('')
+  const [boxes, setBoxes] = useState<BoxeSchema[]>([])
+  const [stores, setStores] = useState<StoreSchema[]>([])
+  const [productCategories, setProductCategories] = useState<string[]>([])
   const [dialogOpen, setDialogOpen] = useState(false)
   const [errors, setErrors] = useState<Array<string>>([])
   const { user } = useUserContext()
@@ -30,6 +33,8 @@ export default function NewSeller() {
   if (!network.online) {
     return <OfflineScreen />
   }
+  if (!user) return <LandingPage />
+
   interface StepOne {
     name: string
     phone_number?: string | undefined
@@ -114,7 +119,17 @@ export default function NewSeller() {
     window.history.back()
   }
 
-  if (!user) return <LandingPage />
+  const onGoBackToStepOne = async ({
+    boxes,
+    stores,
+    product_categories,
+  }: StepTwo) => {
+    setBoxes(boxes)
+    setStores(stores)
+    setProductCategories(product_categories)
+    setCurrentStep(1)
+  }
+
   return (
     <div className="flex md:justify-center md:items-center flex-col h-screen">
       <SnackbarProvider />
@@ -138,14 +153,23 @@ export default function NewSeller() {
           switch (currentStep) {
             case 1:
               return (
-                <SellerFormStepOne onNext={onSubmitStepOne} onBack={onCancel} />
+                <SellerFormStepOne
+                  onNext={onSubmitStepOne}
+                  onBack={onCancel}
+                  defaultValues={{ name, phone_number }}
+                />
               )
             case 2:
               return (
                 <SellerFormStepTwo
                   onNext={onSubmitStepTwo}
-                  onBack={onCancel}
+                  onBack={onGoBackToStepOne}
                   sellerName={name}
+                  defaultValues={{
+                    boxes,
+                    stores,
+                    product_categories: productCategories,
+                  }}
                 />
               )
             default:

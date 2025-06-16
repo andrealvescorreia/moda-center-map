@@ -18,11 +18,13 @@ type SellerSchemaStepOne = z.infer<typeof sellerSchemaStepOne>
 interface SellerFormStepOneProps {
   onNext: (data: SellerSchemaStepOne) => void
   onBack: () => void
+  defaultValues?: SellerSchemaStepOne
 }
 
 export default function SellerFormStepOne({
   onNext,
   onBack,
+  defaultValues,
 }: SellerFormStepOneProps) {
   const {
     register,
@@ -57,7 +59,13 @@ export default function SellerFormStepOne({
         <div className="space-y-2">
           <label htmlFor="name">Nome</label>
           <InputRoot>
-            <InputField id="name" type="text" autoFocus {...register('name')} />
+            <InputField
+              id="name"
+              type="text"
+              autoFocus
+              {...register('name')}
+              defaultValue={defaultValues?.name}
+            />
           </InputRoot>
 
           {errors?.name && (
@@ -74,6 +82,7 @@ export default function SellerFormStepOne({
             <InputField
               id="phone"
               {...registerWithMask('phone_number', ['99 99999-9999'])}
+              defaultValue={defaultValues?.phone_number}
             />
           </InputRoot>
           {errors?.phone_number && (
