@@ -389,7 +389,7 @@ export async function update(req: Request, res: Response, next: NextFunction) {
       const updatedSeller = await findSellerById(req.params.id)
       if (!updatedSeller) return
 
-      res.status(200).json({ updatedSeller })
+      res.status(200).json(updatedSeller)
       return
     } catch (error) {
       await t.rollback()
