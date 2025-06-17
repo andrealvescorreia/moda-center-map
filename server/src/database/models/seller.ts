@@ -7,6 +7,7 @@ import {
   Table,
 } from 'sequelize-typescript'
 import Boxe from './boxe'
+import Notes from './note'
 import ProductCategory from './product-category'
 import SellerProductCategories from './seller-product-categories'
 import Store from './store'
@@ -52,11 +53,17 @@ export default class Seller extends Model {
   @HasMany(() => Store, { onDelete: 'CASCADE' })
   declare stores: Store[]
 
-  @BelongsToMany(() => User, {
-    through: () => UserFavoriteSellers,
-    onDelete: 'CASCADE',
-  })
-  declare users: User[]
+  @BelongsToMany(
+    () => User,
+    () => UserFavoriteSellers
+  )
+  declare favorite_users: User[]
+
+  @BelongsToMany(
+    () => User,
+    () => Notes
+  )
+  declare users_notes: User[]
 
   @BelongsToMany(() => ProductCategory, {
     through: () => SellerProductCategories,
