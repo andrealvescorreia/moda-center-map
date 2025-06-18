@@ -5,6 +5,7 @@ import L from 'leaflet'
 import { useEffect, useState } from 'react'
 import { useMemo, useRef } from 'react'
 import { Marker } from 'react-leaflet'
+import { set } from 'zod'
 import Logo from '../../assets/logo.png'
 import PersonMarker from '../../assets/person.png'
 import { ClickPosition } from '../../components/Map/click-position'
@@ -26,7 +27,7 @@ const modaCenterGridMap = new ModaCenterGridMap()
 const minZoomLevelToRenderMarkers = 5
 
 function Home() {
-  const { route } = useRouteContext()
+  const { route, setRoute } = useRouteContext()
   const { show, setShow } = useNavContext()
   const { user } = useUserContext()
   const [isSearching, setIsSearching] = useState(false)
@@ -82,6 +83,7 @@ function Home() {
         route?.inicio?.position.y ?? 0,
         route?.inicio?.position.x ?? 0,
       ])
+      setRoute((prev) => (prev ? { ...prev } : undefined)) // force re-render to update marker position
       return
     }
 
@@ -98,6 +100,7 @@ function Home() {
         route?.inicio?.position.y ?? 0,
         route?.inicio?.position.x ?? 0,
       ])
+      setRoute((prev) => (prev ? { ...prev } : undefined)) // force re-render to update marker position
       return
     }
 
