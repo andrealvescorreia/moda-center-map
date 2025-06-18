@@ -100,6 +100,19 @@ describe('seller note', () => {
     response.body.text.should.equal('Note has been changed')
   })
 
+  it('should edit a note for a seller when text is empty', async () => {
+    const seller = await findSellerByName('Olivia Palito moda feminina')
+    const text = ''
+    const response = await request(app)
+      .put(`/seller/id/${seller?.id}/note`)
+      .set('Cookie', authHeader['set-cookie'])
+      .send({ text })
+    response.status.should.equal(200)
+    response.body.should.have.property('id')
+    response.body.should.have.property('text')
+    response.body.text.should.equal(text)
+  })
+
   it('should return 404 if user have not added note to seller', async () => {
     const seller = await findSellerByName('Lobo Manso')
     const response = await request(app)
