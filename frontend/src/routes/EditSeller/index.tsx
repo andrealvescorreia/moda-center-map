@@ -10,7 +10,6 @@ import LandingPage from '../../components/landing-page'
 import OfflineScreen from '../../components/offline-screen'
 import { updateSeller } from '../../http/api'
 import { getSeller } from '../../http/api'
-//import type { EditSeller } from '../../http/responses'
 import { useLoadingContext } from '../../providers/LoadingProvider'
 import { useUserContext } from '../../providers/UserProvider'
 import type { BoxeSchema } from '../../schemas/box'
@@ -140,7 +139,7 @@ export default function EditSeller() {
     }
   }
   const onCancel = () => {
-    navigate('/sellers')
+    navigate(-1)
   }
 
   return (

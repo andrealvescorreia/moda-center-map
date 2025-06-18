@@ -20,7 +20,7 @@ export function IconButton({
       type={type}
       disabled={disabled}
       className={twMerge(
-        'px-3 py-1.5 text-blue rounded-4xl cursor-pointer transition-colors duration-300 flex items-center justify-center gap-1 disabled:opacity-50 disabled:cursor-not-allowed',
+        'px-3 py-1.5 text-blue rounded-4xl cursor-pointer transition-colors duration-300 flex items-center justify-center gap-1 disabled:opacity-50 disabled:cursor-not-allowed text-nowrap',
         typeStyles[type],
         className
       )}

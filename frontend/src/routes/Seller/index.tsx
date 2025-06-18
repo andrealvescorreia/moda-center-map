@@ -38,6 +38,7 @@ import {
 import SellerCard from './seller-card'
 
 import { useNetworkState } from '@uidotdev/usehooks'
+import SellerNote from '../../components/Note/seller-note'
 import OfflineScreen from '../../components/offline-screen'
 import { useLoadingContext } from '../../providers/LoadingProvider'
 import { useRouteContext } from '../../providers/RouteProvider'
@@ -271,6 +272,7 @@ export default function Seller() {
         onClose={() => setModalOpen(false)}
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
+        sx={{ zIndex: 10000 }} // valor maior que o do Sheet
       >
         <DialogTitle id="alert-dialog-title">Deletar Vendedor</DialogTitle>
         <DialogContent>
@@ -291,7 +293,11 @@ export default function Seller() {
   }
   function OkModal(text: string, onOK?: () => void) {
     return (
-      <Dialog open={true} onClose={() => setModalOpen(false)}>
+      <Dialog
+        open={true}
+        onClose={() => setModalOpen(false)}
+        sx={{ zIndex: 10000 }} // valor maior que o do Sheet
+      >
         <DialogContent>
           <p className="text-gray02">{text}</p>
         </DialogContent>
@@ -328,13 +334,14 @@ export default function Seller() {
         isOpen={true}
         onClose={onClose}
         snapPoints={[
-          isMultiLocationSeller.current ? 1000 : 230,
-          isMultiLocationSeller.current ? 380 : 230,
-          140,
+          isMultiLocationSeller.current ? 1000 : 300,
+          isMultiLocationSeller.current ? 380 : 300,
+          130,
         ]}
         onCloseEnd={onClose}
         onOpenEnd={() => snapTo(1)}
         initialSnap={1}
+        className="md:max-w-100  md:ml-[50%] md:-translate-x-1/2"
       >
         <Sheet.Container>
           <SheetHeaderTitle onDismiss={onClose}>
@@ -347,7 +354,7 @@ export default function Seller() {
               </h2>
             )}
           </SheetHeaderTitle>
-          <Sheet.Content className="flex gap-3 pl-5 pt-2 mt-4 md:w-120 ">
+          <Sheet.Content className="flex gap-3 px-5 pt-2 mt-4 ">
             {seller && (
               <SellerCard
                 name={seller.name}
@@ -388,7 +395,7 @@ export default function Seller() {
               </div>
             )}
 
-            <div className="flex justify-baseline gap-4">
+            <div className="flex justify-baseline gap-4 overflow-auto">
               <AddToRouteButton
                 onClick={() => {
                   addToRoute()
@@ -396,18 +403,17 @@ export default function Seller() {
               />
               <EditButton
                 onClick={() => {
-                  snapTo(2)
                   navigate(`/sellers/${seller?.id}/edit`)
                 }}
               />
               <DeleteButton
                 onClick={() => {
-                  snapTo(2)
                   setModalComponent(DeleteSellerModal())
                   setModalOpen(true)
                 }}
               />
             </div>
+            <SellerNote seller_id={seller?.id || ''} />
             {isMultiLocationSeller.current && (
               <div className="pt-5">
                 <h3 className="text-lg font-semibold text-gray02">
@@ -468,7 +474,7 @@ export default function Seller() {
     return (
       <IconButton
         onClick={onClick}
-        className="opacity-75 h-8 text-sm p-3 border-none bg-gray06"
+        className="opacity-75 h-8 text-sm p-3 border-none bg-gray06 max-h-8"
       >
         <Plus size={18} />
         Adicionar à rota

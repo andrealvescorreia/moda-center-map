@@ -3,6 +3,7 @@ import { Sequelize } from 'sequelize-typescript'
 import configs from '../config/database'
 import { env } from '../env'
 import Boxe from './models/boxe'
+import Notes from './models/note'
 import ProductCategory from './models/product-category'
 import Seller from './models/seller'
 import SellerProductCategories from './models/seller-product-categories'
@@ -17,6 +18,7 @@ const models = [
   Boxe,
   Store,
   UserFavoriteSellers,
+  Notes,
   SellerProductCategories,
 ]
 

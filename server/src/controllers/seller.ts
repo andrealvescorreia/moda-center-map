@@ -1,5 +1,5 @@
 import type { NextFunction, Request, Response } from 'express'
-import { Sequelize, type Transaction } from 'sequelize'
+import { Sequelize } from 'sequelize'
 import z from 'zod'
 import sequelize from '../database'
 import Boxe from '../database/models/boxe'
@@ -61,7 +61,7 @@ export async function index(req: Request, res: Response, next: NextFunction) {
 }
 async function findSellerById(id: string) {
   return await Seller.findOne({
-    where: { id: id },
+    where: { id },
     include: [
       {
         model: Boxe,
@@ -76,7 +76,7 @@ async function findSellerById(id: string) {
         attributes: {
           exclude: ['createdAt', 'updatedAt'],
         },
-        through: { attributes: [] }, // Exclude the join table attributes (SellerProductCategories)
+        through: { attributes: [] },
       },
     ],
     attributes: { exclude: ['createdAt', 'updatedAt', 'search_vector'] },
@@ -94,6 +94,20 @@ async function findSellerByReqId(req: Request, res: Response) {
     return
   }
   return seller
+}
+
+const findUserByReqId = async (req: Request, res: Response) => {
+  const user_id = req.body.userId
+  if (!user_id) {
+    res.status(401).json({ message: 'Unauthorized' })
+    return
+  }
+  const user = await User.findOne({ where: { id: user_id } })
+  if (!user) {
+    res.status(404).json({ message: 'User not found' })
+    return
+  }
+  return user
 }
 
 export async function show(req: Request, res: Response, next: NextFunction) {
@@ -130,18 +144,7 @@ export async function showByBoxe(
       return
     }
 
-    const seller = await Seller.findOne({
-      where: { id: boxe.seller_id },
-      include: [
-        { model: Boxe, attributes: { exclude: ['createdAt', 'updatedAt'] } },
-        { model: Store, attributes: { exclude: ['createdAt', 'updatedAt'] } },
-        {
-          model: ProductCategory,
-          attributes: { exclude: ['createdAt', 'updatedAt', 'search_vector'] },
-        },
-      ],
-      attributes: { exclude: ['createdAt', 'updatedAt'] },
-    })
+    const seller = await findSellerById(boxe.seller_id)
 
     res.status(200).json(seller)
     return
@@ -173,18 +176,7 @@ export async function showByStore(
       return
     }
 
-    const seller = await Seller.findOne({
-      where: { id: store.seller_id },
-      include: [
-        { model: Boxe, attributes: { exclude: ['createdAt', 'updatedAt'] } },
-        { model: Store, attributes: { exclude: ['createdAt', 'updatedAt'] } },
-        {
-          model: ProductCategory,
-          attributes: { exclude: ['createdAt', 'updatedAt'] },
-        },
-      ],
-      attributes: { exclude: ['createdAt', 'updatedAt', 'search_vector'] },
-    })
+    const seller = await findSellerById(store.seller_id)
 
     res.status(200).json(seller)
     return
@@ -402,15 +394,9 @@ export async function update(req: Request, res: Response, next: NextFunction) {
 
 export async function destroy(req: Request, res: Response, next: NextFunction) {
   try {
-    if (!z.string().uuid().safeParse(req.params.id).success) {
-      res.status(400).json({ message: 'Invalid id' })
-      return
-    }
-    const seller = await Seller.findOne({ where: { id: req.params.id } })
-    if (!seller) {
-      res.status(404).json({ message: 'Seller not found' })
-      return
-    }
+    const seller = await findSellerByReqId(req, res)
+    if (!seller) return
+
     await Seller.destroy({ where: { id: req.params.id } })
     res.status(204).send()
     return
@@ -425,27 +411,10 @@ export async function favorite(
   next: NextFunction
 ) {
   try {
-    if (!z.string().uuid().safeParse(req.params.id).success) {
-      res.status(400).json({ message: 'Invalid id' })
-      return
-    }
-
-    const seller = await Seller.findOne({ where: { id: req.params.id } })
-    if (!seller) {
-      res.status(404).json({ message: 'Seller not found' })
-      return
-    }
-
-    const user_id = req.body.userId
-    if (!user_id) {
-      res.status(401).json({ message: 'Unauthorized' })
-      return
-    }
-    const user = await User.findOne({ where: { id: user_id } })
-    if (!user) {
-      res.status(404).json({ message: 'User not found' })
-      return
-    }
+    const seller = await findSellerByReqId(req, res)
+    if (!seller) return
+    const user = await findUserByReqId(req, res)
+    if (!user) return
 
     await user.$add('favorite_sellers', seller)
     res.status(200).json({ message: 'Seller favorited' })
@@ -460,27 +429,10 @@ export async function unfavorite(
   next: NextFunction
 ) {
   try {
-    if (!z.string().uuid().safeParse(req.params.id).success) {
-      res.status(400).json({ message: 'Invalid id' })
-      return
-    }
-
-    const seller = await Seller.findOne({ where: { id: req.params.id } })
-    if (!seller) {
-      res.status(404).json({ message: 'Seller not found' })
-      return
-    }
-
-    const user_id = req.body.userId
-    if (!user_id) {
-      res.status(401).json({ message: 'Unauthorized' })
-      return
-    }
-    const user = await User.findOne({ where: { id: user_id } })
-    if (!user) {
-      res.status(404).json({ message: 'User not found' })
-      return
-    }
+    const seller = await findSellerByReqId(req, res)
+    if (!seller) return
+    const user = await findUserByReqId(req, res)
+    if (!user) return
 
     await user.$remove('favorite_sellers', seller)
     res.status(200).json({ message: 'Seller unfavorited' })
@@ -496,16 +448,8 @@ export async function indexFavorites(
   next: NextFunction
 ) {
   try {
-    const user_id = req.body.userId
-    if (!user_id) {
-      res.status(401).json({ message: 'Unauthorized' })
-      return
-    }
-    const user = await User.findOne({ where: { id: user_id } })
-    if (!user) {
-      res.status(404).json({ message: 'User not found' })
-      return
-    }
+    const user = await findUserByReqId(req, res)
+    if (!user) return
 
     const favoriteSellers = await user.$get('favorite_sellers', {
       include: [
@@ -531,30 +475,57 @@ export async function isFavorite(
   next: NextFunction
 ) {
   try {
-    if (!z.string().uuid().safeParse(req.params.id).success) {
-      res.status(400).json({ message: 'Invalid id' })
-      return
-    }
-
-    const seller = await Seller.findOne({ where: { id: req.params.id } })
-    if (!seller) {
-      res.status(404).json({ message: 'Seller not found' })
-      return
-    }
-
-    const user_id = req.body.userId
-    if (!user_id) {
-      res.status(401).json({ message: 'Unauthorized' })
-      return
-    }
-    const user = await User.findOne({ where: { id: user_id } })
-    if (!user) {
-      res.status(404).json({ message: 'User not found' })
-      return
-    }
+    const seller = await findSellerByReqId(req, res)
+    if (!seller) return
+    const user = await findUserByReqId(req, res)
+    if (!user) return
 
     const isFavorite = await user.$has('favorite_sellers', seller)
     res.status(200).json({ isFavorite })
+    return
+  } catch (error) {
+    return next(error)
+  }
+}
+
+export async function putNote(req: Request, res: Response, next: NextFunction) {
+  try {
+    const seller = await findSellerByReqId(req, res)
+    if (!seller) return
+    const user = await findUserByReqId(req, res)
+    if (!user) return
+
+    const text = req.body.text
+    if (text === undefined || text === null) {
+      res.status(400).json({ message: 'text is required' })
+      return
+    }
+    await user.$add('sellers_notes', seller, { through: { text } })
+    const notes = await user.$get('notes', {
+      where: { seller_id: seller.id },
+    })
+    res.status(200).json({ id: notes[0].id, text: notes[0].text })
+    return
+  } catch (error) {
+    return next(error)
+  }
+}
+
+export async function getNote(req: Request, res: Response, next: NextFunction) {
+  try {
+    const seller = await findSellerByReqId(req, res)
+    if (!seller) return
+    const user = await findUserByReqId(req, res)
+    if (!user) return
+
+    const notes = await user.$get('notes', {
+      where: { seller_id: seller.id },
+    })
+    if (notes.length === 0) {
+      res.status(404).json({ message: 'Note not found' })
+      return
+    }
+    res.status(200).json({ id: notes[0].id, text: notes[0].text })
     return
   } catch (error) {
     return next(error)

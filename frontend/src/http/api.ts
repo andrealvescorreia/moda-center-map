@@ -112,6 +112,14 @@ export async function favoriteSeller(seller_id: string) {
   return await axiosInstance.post(`seller/favorite/${seller_id}`)
 }
 
+export async function getNote(seller_id: string) {
+  return await axiosInstance.get(`seller/id/${seller_id}/note`)
+}
+
+export async function putNote(seller_id: string, note: string) {
+  return await axiosInstance.put(`seller/id/${seller_id}/note`, { text: note })
+}
+
 export async function unfavoriteSeller(seller_id: string) {
   return await axiosInstance.delete(`seller/favorite/${seller_id}`)
 }

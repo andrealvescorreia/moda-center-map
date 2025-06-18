@@ -104,6 +104,7 @@ const sellerPaths: OpenAPIV3.PathsObject = {
       },
     },
   },
+
   '/seller/boxe': {
     get: {
       summary: 'Get seller by boxe',
@@ -472,6 +473,184 @@ const sellerPaths: OpenAPIV3.PathsObject = {
       },
     },
   },
+  '/seller/id/{id}/note': {
+    put: {
+      summary: 'Add a note to a seller',
+      description: 'A personal note for a seller, only visible to the user.',
+      tags: ['Seller'],
+      parameters: [
+        {
+          name: 'id',
+          in: 'path',
+          description: 'The id of the seller',
+          required: true,
+          schema: {
+            type: 'string',
+            format: 'uuid',
+          },
+        },
+      ],
+      requestBody: {
+        required: true,
+        content: {
+          'application/json': {
+            schema: {
+              type: 'object',
+              properties: {
+                text: {
+                  type: 'string',
+                  description: 'The text of the note',
+                  example: 'This is a test note,\n hello friend.',
+                },
+              },
+            },
+          },
+        },
+      },
+      responses: {
+        '200': {
+          description: 'Note saved sucessfully.',
+          content: {
+            'application/json': {
+              schema: {
+                properties: {
+                  id: {
+                    type: 'string',
+                    description:
+                      'The id of the note, generated on creation, in UUID format',
+                    format: 'uuid',
+                  },
+                  text: {
+                    type: 'string',
+                    description: 'The text of the note',
+                    example: 'This is a test note,\n hello friend.',
+                  },
+                },
+              },
+            },
+          },
+        },
+        '400': {
+          description: 'Bad request, invalid id format',
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                properties: {
+                  errors: {
+                    type: 'array',
+                    items: {
+                      type: 'string',
+                    },
+                  },
+                },
+                example: {
+                  message: 'Invalid id',
+                },
+              },
+            },
+          },
+        },
+        '404': {
+          description:
+            'Seller or current User not found. Returns an error message.',
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                properties: {
+                  message: {
+                    type: 'string',
+                    description: 'Error message',
+                    example: 'Seller not found',
+                  },
+                },
+              },
+            },
+          },
+        },
+        '401': {
+          description: 'Unauthorized, user not logged in',
+          content: {
+            'application/json': {
+              schema: {
+                $ref: '#/components/schemas/UnauthorizedResponse',
+              },
+            },
+          },
+        },
+      },
+    },
+    get: {
+      summary: 'Get note about seller',
+      description: 'A personal note for a seller, only visible to the user.',
+      tags: ['Seller'],
+      parameters: [
+        {
+          name: 'id',
+          in: 'path',
+          description: 'The id of the seller',
+          required: true,
+          schema: {
+            type: 'string',
+            format: 'uuid',
+          },
+        },
+      ],
+      responses: {
+        '200': {
+          description: 'Note found.',
+          content: {
+            'application/json': {
+              schema: {
+                properties: {
+                  id: {
+                    type: 'string',
+                    description:
+                      'The id of the note, generated on creation, in UUID format',
+                    format: 'uuid',
+                  },
+                  text: {
+                    type: 'string',
+                    description: 'The text of the note',
+                    example: 'This is a test note,\n hello friend.',
+                  },
+                },
+              },
+            },
+          },
+        },
+        '404': {
+          description:
+            'Seller, Note or current User not found. Returns an error message.',
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                properties: {
+                  message: {
+                    type: 'string',
+                    description: 'Error message',
+                    example: 'Note not found',
+                  },
+                },
+              },
+            },
+          },
+        },
+        '401': {
+          description: 'Unauthorized, user not logged in',
+          content: {
+            'application/json': {
+              schema: {
+                $ref: '#/components/schemas/UnauthorizedResponse',
+              },
+            },
+          },
+        },
+      },
+    },
+  },
   '/seller/search': {
     get: {
       summary: 'Search seller',
@@ -697,6 +876,7 @@ const sellerPaths: OpenAPIV3.PathsObject = {
       },
     },
   },
+
   '/seller/favorite': {
     get: {
       summary: 'Get all favorite sellers',

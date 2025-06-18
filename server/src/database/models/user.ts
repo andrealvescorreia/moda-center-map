@@ -5,9 +5,11 @@ import {
   BelongsToMany,
   Column,
   DataType,
+  HasMany,
   Model,
   Table,
 } from 'sequelize-typescript'
+import Notes from './note'
 import Seller from './seller'
 import UserFavoriteSellers from './user-favorite-sellers'
 
@@ -48,6 +50,15 @@ export default class User extends Model {
     () => UserFavoriteSellers //associative table
   )
   declare favorite_sellers: Seller[]
+
+  @BelongsToMany(
+    () => Seller,
+    () => Notes
+  )
+  declare sellers_notes: Seller[]
+
+  @HasMany(() => Notes, { onDelete: 'CASCADE' })
+  declare notes: Notes[]
 
   @BeforeCreate
   static async hashPassword(user: User) {

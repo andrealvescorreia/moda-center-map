@@ -3,9 +3,11 @@ import {
   create,
   destroy,
   favorite,
+  getNote,
   index,
   indexFavorites,
   isFavorite,
+  putNote,
   search,
   show,
   showByBoxe,
@@ -18,6 +20,8 @@ import loginRequired from '../middleware/loginRequired'
 const router = Router()
 router.post('/', loginRequired, create)
 router.put('/id/:id', loginRequired, update)
+router.put('/id/:id/note', loginRequired, putNote)
+router.get('/id/:id/note', loginRequired, getNote)
 router.get('/', index)
 router.get('/id/:id', show)
 router.delete('/id/:id', loginRequired, destroy)

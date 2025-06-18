@@ -24,9 +24,6 @@ export function DestinyList({
   }, [])
 
   if (reducedView && route.destinos.length > 2) {
-    const divider = (
-      <div className="bg-gray05 w-full h-[1.2px] absolute bottom-0 rounded-2xl" />
-    )
     const upwardsLine = (
       <div className="h-[50%] absolute -top-2 border-solid border-[1.4px] border-gray05" />
     )
@@ -36,7 +33,7 @@ export function DestinyList({
 
     return (
       <div className="w-full h-full ">
-        <ul className="bg-white  rounded-md py-1" ref={listRef}>
+        <ul className="bg-white  rounded-md" ref={listRef}>
           {route.inicio && (
             <DestinyLiItem
               index={-1}
@@ -57,8 +54,6 @@ export function DestinyList({
               <div className="text-base">
                 {route.destinos.length - 1} paradas
               </div>
-
-              {divider}
             </div>
           </li>
 
@@ -75,7 +70,7 @@ export function DestinyList({
 
   return (
     <div className="w-full h-full">
-      <ul className="bg-white  rounded-md py-2" ref={listRef}>
+      <ul className="bg-white  rounded-md " ref={listRef}>
         {route.inicio && (
           <DestinyLiItem
             index={-1}
@@ -151,9 +146,6 @@ function DestinyLiItem({
       </span>
     )
   }
-  const divider = (
-    <div className="bg-gray05 w-full h-[1.2px]  absolute bottom-0 rounded-2xl -mb-1" />
-  )
 
   const upwardsLine = (
     <div className="h-[50%] absolute -top-2 border-solid border-[1.4px] border-gray05" />
@@ -165,7 +157,7 @@ function DestinyLiItem({
   return (
     <li
       key={`${destiny.sellingLocation.setor}-${destiny.position.x}-${destiny.position.y}`}
-      className="list-none w-full py-1.5 max-h-10 md:max-h-12
+      className="list-none w-full py-1.5 max-h-12
        px-2 gap-1 grid grid-cols-[8%_auto_8%] items-center"
     >
       <div className="h-full flex justify-center items-center relative">
@@ -178,11 +170,10 @@ function DestinyLiItem({
           {locationName}
         </p>
         {!reducedView && (
-          <p className="text-sm -mt-1.5 md:mt-0 md:text-xs text-gray04">
+          <p className="text-sm -mt-1.2 md:mt-0 md:text-xs text-gray04">
             {location}
           </p>
         )}
-        {!isEndingPoint && divider}
       </div>
       {!isStartingPoint && !reducedView && (
         <button
