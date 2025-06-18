@@ -271,6 +271,7 @@ export default function Seller() {
         onClose={() => setModalOpen(false)}
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
+        sx={{ zIndex: 10000 }} // valor maior que o do Sheet
       >
         <DialogTitle id="alert-dialog-title">Deletar Vendedor</DialogTitle>
         <DialogContent>
@@ -339,6 +340,7 @@ export default function Seller() {
         onCloseEnd={onClose}
         onOpenEnd={() => snapTo(1)}
         initialSnap={1}
+        className="md:w-110"
       >
         <Sheet.Container>
           <SheetHeaderTitle onDismiss={onClose}>
