@@ -1,9 +1,8 @@
 import type { NextFunction, Request, Response } from 'express'
-import { Sequelize, type Transaction } from 'sequelize'
+import { Sequelize } from 'sequelize'
 import z from 'zod'
 import sequelize from '../database'
 import Boxe from '../database/models/boxe'
-import type Notes from '../database/models/note'
 import ProductCategory from '../database/models/product-category'
 import Seller from '../database/models/seller'
 import Store from '../database/models/store'
@@ -62,7 +61,7 @@ export async function index(req: Request, res: Response, next: NextFunction) {
 }
 async function findSellerById(id: string) {
   return await Seller.findOne({
-    where: { id: id },
+    where: { id },
     include: [
       {
         model: Boxe,
@@ -77,7 +76,7 @@ async function findSellerById(id: string) {
         attributes: {
           exclude: ['createdAt', 'updatedAt'],
         },
-        through: { attributes: [] }, // Exclude the join table attributes (SellerProductCategories)
+        through: { attributes: [] },
       },
     ],
     attributes: { exclude: ['createdAt', 'updatedAt', 'search_vector'] },
