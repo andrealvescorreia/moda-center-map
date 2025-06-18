@@ -496,7 +496,7 @@ export async function putNote(req: Request, res: Response, next: NextFunction) {
     if (!user) return
 
     const text = req.body.text
-    if (!text) {
+    if (text === undefined || text === null) {
       res.status(400).json({ message: 'text is required' })
       return
     }
