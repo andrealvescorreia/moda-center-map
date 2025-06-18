@@ -254,9 +254,9 @@ const RouteEditor = ({
               <h2 className="pl-4 text-[1.3rem] md:text-lg">Minha rota</h2>
             </SheetHeaderTitle>
             <Sheet.Content className="flex gap-3 pl-5 pt-2.5 md:pl-2">
-              <div className="flex gap-3 overflow-x-auto pb-3 md:flex-col md:pr-3 md:h-38">
+              <div className="flex gap-3 overflow-x-auto pb-3 md:flex-col md:pr-3 md:h-38 min-h-10 pr-5">
                 <IconButton
-                  className="shrink-0 md:h-7 text-sm  md:text-xs"
+                  className="shrink-0 h-8 md:h-7 text-sm  md:text-xs"
                   type="submit"
                   onClick={onStart}
                   disabled={route.destinos.length === 0}
@@ -266,7 +266,7 @@ const RouteEditor = ({
                 </IconButton>
 
                 <IconButton
-                  className="shrink-0  md:h-7 text-sm  md:text-xs"
+                  className="shrink-0 h-8 md:h-7 text-sm md:text-xs"
                   onClick={() => {
                     setIsAddingDestiny(true)
                     setIsEditingMarcadorInicio(false)
@@ -277,7 +277,7 @@ const RouteEditor = ({
                 </IconButton>
 
                 <IconButton
-                  className="shrink-0 text-sm md:h-7 md:text-xs"
+                  className="shrink-0 h-8 text-sm md:h-7 md:text-xs"
                   onClick={() => {
                     setIsEditingMarcadorInicio(true)
                     notAddingDestiny()
@@ -288,7 +288,7 @@ const RouteEditor = ({
                 </IconButton>
 
                 <IconButton
-                  className="shrink-0 text-sm md:h-7 md:text-xs"
+                  className="shrink-0 h-8 text-sm md:h-7 md:text-xs"
                   type="reset"
                   onClick={() => {
                     deleteRoute()
@@ -296,16 +296,20 @@ const RouteEditor = ({
                   }}
                 >
                   <Trash size={20} />
-                  Excluir
+                  Limpar
                 </IconButton>
               </div>
-
-              <div className="pt-2 md:pt-0 overflow-y-auto max-w-[97%] md:text-xs">
-                <DestinyList
-                  route={{ ...bestRoute, inicio: route.inicio }}
-                  onClickRemoveDestiny={removeDestiny}
-                />
-              </div>
+              {
+                // https://github.com/Temzasse/react-modal-sheet/issues/154
+              }
+              <Sheet.Scroller>
+                <div className="pr-3 md:text-xs pb-15">
+                  <DestinyList
+                    route={{ ...bestRoute, inicio: route.inicio }}
+                    onClickRemoveDestiny={removeDestiny}
+                  />
+                </div>
+              </Sheet.Scroller>
             </Sheet.Content>
           </Sheet.Container>
         </Sheet>
