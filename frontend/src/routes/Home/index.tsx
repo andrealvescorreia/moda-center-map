@@ -14,6 +14,7 @@ import CallToLogin from '../../components/call-to-login'
 import { InputField, InputIcon, InputRoot } from '../../components/input'
 import NavBar from '../../components/nav'
 import type { Position } from '../../interfaces/Position'
+import type { Route } from '../../interfaces/Route'
 import { ModaCenterGridMap } from '../../models/ModaCenterGridMap'
 import { useNavContext } from '../../providers/NavProvider'
 import { useRouteContext } from '../../providers/RouteProvider'
@@ -25,11 +26,16 @@ const modaCenterGridMap = new ModaCenterGridMap()
 const minZoomLevelToRenderMarkers = 5
 
 function Home() {
-  const { route, setRoute } = useRouteContext()
+  const { route } = useRouteContext()
   const { show, setShow } = useNavContext()
   const { user } = useUserContext()
   const [isSearching, setIsSearching] = useState(false)
   const [isManagingRoute, setIsManagingRoute] = useState(false)
+
+  type RoutingManagerRef = {
+    handleUpdate: (route: Route) => void
+  }
+  const childRef = useRef<RoutingManagerRef>(null)
 
   useEffect(() => {
     if (isManagingRoute) {
@@ -48,8 +54,8 @@ function Home() {
 
   function setInitialPosition(position: [number, number]) {
     if (!route) return
-    setRoute((prevRoute) => ({
-      ...prevRoute,
+    const newRoute = {
+      ...route,
       inicio: {
         position: { x: position[1], y: position[0] },
         sellingLocation: modaCenterGridMap.findNearestBoxe(
@@ -57,9 +63,11 @@ function Home() {
           position[1]
         ),
       },
-      destinos: prevRoute?.destinos ?? [],
-      passos: prevRoute?.passos ?? [],
-    }))
+      destinos: route?.destinos ?? [],
+      passos: route?.passos ?? [],
+    }
+    if (!childRef.current) return
+    childRef.current.handleUpdate(newRoute)
   }
 
   function isInsideGridMap(lat: number, lng: number) {
@@ -145,6 +153,7 @@ function Home() {
         </span>
       ) : (
         <RoutingManager
+          ref={childRef}
           gridMap={modaCenterGridMap}
           onStopManagingRoute={() => setIsManagingRoute(false)}
         />
