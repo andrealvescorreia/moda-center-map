@@ -139,7 +139,7 @@ export default function EditSeller() {
     }
   }
   const onCancel = () => {
-    navigate('/sellers')
+    navigate(-1)
   }
 
   return (
