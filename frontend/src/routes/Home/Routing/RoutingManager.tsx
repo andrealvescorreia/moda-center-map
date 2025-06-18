@@ -34,7 +34,7 @@ const RoutingManager = forwardRef(
         JSON.stringify(newRoute.destinos) === JSON.stringify(route?.destinos) &&
         JSON.stringify(newRoute.inicio) === JSON.stringify(route?.inicio)
       ) {
-        console.log('No changes in route, skipping update.')
+        //console.log('No changes in route, skipping update.')
         return
       }
 
