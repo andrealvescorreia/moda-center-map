@@ -11,8 +11,8 @@ export function SheetHeaderTitle({
 }: SheetHeaderTitleProps) {
   return (
     <Sheet.Header className="flex justify-center items-center relative">
-      <div className="bg-gray05 w-8 rounded-2xl h-1 absolute top-1" />
-      <div className="w-full flex justify-between items-center pt-2  text-3xl">
+      <div className="bg-gray05 w-8 rounded-2xl h-1 absolute top-1.5" />
+      <div className="w-full flex justify-between items-center pt-3 text-3xl">
         {children}
         <button
           type="button"
