@@ -291,7 +291,11 @@ export default function Seller() {
   }
   function OkModal(text: string, onOK?: () => void) {
     return (
-      <Dialog open={true} onClose={() => setModalOpen(false)}>
+      <Dialog
+        open={true}
+        onClose={() => setModalOpen(false)}
+        sx={{ zIndex: 10000 }} // valor maior que o do Sheet
+      >
         <DialogContent>
           <p className="text-gray02">{text}</p>
         </DialogContent>
