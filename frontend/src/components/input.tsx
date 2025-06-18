@@ -1,15 +1,22 @@
 import type { ComponentProps } from 'react'
-
+import { twMerge } from 'tailwind-merge'
 // Pattern: Composition
 
 interface InputRootProps extends ComponentProps<'div'> {
   error?: boolean
 }
-export function InputRoot({ error = false, ...props }: InputRootProps) {
+export function InputRoot({
+  className,
+  error = false,
+  ...props
+}: InputRootProps) {
   return (
     <div
       data-error={error}
-      className="group bg-white h-12 border-gray05 border-[1.5px] rounded-4xl px-4 flex items-center gap-2 focus-within:border-gray04 data-[error=true]:border-danger"
+      className={twMerge(
+        'group bg-white h-12 border-gray05 border-[1.5px] rounded-4xl px-4 flex items-center gap-2 focus-within:border-gray04 data-[error=true]:border-danger',
+        className
+      )}
       {...props}
     />
   )
