@@ -16,7 +16,11 @@ import SellerList from '../../Sellers/seller-list'
 interface SearchStoreProps {
   onCancel?: () => void
   onChooseOnMap?: () => void
-  onSellectSeller?: (sellerName: string, location: Boxe | Loja) => void
+  onSellectSeller?: (
+    sellerName: string,
+    sellerId: string | undefined,
+    location: Boxe | Loja
+  ) => void
 }
 
 export function SearchStore({
@@ -101,7 +105,7 @@ export function SearchStore({
         numero: location.box_number,
         positionInGrid: { x: 0, y: 0 }, //unknown
       }
-      onSellectSeller?.(seller.name, boxe)
+      onSellectSeller?.(seller.name, seller.id, boxe)
     } else {
       const loja: Loja = {
         setor,
@@ -111,7 +115,7 @@ export function SearchStore({
         getBounds: () => [], //unknown
         getEntrance: () => ({ x: 0, y: 0 }), //unknown
       }
-      onSellectSeller?.(seller.name, loja)
+      onSellectSeller?.(seller.name, seller.id, loja)
     }
   }
 

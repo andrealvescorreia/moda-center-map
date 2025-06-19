@@ -181,7 +181,11 @@ const RouteEditor = ({
     onUpdate(newRoute)
   }
 
-  const addDestiny = (sellingLocation: Loja | Boxe, sellerName: string) => {
+  const addDestiny = (
+    sellingLocation: Loja | Boxe,
+    sellerName: string,
+    sellerId: string | undefined
+  ) => {
     const position =
       'rua' in sellingLocation
         ? {
@@ -198,6 +202,7 @@ const RouteEditor = ({
           sellingLocation,
           position,
           sellerName,
+          sellerId,
         },
       ],
     })
@@ -324,13 +329,13 @@ const RouteEditor = ({
         onChooseOnMap={() => {
           setIsAddingDestinyFromMap(true)
         }}
-        onSellectSeller={(sellerName, sellingLocation) => {
+        onSellectSeller={(sellerName, sellerId, sellingLocation) => {
           const choosenLocation = gridMap.getSellingLocation(sellingLocation)
           if (!choosenLocation) {
             notAddingDestiny()
             return
           }
-          addDestiny(choosenLocation, sellerName)
+          addDestiny(choosenLocation, sellerName, sellerId)
           notAddingDestiny()
         }}
       />

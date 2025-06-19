@@ -62,6 +62,7 @@ export default function Seller() {
   const { setLoading } = useLoadingContext()
   const [doneFetching, setDoneFetching] = useState(false)
   const network = useNetworkState()
+
   useEffect(() => {
     if (!id) return
     setLoading(true)
@@ -133,7 +134,7 @@ export default function Seller() {
   }
   const navigate = useNavigate()
   function onClose() {
-    navigate('/sellers')
+    navigate(-1)
   }
   const ref = useRef<SheetRef>(null)
   const snapTo = (i: number) => ref.current?.snapTo(i)
@@ -173,7 +174,7 @@ export default function Seller() {
       removeFromRoute()
       setModalComponent(
         OkModal(`Vendedor ${seller.name} deletado com sucesso`, () => {
-          navigate('/sellers')
+          navigate(-1)
         })
       )
       setModalOpen(true)
