@@ -281,6 +281,24 @@ export default function Seller() {
     }
   }
 
+  function copyPhoneToClipboard() {
+    navigator.clipboard.writeText(seller?.phone_number || '').then(
+      () => {
+        setModalComponent(
+          OkModal(
+            `"${seller?.phone_number || ''}" copiado para a área de transferência`,
+            closeModal,
+            closeModal
+          )
+        )
+        setModalOpen(true)
+      },
+      (err) => {
+        console.error('Erro ao copiar para a área de transferência:', err)
+      }
+    )
+  }
+
   if (!network.online) {
     return <OfflineScreen />
   }
@@ -354,13 +372,17 @@ export default function Seller() {
               </SellerCard>
             )}
             {seller?.phone_number && (
-              <div className="flex w-full justify-center items-center text-xl gap-2 text-gray02">
-                <Phone size={24} />
+              // biome-ignore lint/a11y/useKeyWithClickEvents: <explanation>
+              <div
+                className="flex w-full justify-center items-center text-lg gap-1 text-gray02"
+                onClick={copyPhoneToClipboard}
+              >
+                <Phone size={20} />
                 <p>{formatPhoneNumber(seller.phone_number.trim())}</p>
               </div>
             )}
 
-            <div className="flex justify-baseline gap-4 overflow-auto">
+            <div className="flex justify-baseline gap-4 overflow-auto pb-3 pt-2">
               <AddToRouteButton
                 onClick={() => {
                   addToRoute()
