@@ -43,7 +43,7 @@ import { useUserContext } from '../../providers/UserProvider'
 
 const modaCenterGridMap = new ModaCenterGridMap()
 
-export default function Seller() {
+export default function SellerPage() {
   const { id } = useParams<{ id: string }>()
 
   const [seller, setSeller] = useState<SellerResponse | undefined>()
