@@ -60,7 +60,10 @@ const RouteEditor = ({
   const ref = useRef<SheetRef>(null)
 
   useEffect(() => {
-    if (!destinyView) return
+    if (destinyView === null) {
+      setConvertedDestinyView(null)
+      return
+    }
     const convertedDestiny =
       'numero' in destinyView
         ? {
