@@ -39,6 +39,8 @@ const RouteEditor = ({
   const { clickLocation } = useClickContext()
 
   const [bottomSheetOpen, setBottomSheetOpen] = useState(false)
+  const [modalOpen, setModalOpen] = useState(false)
+
   const ref = useRef<SheetRef>(null)
 
   useEffect(() => {
