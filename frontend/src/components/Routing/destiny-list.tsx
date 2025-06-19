@@ -2,6 +2,7 @@ import { faPerson } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { X } from 'lucide-react'
 import { useEffect, useRef } from 'react'
+import { useNavigate } from 'react-router-dom'
 import type { Destiny } from '../../interfaces/Destiny'
 import type { Route } from '../../interfaces/Route'
 
@@ -16,6 +17,7 @@ export function DestinyList({
   reducedView = false,
 }: DestinyListProps) {
   const listRef = useRef<HTMLUListElement>(null)
+  const navigate = useNavigate()
 
   useEffect(() => {
     if (listRef.current) {
@@ -88,6 +90,7 @@ export function DestinyList({
               index={index}
               destiny={destiny}
               onClickRemoveDestiny={onClickRemoveDestiny}
+              onClickDestiny={() => navigate(`/sellers/${destiny.sellerId}`)}
               isEndingPoint={isThisTheLastDestiny}
               reducedView={reducedView}
             />
@@ -104,6 +107,7 @@ interface DestinyLiItemProps {
   isStartingPoint?: boolean
   isEndingPoint?: boolean
   onClickRemoveDestiny?: (index: number) => void
+  onClickDestiny?: (destiny: Destiny) => void
   reducedView?: boolean
 }
 function DestinyLiItem({
@@ -112,6 +116,7 @@ function DestinyLiItem({
   isStartingPoint,
   isEndingPoint,
   onClickRemoveDestiny,
+  onClickDestiny,
   reducedView = false,
 }: DestinyLiItemProps) {
   if (!destiny.sellingLocation) return null
@@ -165,7 +170,11 @@ function DestinyLiItem({
         {leftIcon}
         {!isEndingPoint && downardsLine}
       </div>
-      <div className="h-full flex flex-col relative gap-0">
+      {/* biome-ignore lint/a11y/useKeyWithClickEvents: <explanation> */}
+      <div
+        className="h-full flex flex-col relative gap-0"
+        onClick={() => onClickDestiny?.(destiny)}
+      >
         <p className="text-base md:text-sm whitespace-nowrap overflow-hidden text-ellipsis max-w-[70vw]">
           {locationName}
         </p>

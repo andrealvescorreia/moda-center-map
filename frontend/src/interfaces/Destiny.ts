@@ -6,4 +6,5 @@ export interface Destiny {
   position: Position
   sellingLocation: Boxe | Loja | null
   sellerName?: string
+  sellerId?: string
 }
