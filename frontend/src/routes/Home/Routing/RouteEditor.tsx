@@ -6,14 +6,23 @@ import { ModaCenterGridMap } from '../../../models/ModaCenterGridMap'
 import { useClickContext } from '../../../providers/ClickProvider'
 import { SearchStore } from './SearchSellingPoint'
 
-import { MapPinPlus, Navigation, PersonStanding, Trash } from 'lucide-react'
+import {
+  ArrowLeft,
+  MapPinPlus,
+  Navigation,
+  PersonStanding,
+  Trash,
+} from 'lucide-react'
 import { Sheet, type SheetRef } from 'react-modal-sheet'
 import { DialogAction } from '../../../components/Routing/dialog-action'
 import ActionModal from '../../../components/action-modal'
 import { IconButton } from '../../../components/icon-button'
+import SellerByLocation from '../../../components/seller-by-location'
 import { SheetHeaderTitle } from '../../../components/sheet-header-title'
 import { getSellerByBox, getSellerByStore } from '../../../http/api'
 import type { Boxe } from '../../../interfaces/Boxe'
+import type { BoxeSchema } from '../../../schemas/box'
+import type { StoreSchema } from '../../../schemas/store'
 import { colorToEnglishMap } from '../../../utils/utils'
 interface RouteEditorProps {
   gridMap: ModaCenterGridMap
@@ -42,7 +51,33 @@ const RouteEditor = ({
   const [bottomSheetOpen, setBottomSheetOpen] = useState(false)
   const [modalOpen, setModalOpen] = useState(false)
 
+  const [destinyView, setDestinyView] = useState<Loja | Boxe | null>(null)
+
+  const [convertedDestinyView, setConvertedDestinyView] = useState<
+    StoreSchema | BoxeSchema | null
+  >(null)
+
   const ref = useRef<SheetRef>(null)
+
+  useEffect(() => {
+    if (destinyView === null) {
+      setConvertedDestinyView(null)
+      return
+    }
+    const convertedDestiny =
+      'numero' in destinyView
+        ? {
+            box_number: destinyView.numero,
+            sector_color: colorToEnglishMap[destinyView.setor],
+            street_letter: destinyView.rua,
+          }
+        : {
+            block_number: destinyView.bloco,
+            store_number: destinyView.numLoja,
+            sector_color: colorToEnglishMap[destinyView.setor],
+          }
+    setConvertedDestinyView(convertedDestiny)
+  }, [destinyView])
 
   useEffect(() => {
     if (!isAddingDestiny && !!route.inicio) {
@@ -261,6 +296,33 @@ const RouteEditor = ({
           />
         </div>
 
+        {convertedDestinyView && (
+          <div className="w-full h-full fixed bg-white z-[99999] flex flex-col">
+            <button
+              type="button"
+              className="self-start m-3"
+              onClick={() => setDestinyView(null)}
+            >
+              <ArrowLeft className="text-gray04" size={28} />
+            </button>
+            <SellerByLocation
+              location={convertedDestinyView}
+              onClickRemoveDestiny={() => {
+                if (!convertedDestinyView) return
+                const destinyIndex = route.destinos.findIndex(
+                  (destiny) => destiny.sellingLocation === destinyView
+                )
+                console.log('destinyIndex', destinyIndex)
+                if (destinyIndex === -1) return
+                removeDestiny(destinyIndex)
+
+                setDestinyView(null)
+                setConvertedDestinyView(null)
+              }}
+            />
+          </div>
+        )}
+
         <Sheet
           ref={ref}
           isOpen={bottomSheetOpen}
@@ -325,6 +387,10 @@ const RouteEditor = ({
                   <DestinyList
                     route={{ ...bestRoute, inicio: route.inicio }}
                     onClickRemoveDestiny={removeDestiny}
+                    onClickDestiny={(destiny) => {
+                      if (!destiny.sellingLocation) return
+                      setDestinyView(destiny.sellingLocation)
+                    }}
                   />
                 </div>
               </Sheet.Scroller>

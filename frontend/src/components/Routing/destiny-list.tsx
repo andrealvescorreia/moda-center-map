@@ -2,7 +2,6 @@ import { faPerson } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { X } from 'lucide-react'
 import { useEffect, useRef } from 'react'
-import { useNavigate } from 'react-router-dom'
 import type { Destiny } from '../../interfaces/Destiny'
 import type { Route } from '../../interfaces/Route'
 
@@ -10,14 +9,15 @@ interface DestinyListProps {
   route: Route
   onClickRemoveDestiny: (index: number) => void
   reducedView?: boolean
+  onClickDestiny?: (destiny: Destiny) => void
 }
 export function DestinyList({
   route,
   onClickRemoveDestiny,
   reducedView = false,
+  onClickDestiny,
 }: DestinyListProps) {
   const listRef = useRef<HTMLUListElement>(null)
-  const navigate = useNavigate()
 
   useEffect(() => {
     if (listRef.current) {
@@ -90,7 +90,7 @@ export function DestinyList({
               index={index}
               destiny={destiny}
               onClickRemoveDestiny={onClickRemoveDestiny}
-              onClickDestiny={() => navigate(`/sellers/${destiny.sellerId}`)}
+              onClickDestiny={onClickDestiny}
               isEndingPoint={isThisTheLastDestiny}
               reducedView={reducedView}
             />

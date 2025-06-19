@@ -13,7 +13,7 @@ import { useLoadingContext } from './providers/LoadingProvider'
 import RouteProvider from './providers/RouteProvider'
 import EditSeller from './routes/EditSeller'
 import NewSeller from './routes/NewSeller'
-import Seller from './routes/Seller'
+import SellerPage from './routes/SellerPage'
 import Sellers from './routes/Sellers'
 import UserProfile from './routes/UserProfile'
 
@@ -67,10 +67,11 @@ export default function App() {
           path="sellers/:id"
           element={
             <RouteProvider>
-              <Seller />
+              <SellerPage />
             </RouteProvider>
           }
         />
+
         <Route path="sellers/:id/edit" element={<EditSeller />} />
         <Route path="new-seller" element={<NewSeller />} />
         <Route path="user" element={<UserProfile />} />

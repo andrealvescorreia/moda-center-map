@@ -31,7 +31,7 @@ export default function Note({ defaultNote, onSave, onClose }: NoteProps) {
   }
 
   return (
-    <span>
+    <span className="w-full">
       <InputRoot
         className="rounded-xl border-gray03 bg-gray06"
         onClick={() => openModal()}
