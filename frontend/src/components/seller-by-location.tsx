@@ -1,9 +1,8 @@
 import { useNetworkState } from '@uidotdev/usehooks'
-import { Bookmark, Pencil, Phone, Trash2, X } from 'lucide-react'
+import { Bookmark, Pencil, Phone, X } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
-  deleteSeller,
   favoriteSeller,
   getSellerByBox,
   getSellerByStore,
@@ -18,7 +17,6 @@ import type { BoxeSchema } from '../schemas/box'
 import type { StoreSchema } from '../schemas/store'
 import { formatPhoneNumber } from '../utils/utils'
 import SellerNote from './Note/seller-note'
-import ActionModal from './action-modal'
 import { IconButton } from './icon-button'
 import LoadingOverlay from './loading-overlay'
 import OfflineScreen from './offline-screen'
@@ -82,28 +80,6 @@ export default function SellerByLocation({
       .catch(console.error)
   }, [location, setLoading, seller?.id])
 
-  async function deleteSell() {
-    if (!seller) return
-    const modalAction = () => {
-      navigate(-1)
-    }
-    try {
-      setLoading(true)
-      await deleteSeller(seller.id)
-      setModalComponent(
-        OkModal(
-          `Vendedor ${seller.name} deletado com sucesso`,
-          modalAction,
-          modalAction
-        )
-      )
-      setModalOpen(true)
-    } catch (error) {
-      console.error(error)
-    } finally {
-      setLoading(false)
-    }
-  }
   async function favoriteSell() {
     if (!seller) return
     try {
@@ -220,22 +196,6 @@ export default function SellerByLocation({
             navigate(`/sellers/${seller?.id}/edit`)
           }}
         />
-        <DeleteButton
-          onClick={() => {
-            setModalComponent(
-              ActionModal({
-                title: 'Deletar vendedor',
-                content: `Você tem certeza que deseja deletar o vendedor ${seller?.name}?`,
-                onConfirm: () => {
-                  closeModal()
-                  deleteSell()
-                },
-                onCancel: () => closeModal(),
-              })
-            )
-            setModalOpen(true)
-          }}
-        />
       </div>
 
       <SellerNote seller_id={seller.id} />
@@ -263,18 +223,6 @@ function EditButton({ onClick }: { onClick: () => void }) {
     >
       <Pencil size={16} />
       Editar
-    </IconButton>
-  )
-}
-
-function DeleteButton({ onClick }: { onClick: () => void }) {
-  return (
-    <IconButton
-      className="opacity-65 text-danger  p-3 border-none bg-gray06 text-sm h-8"
-      onClick={onClick}
-    >
-      <Trash2 size={16} />
-      Deletar
     </IconButton>
   )
 }
