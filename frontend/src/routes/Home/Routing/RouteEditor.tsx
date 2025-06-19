@@ -9,6 +9,7 @@ import { SearchStore } from './SearchSellingPoint'
 import { MapPinPlus, Navigation, PersonStanding, Trash } from 'lucide-react'
 import { Sheet, type SheetRef } from 'react-modal-sheet'
 import { DialogAction } from '../../../components/Routing/dialog-action'
+import ActionModal from '../../../components/action-modal'
 import { IconButton } from '../../../components/icon-button'
 import { SheetHeaderTitle } from '../../../components/sheet-header-title'
 import { getSellerByBox, getSellerByStore } from '../../../http/api'
@@ -39,6 +40,8 @@ const RouteEditor = ({
   const { clickLocation } = useClickContext()
 
   const [bottomSheetOpen, setBottomSheetOpen] = useState(false)
+  const [modalOpen, setModalOpen] = useState(false)
+
   const ref = useRef<SheetRef>(null)
 
   useEffect(() => {
@@ -237,6 +240,19 @@ const RouteEditor = ({
   if (!isAddingDestiny && route.inicio) {
     return (
       <span>
+        {modalOpen && (
+          <ActionModal
+            title="Limpar a rota"
+            content="Deseja remover todos os destinos da rota?"
+            onConfirm={() => {
+              deleteRoute()
+              setModalOpen(false)
+              onCancel()
+            }}
+            onCancel={() => setModalOpen(false)}
+          />
+        )}
+
         <div className="ui ml-[50%] -translate-x-1/2 absolute w-[95%] flex justify-center items-center top-1 shadow max-h-45 overflow-auto md:size-0">
           <DestinyList
             route={{ ...bestRoute, inicio: route.inicio }}
@@ -295,10 +311,7 @@ const RouteEditor = ({
                 <IconButton
                   className="shrink-0 h-8 text-sm md:h-7 md:text-xs"
                   type="reset"
-                  onClick={() => {
-                    deleteRoute()
-                    onCancel()
-                  }}
+                  onClick={() => setModalOpen(true)}
                 >
                   <Trash size={20} />
                   Limpar

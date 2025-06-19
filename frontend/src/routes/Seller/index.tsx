@@ -1,8 +1,3 @@
-import Button from '@mui/material/Button'
-import Dialog from '@mui/material/Dialog'
-import DialogActions from '@mui/material/DialogActions'
-import DialogContent from '@mui/material/DialogContent'
-import DialogTitle from '@mui/material/DialogTitle'
 import L from 'leaflet'
 import { ArrowRight, Bookmark, Pencil, Phone, Plus, Trash2 } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
@@ -39,7 +34,9 @@ import SellerCard from './seller-card'
 
 import { useNetworkState } from '@uidotdev/usehooks'
 import SellerNote from '../../components/Note/seller-note'
+import ActionModal from '../../components/action-modal'
 import OfflineScreen from '../../components/offline-screen'
+import OkModal from '../../components/ok-modal'
 import { useLoadingContext } from '../../providers/LoadingProvider'
 import { useRouteContext } from '../../providers/RouteProvider'
 import { useUserContext } from '../../providers/UserProvider'
@@ -168,14 +165,19 @@ export default function Seller() {
 
   async function deleteSell() {
     if (!seller) return
+    const modalAction = () => {
+      navigate(-1)
+    }
     try {
       setLoading(true)
       await deleteSeller(seller.id)
       removeFromRoute()
       setModalComponent(
-        OkModal(`Vendedor ${seller.name} deletado com sucesso`, () => {
-          navigate(-1)
-        })
+        OkModal(
+          `Vendedor ${seller.name} deletado com sucesso`,
+          modalAction,
+          modalAction
+        )
       )
       setModalOpen(true)
     } catch (error) {
@@ -208,6 +210,9 @@ export default function Seller() {
       setLoading(false)
     }
   }
+  function closeModal() {
+    setModalOpen(false)
+  }
   function sellerToDestiny() {
     if (activeSellingLocation && seller) {
       const newDestiny: Destiny = {
@@ -235,7 +240,13 @@ export default function Seller() {
           JSON.stringify(newDestiny.position)
       )
       if (found) {
-        setModalComponent(OkModal(`Esse local já está na rota "Minha rota"`))
+        setModalComponent(
+          OkModal(
+            `Esse local já está na rota "Minha rota"`,
+            closeModal,
+            closeModal
+          )
+        )
         setModalOpen(true)
         return
       }
@@ -246,7 +257,11 @@ export default function Seller() {
       }
       setRoute(newRoute)
       setModalComponent(
-        OkModal(`Vendedor ${seller.name} adicionado à "Minha rota"`)
+        OkModal(
+          `Vendedor ${seller.name} adicionado à "Minha rota"`,
+          closeModal,
+          closeModal
+        )
       )
       setModalOpen(true)
     }
@@ -266,54 +281,21 @@ export default function Seller() {
     }
   }
 
-  function DeleteSellerModal() {
-    return (
-      <Dialog
-        open={true}
-        onClose={() => setModalOpen(false)}
-        aria-labelledby="alert-dialog-title"
-        aria-describedby="alert-dialog-description"
-        sx={{ zIndex: 10000 }} // valor maior que o do Sheet
-      >
-        <DialogTitle id="alert-dialog-title">Deletar Vendedor</DialogTitle>
-        <DialogContent>
-          <p className="text-gray02">
-            Tem certeza que deseja deletar o vendedor {seller?.name}?
-          </p>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setModalOpen(false)} autoFocus>
-            CANCELAR
-          </Button>
-          <Button onClick={() => deleteSell()} autoFocus>
-            OK
-          </Button>
-        </DialogActions>
-      </Dialog>
-    )
-  }
-  function OkModal(text: string, onOK?: () => void) {
-    return (
-      <Dialog
-        open={true}
-        onClose={() => setModalOpen(false)}
-        sx={{ zIndex: 10000 }} // valor maior que o do Sheet
-      >
-        <DialogContent>
-          <p className="text-gray02">{text}</p>
-        </DialogContent>
-        <DialogActions>
-          <Button
-            onClick={() => {
-              setModalOpen(false)
-              if (onOK) onOK()
-            }}
-            autoFocus
-          >
-            OK
-          </Button>
-        </DialogActions>
-      </Dialog>
+  function copyPhoneToClipboard() {
+    navigator.clipboard.writeText(seller?.phone_number || '').then(
+      () => {
+        setModalComponent(
+          OkModal(
+            `"${seller?.phone_number || ''}" copiado para a área de transferência`,
+            closeModal,
+            closeModal
+          )
+        )
+        setModalOpen(true)
+      },
+      (err) => {
+        console.error('Erro ao copiar para a área de transferência:', err)
+      }
     )
   }
 
@@ -390,13 +372,17 @@ export default function Seller() {
               </SellerCard>
             )}
             {seller?.phone_number && (
-              <div className="flex w-full justify-center items-center text-xl gap-2 text-gray02">
-                <Phone size={24} />
+              // biome-ignore lint/a11y/useKeyWithClickEvents: <explanation>
+              <div
+                className="flex w-full justify-center items-center text-lg gap-1 text-gray02"
+                onClick={copyPhoneToClipboard}
+              >
+                <Phone size={20} />
                 <p>{formatPhoneNumber(seller.phone_number.trim())}</p>
               </div>
             )}
 
-            <div className="flex justify-baseline gap-4 overflow-auto">
+            <div className="flex justify-baseline gap-4 overflow-auto pb-3 pt-2">
               <AddToRouteButton
                 onClick={() => {
                   addToRoute()
@@ -409,7 +395,17 @@ export default function Seller() {
               />
               <DeleteButton
                 onClick={() => {
-                  setModalComponent(DeleteSellerModal())
+                  setModalComponent(
+                    ActionModal({
+                      title: 'Deletar vendedor',
+                      content: `Você tem certeza que deseja deletar o vendedor ${seller?.name}?`,
+                      onConfirm: () => {
+                        closeModal()
+                        deleteSell()
+                      },
+                      onCancel: () => closeModal(),
+                    })
+                  )
                   setModalOpen(true)
                 }}
               />
