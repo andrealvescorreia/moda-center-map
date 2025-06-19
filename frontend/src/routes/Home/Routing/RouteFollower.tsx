@@ -11,6 +11,7 @@ import { SheetHeaderTitle } from '../../../components/sheet-header-title'
 import type { Boxe } from '../../../interfaces/Boxe'
 import type { Loja } from '../../../interfaces/Loja'
 import type { Position } from '../../../interfaces/Position'
+import type { Route } from '../../../interfaces/Route'
 import { ModaCenterGridMap } from '../../../models/ModaCenterGridMap'
 import { useRouteContext } from '../../../providers/RouteProvider'
 
@@ -19,13 +20,15 @@ export default function RouteFollower({
   onFinish,
   onChooseToEdit,
   gridMap,
+  onUpdateRoute,
 }: {
   onCancel: () => void
   onFinish: () => void
   onChooseToEdit: () => void
   gridMap: ModaCenterGridMap
+  onUpdateRoute: (newRoute: Route) => void
 }) {
-  const { route, setRoute } = useRouteContext()
+  const { route } = useRouteContext()
   const ref = useRef<SheetRef>(null)
 
   if (!route) return null
@@ -68,7 +71,8 @@ export default function RouteFollower({
       sellingLocation: currentDestiny.sellingLocation,
     }
     newRoute.destinos = newRoute.destinos.slice(1)
-    setRoute(newRoute)
+    //setRoute(newRoute)
+    onUpdateRoute(newRoute)
   }
 
   const snapTo = (i: number) => ref.current?.snapTo(i)

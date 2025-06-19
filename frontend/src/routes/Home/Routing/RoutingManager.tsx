@@ -123,6 +123,7 @@ const RoutingManager = forwardRef(
               setIsCreatingRoute(true)
               setIsFollowingRoute(false)
             }}
+            onUpdateRoute={handleUpdate}
             gridMap={gridMap}
           />
         )}
