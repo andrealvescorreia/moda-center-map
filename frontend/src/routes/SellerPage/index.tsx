@@ -131,7 +131,7 @@ export default function SellerPage() {
   }
   const navigate = useNavigate()
   function onClose() {
-    navigate(-1)
+    navigate('/sellers')
   }
   const ref = useRef<SheetRef>(null)
   const snapTo = (i: number) => ref.current?.snapTo(i)
@@ -166,7 +166,7 @@ export default function SellerPage() {
   async function deleteSell() {
     if (!seller) return
     const modalAction = () => {
-      navigate(-1)
+      navigate('/sellers')
     }
     try {
       setLoading(true)
