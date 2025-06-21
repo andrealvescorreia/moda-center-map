@@ -198,7 +198,7 @@ export default function SellerByLocation({
         />
       </div>
 
-      <SellerNote seller_id={seller.id} />
+      {user && <SellerNote seller_id={seller.id} />}
     </div>
   )
 }

@@ -410,7 +410,7 @@ export default function SellerPage() {
                 }}
               />
             </div>
-            <SellerNote seller_id={seller?.id || ''} />
+            {user && <SellerNote seller_id={seller?.id || ''} />}
             {isMultiLocationSeller.current && (
               <div className="pt-5">
                 <h3 className="text-lg font-semibold text-gray02">
