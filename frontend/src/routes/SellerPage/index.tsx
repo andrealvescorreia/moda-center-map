@@ -440,6 +440,16 @@ export default function SellerPage() {
       <MapContainer
         crs={L.CRS.Simple}
         bounds={modaCenterGridMap.getBounds()}
+        maxBounds={[
+          [
+            modaCenterGridMap.getBounds()[0][0] - 85,
+            modaCenterGridMap.getBounds()[0][1] - 85 / 2,
+          ],
+          [
+            modaCenterGridMap.getBounds()[1][0] + 85,
+            modaCenterGridMap.getBounds()[1][1] + 85 / 2,
+          ],
+        ]}
         zoom={5}
         maxZoom={6}
         minZoom={1}
