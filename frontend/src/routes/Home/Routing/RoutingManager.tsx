@@ -1,4 +1,4 @@
-import { forwardRef, useImperativeHandle, useState } from 'react'
+import { forwardRef, useEffect, useImperativeHandle, useState } from 'react'
 import type { Destiny } from '../../../interfaces/Destiny'
 import type { Position } from '../../../interfaces/Position'
 import type { Route } from '../../../interfaces/Route'
@@ -30,15 +30,12 @@ const RoutingManager = forwardRef(
     }))
 
     const handleUpdate = (newRoute: Route) => {
-      if (
-        JSON.stringify(newRoute.destinos) === JSON.stringify(route?.destinos) &&
-        JSON.stringify(newRoute.inicio) === JSON.stringify(route?.inicio)
-      ) {
-        //console.log('No changes in route, skipping update.')
+      if (!newRoute) return
+      if (!newRoute?.inicio && newRoute?.destinos.length >= 0) {
+        setRoute(newRoute)
+        setBestRoute(newRoute)
         return
       }
-
-      if (!newRoute) return
       if (newRoute.destinos.length === 0) {
         const newBestRoute = { ...newRoute, passos: [] }
         if (JSON.stringify(route) !== JSON.stringify(newBestRoute)) {
@@ -47,11 +44,7 @@ const RoutingManager = forwardRef(
         setBestRoute(newRoute)
         return
       }
-      if (!newRoute?.inicio && newRoute?.destinos.length >= 0) {
-        setRoute(newRoute)
-        setBestRoute(newRoute)
-        return
-      }
+
       let destinosMelhorOrdem: Destiny[] = []
       let melhoresPassos: Position[] = []
 
@@ -62,11 +55,10 @@ const RoutingManager = forwardRef(
           return seen.has(key) ? false : seen.add(key)
         })
       }
-      if (newRoute.destinos.length > 0) {
-        newRoute.destinos = removeDuplicates(newRoute.destinos)
-      }
 
-      if (newRoute.inicio && newRoute.destinos.length > 0) {
+      newRoute.destinos = removeDuplicates(newRoute.destinos)
+
+      if (newRoute.inicio) {
         const routeCalculator = new RouteCalculator({
           grid: gridMap.getGrid(),
           tspSolver: new TSPSolverNN(),
@@ -89,7 +81,9 @@ const RoutingManager = forwardRef(
         destinos: destinosMelhorOrdem.slice(1),
         passos: melhoresPassos,
       }
-      setRoute(newBestRoute)
+      if (JSON.stringify(route) !== JSON.stringify(newBestRoute)) {
+        setRoute(newBestRoute)
+      }
     }
 
     function cancelRoute() {
@@ -98,8 +92,16 @@ const RoutingManager = forwardRef(
       onStopManagingRoute()
     }
 
+    // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
+    useEffect(() => {
+      if (route) {
+        handleUpdate(route)
+      }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [])
+
     return (
-      <div>
+      <>
         {isCreatingRoute && !isFollowingRoute && (
           <RouteEditor
             gridMap={gridMap}
@@ -112,8 +114,9 @@ const RoutingManager = forwardRef(
             onStart={() => setIsFollowingRoute(true)}
           />
         )}
-        {isFollowingRoute && (
+        {isFollowingRoute && route && (
           <RouteFollower
+            route={route}
             onCancel={() => setIsFollowingRoute(false)}
             onFinish={() => {
               handleUpdate({ inicio: null, destinos: [] })
@@ -127,7 +130,7 @@ const RoutingManager = forwardRef(
             gridMap={gridMap}
           />
         )}
-      </div>
+      </>
     )
   }
 )

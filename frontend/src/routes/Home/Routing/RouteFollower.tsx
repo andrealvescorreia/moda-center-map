@@ -13,25 +13,23 @@ import type { Loja } from '../../../interfaces/Loja'
 import type { Position } from '../../../interfaces/Position'
 import type { Route } from '../../../interfaces/Route'
 import { ModaCenterGridMap } from '../../../models/ModaCenterGridMap'
-import { useRouteContext } from '../../../providers/RouteProvider'
 
 export default function RouteFollower({
+  route,
   onCancel,
   onFinish,
   onChooseToEdit,
   gridMap,
   onUpdateRoute,
 }: {
+  route: Route
   onCancel: () => void
   onFinish: () => void
   onChooseToEdit: () => void
   gridMap: ModaCenterGridMap
   onUpdateRoute: (newRoute: Route) => void
 }) {
-  const { route } = useRouteContext()
   const ref = useRef<SheetRef>(null)
-
-  if (!route) return null
 
   function locationToText(sellingLocation: Boxe | Loja | null | undefined) {
     if (!sellingLocation) return ''
@@ -45,7 +43,7 @@ export default function RouteFollower({
   }
 
   const inicioText = locationToText(route.inicio?.sellingLocation)
-  function gerNearestFreePath(position: Position) {
+  function getNearestFreePath(position: Position) {
     const grid = gridMap.getGrid()
     const { x, y } = position
     const isCaminho = (lat: number, lng: number) =>
@@ -67,7 +65,7 @@ export default function RouteFollower({
     if (!route) return
     const newRoute = { ...route }
     newRoute.inicio = {
-      position: gerNearestFreePath(currentDestiny.position),
+      position: getNearestFreePath(currentDestiny.position),
       sellingLocation: currentDestiny.sellingLocation,
     }
     newRoute.destinos = newRoute.destinos.slice(1)
@@ -77,7 +75,7 @@ export default function RouteFollower({
 
   const snapTo = (i: number) => ref.current?.snapTo(i)
   return (
-    <div>
+    <>
       <div className="ui absolute top-0 w-[90%] md:max-w-110 ml-[50%] mt-4 -translate-x-1/2">
         <div className="w-full bg-[#4CA866] text-white  flex items-center p-2 rounded-t-2xl rounded-br-2xl gap-2">
           <MoveUp size={40} strokeWidth={3} />
@@ -142,6 +140,6 @@ export default function RouteFollower({
           </Sheet.Content>
         </Sheet.Container>
       </Sheet>
-    </div>
+    </>
   )
 }

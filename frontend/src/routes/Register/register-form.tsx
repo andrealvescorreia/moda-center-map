@@ -10,7 +10,6 @@ import { Button } from '../../components/button'
 import { InputField, InputIcon, InputRoot } from '../../components/input'
 import { registerUser } from '../../http/api'
 import { useLoadingContext } from '../../providers/LoadingProvider'
-import { useUserContext } from '../../providers/UserProvider'
 
 const registrationSchema = z.object({
   username: z
@@ -34,7 +33,6 @@ export default function RegistrationForm() {
   } = useForm<RegistrationSchema>({
     resolver: zodResolver(registrationSchema),
   })
-  const { setUser } = useUserContext()
 
   const [showPassword, setShowPassword] = useState(false)
   const [isFetching, setIsFetching] = useState(false)
@@ -46,10 +44,9 @@ export default function RegistrationForm() {
       setIsFetching(true)
       setLoading(true)
       const response = await registerUser({ username, password })
-      setUser(response.data)
       if (response.status === 201) {
-        alert('Registrado com sucesso!')
-        navigate(-1)
+        alert('Registrado com sucesso! Realize o login.')
+        navigate('/login')
       }
     } catch (error) {
       if (error instanceof AxiosError) {

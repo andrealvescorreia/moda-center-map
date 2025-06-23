@@ -3,22 +3,20 @@ import MapDrawer from '../../components/Map/map-drawer'
 import 'leaflet/dist/leaflet.css'
 import L from 'leaflet'
 import { useEffect, useState } from 'react'
-import { useMemo, useRef } from 'react'
-import { Marker } from 'react-leaflet'
+import { useRef } from 'react'
 import Logo from '../../assets/logo.png'
-import PersonMarker from '../../assets/person.png'
 import { ClickPosition } from '../../components/Map/click-position'
 import FlyTo from '../../components/Map/fly-to'
 import RouteButton from '../../components/Routing/route-button'
 import CallToLogin from '../../components/call-to-login'
 import { InputField, InputIcon, InputRoot } from '../../components/input'
 import NavBar from '../../components/nav'
-import type { Position } from '../../interfaces/Position'
 import type { Route } from '../../interfaces/Route'
 import { ModaCenterGridMap } from '../../models/ModaCenterGridMap'
 import { useNavContext } from '../../providers/NavProvider'
 import { useRouteContext } from '../../providers/RouteProvider'
 import { useUserContext } from '../../providers/UserProvider'
+import DraggableMarker from './Routing/DraggableMarker'
 import RouteDrawer from './Routing/RouteDrawer'
 import RoutingManager from './Routing/RoutingManager'
 import SearchSeller from './search-seller'
@@ -126,7 +124,7 @@ function Home() {
   }
 
   return (
-    <div>
+    <>
       <NavBar />
 
       <div className="absolute ui top-0 w-full ">
@@ -204,45 +202,7 @@ function Home() {
         )}
         <ClickPosition />
       </MapContainer>
-    </div>
-  )
-}
-
-function DraggableMarker({
-  position,
-  onUpdatePosition,
-}: {
-  position: Position
-  onUpdatePosition: (position: [number, number]) => void
-}) {
-  const markerRef = useRef<L.Marker>(null)
-  const eventHandlers = useMemo(
-    () => ({
-      dragend() {
-        const marker = markerRef.current
-        if (marker != null) {
-          const { lat, lng } = marker.getLatLng()
-          onUpdatePosition([lat, lng])
-        }
-      },
-    }),
-    [onUpdatePosition]
-  )
-
-  const personIcon = L.icon({
-    iconUrl: PersonMarker,
-    iconSize: [31, 50],
-    iconAnchor: [16, 30], // point of the icon which will correspond to marker's location
-  })
-
-  return (
-    <Marker
-      draggable={true}
-      eventHandlers={eventHandlers}
-      position={[position.y + 0.5, position.x + 0.5]}
-      ref={markerRef}
-      icon={personIcon}
-    />
+    </>
   )
 }
 

@@ -131,7 +131,7 @@ export default function SellerPage() {
   }
   const navigate = useNavigate()
   function onClose() {
-    navigate(-1)
+    navigate('/sellers')
   }
   const ref = useRef<SheetRef>(null)
   const snapTo = (i: number) => ref.current?.snapTo(i)
@@ -166,7 +166,7 @@ export default function SellerPage() {
   async function deleteSell() {
     if (!seller) return
     const modalAction = () => {
-      navigate(-1)
+      navigate('/sellers')
     }
     try {
       setLoading(true)
@@ -310,7 +310,7 @@ export default function SellerPage() {
     )
   }
   return (
-    <div>
+    <>
       {modalOpen && ModalComponent}
       <Sheet
         ref={ref}
@@ -410,7 +410,7 @@ export default function SellerPage() {
                 }}
               />
             </div>
-            <SellerNote seller_id={seller?.id || ''} />
+            {user && <SellerNote seller_id={seller?.id || ''} />}
             {isMultiLocationSeller.current && (
               <div className="pt-5">
                 <h3 className="text-lg font-semibold text-gray02">
@@ -440,6 +440,16 @@ export default function SellerPage() {
       <MapContainer
         crs={L.CRS.Simple}
         bounds={modaCenterGridMap.getBounds()}
+        maxBounds={[
+          [
+            modaCenterGridMap.getBounds()[0][0] - 85,
+            modaCenterGridMap.getBounds()[0][1] - 85 / 2,
+          ],
+          [
+            modaCenterGridMap.getBounds()[1][0] + 85,
+            modaCenterGridMap.getBounds()[1][1] + 85 / 2,
+          ],
+        ]}
         zoom={5}
         maxZoom={6}
         minZoom={1}
@@ -464,7 +474,7 @@ export default function SellerPage() {
 
         {drawPosition()}
       </MapContainer>
-    </div>
+    </>
   )
 
   function AddToRouteButton({ onClick }: { onClick: () => void }) {

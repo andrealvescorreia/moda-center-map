@@ -17,7 +17,7 @@ export default function SelectOptions({
   options,
 }: SelectOptionsProps) {
   return (
-    <div>
+    <>
       <InputLabel id={`${label}-label`}>{label}</InputLabel>
 
       <Select
@@ -34,6 +34,6 @@ export default function SelectOptions({
           </MenuItem>
         ))}
       </Select>
-    </div>
+    </>
   )
 }
