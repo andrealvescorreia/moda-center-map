@@ -1,4 +1,5 @@
 import { MapContainer, useMap } from 'react-leaflet'
+
 import MapDrawer from '../../components/Map/map-drawer'
 import 'leaflet/dist/leaflet.css'
 import L from 'leaflet'
@@ -20,6 +21,8 @@ import DraggableMarker from './Routing/DraggableMarker'
 import RouteDrawer from './Routing/RouteDrawer'
 import RoutingManager from './Routing/RoutingManager'
 import SearchSeller from './search-seller'
+import 'leaflet-rotate'
+
 const modaCenterGridMap = new ModaCenterGridMap()
 const minZoomLevelToRenderMarkers = 5
 
@@ -29,6 +32,13 @@ function Home() {
   const { user } = useUserContext()
   const [isSearching, setIsSearching] = useState(false)
   const [isManagingRoute, setIsManagingRoute] = useState(false)
+
+  const mapRef = useRef()
+
+  // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
+  useEffect(() => {
+    console.log('mapRef.current', mapRef)
+  }, [mapRef])
 
   type RoutingManagerRef = {
     handleUpdate: (route: Route) => void
@@ -176,7 +186,15 @@ function Home() {
         minZoom={1}
         center={modaCenterGridMap.getCenter()}
         zoom={2}
-        //preferCanvas={true}
+        whenCreated={(mapInstance) => {
+          mapRef.current = mapInstance
+        }}
+        rotate={true}
+        touchRotate={true}
+        rotateControl={{
+          closeOnZeroBearing: false,
+        }}
+        bearing={0}
       >
         <MapMaxBoundsUpdater />
         <MapDrawer
