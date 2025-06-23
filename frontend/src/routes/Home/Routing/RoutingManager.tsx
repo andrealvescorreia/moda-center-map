@@ -112,8 +112,9 @@ const RoutingManager = forwardRef(
             onStart={() => setIsFollowingRoute(true)}
           />
         )}
-        {isFollowingRoute && (
+        {isFollowingRoute && route && (
           <RouteFollower
+            route={route}
             onCancel={() => setIsFollowingRoute(false)}
             onFinish={() => {
               handleUpdate({ inicio: null, destinos: [] })
