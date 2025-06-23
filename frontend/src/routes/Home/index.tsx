@@ -126,7 +126,7 @@ function Home() {
   }
 
   return (
-    <div>
+    <>
       <NavBar />
 
       <div className="absolute ui top-0 w-full ">
@@ -204,7 +204,7 @@ function Home() {
         )}
         <ClickPosition />
       </MapContainer>
-    </div>
+    </>
   )
 }
 

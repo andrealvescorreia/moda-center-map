@@ -24,7 +24,7 @@ export default function AlertDialog({
   }
 
   return (
-    <React.Fragment>
+    <>
       <Dialog
         open={open}
         onClose={handleClose}
@@ -39,6 +39,6 @@ export default function AlertDialog({
           </Button>
         </DialogActions>
       </Dialog>
-    </React.Fragment>
+    </>
   )
 }

@@ -310,7 +310,7 @@ export default function SellerPage() {
     )
   }
   return (
-    <div>
+    <>
       {modalOpen && ModalComponent}
       <Sheet
         ref={ref}
@@ -464,7 +464,7 @@ export default function SellerPage() {
 
         {drawPosition()}
       </MapContainer>
-    </div>
+    </>
   )
 
   function AddToRouteButton({ onClick }: { onClick: () => void }) {

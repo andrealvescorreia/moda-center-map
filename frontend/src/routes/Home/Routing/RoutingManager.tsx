@@ -99,7 +99,7 @@ const RoutingManager = forwardRef(
     }
 
     return (
-      <div>
+      <>
         {isCreatingRoute && !isFollowingRoute && (
           <RouteEditor
             gridMap={gridMap}
@@ -127,7 +127,7 @@ const RoutingManager = forwardRef(
             gridMap={gridMap}
           />
         )}
-      </div>
+      </>
     )
   }
 )
