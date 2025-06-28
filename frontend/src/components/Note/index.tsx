@@ -55,7 +55,7 @@ export default function Note({ defaultNote, onSave, onClose }: NoteProps) {
                     />
                   </button>
                   <textarea
-                    className="w-full h-90 p-2 border-none rounded-lg focus:outline-none resize-none"
+                    className="w-full h-[38dvh] md:h-90 p-2 border-none rounded-lg focus:outline-none resize-none"
                     placeholder="Escrever uma nota..."
                     // biome-ignore lint/a11y/noAutofocus: <explanation>
                     autoFocus={!defaultNote}
