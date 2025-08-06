@@ -6,3 +6,5 @@ export const storeSchema = z.object({
   store_number: z.number().int().positive().max(19),
   block_number: z.number().int().positive().max(9),
 })
+
+export type StoreType = z.infer<typeof storeSchema>

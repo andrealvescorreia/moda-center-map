@@ -6,3 +6,5 @@ export const boxeSchema = z.object({
   box_number: z.number().int().positive().max(128),
   street_letter: z.string().regex(/^[A-P]$/),
 })
+
+export type BoxeType = z.infer<typeof boxeSchema>
