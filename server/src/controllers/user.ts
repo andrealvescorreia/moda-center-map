@@ -1,7 +1,6 @@
 import type { NextFunction, Request, Response } from 'express'
 import jwt from 'jsonwebtoken'
 import ms, { type StringValue } from 'ms'
-import { ZodError } from 'zod'
 import errorsIds from '../../../shared/operation-errors'
 import User from '../database/models/user'
 import { env } from '../env'
