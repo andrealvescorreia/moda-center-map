@@ -155,7 +155,7 @@ async function validateStores(stores: StoreType[], ignoredSellerId?: string) {
   const errors = []
   for (let i = 0; i < stores.length; i++) {
     const store = stores[i]
-    //validações lojas externas
+    const field = `sellingLocations.stores.${i}`
     if (
       ['blue', 'orange', 'red', 'green'].includes(store.sector_color) &&
       store.block_number < 8 &&
@@ -163,7 +163,7 @@ async function validateStores(stores: StoreType[], ignoredSellerId?: string) {
     ) {
       errors.push({
         code: errorsIds.TOO_BIG,
-        field: 'sellingLocations.stores.0.store_number',
+        field: `${field}.store_number`,
         message:
           'Number must be less than or equal to 15 for blocks between 1 and 7 of this sector',
       })
@@ -175,7 +175,7 @@ async function validateStores(stores: StoreType[], ignoredSellerId?: string) {
     ) {
       errors.push({
         code: errorsIds.TOO_BIG,
-        field: 'sellingLocations.stores.0.store_number',
+        field: `${field}.store_number`,
         message:
           'Number must be less than or equal to 14 for block 8 of this sector',
       })
@@ -187,7 +187,7 @@ async function validateStores(stores: StoreType[], ignoredSellerId?: string) {
     ) {
       errors.push({
         code: errorsIds.TOO_BIG,
-        field: 'sellingLocations.stores.0.store_number',
+        field: `${field}.store_number`,
         message:
           'Number must be less than or equal to 6 for block 8 of this sector',
       })
@@ -199,7 +199,7 @@ async function validateStores(stores: StoreType[], ignoredSellerId?: string) {
     ) {
       errors.push({
         code: errorsIds.TOO_BIG,
-        field: 'sellingLocations.stores.0.store_number',
+        field: `${field}.store_number`,
         message:
           'Number must be less than or equal to 18 for blocks between 1 and 4 of this sector',
       })
@@ -222,7 +222,7 @@ async function validateStores(stores: StoreType[], ignoredSellerId?: string) {
     if (storeLocation) {
       errors.push({
         code: errorsIds.LOCATION_OCCUPIED,
-        field: `sellingLocations.stores.${i}`,
+        field,
         message: 'Store already occupied by other seller',
         occupiedBy: {
           id: storeLocation.seller_id,
