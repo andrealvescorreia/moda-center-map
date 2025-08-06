@@ -67,21 +67,6 @@ export async function createUser(
     })
     return
   } catch (error) {
-    if (error instanceof ZodError) {
-      const errorsDetails = error.errors.map((e) => ({
-        code:
-          e.code === 'too_small'
-            ? errorsIds.TOO_SHORT
-            : e.code === 'too_big'
-              ? errorsIds.TOO_BIG
-              : errorsIds.INVALID,
-        message: e.message,
-        field: e.path[0],
-      }))
-
-      res.status(400).json({ errors: errorsDetails })
-      return
-    }
     next(error)
   }
 }
