@@ -117,6 +117,7 @@ async function validateBoxes(
       errors.push(auxBoxeError)
     }
   }
+  if (errors.length) return errors
 
   for (const box of boxes || []) {
     const boxLocation = await Boxe.findOne({
