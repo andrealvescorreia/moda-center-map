@@ -52,6 +52,7 @@ describe('create seller', () => {
       name: 'Olivia Palito moda feminina',
       sellingLocations: {
         boxes: [{ sector_color: 'blue', box_number: 2, street_letter: 'A' }],
+        stores: [{ sector_color: 'orange', block_number: 1, store_number: 1 }],
       },
     }
 
@@ -194,7 +195,10 @@ describe('create seller', () => {
       const reqBody = {
         name: 'Outra Olivia Palito',
         sellingLocations: {
-          boxes: [{ sector_color: 'blue', box_number: 2, street_letter: 'A' }],
+          boxes: [
+            { sector_color: 'red', box_number: 2, street_letter: 'B' }, //free
+            { sector_color: 'blue', box_number: 2, street_letter: 'A' }, //occupied
+          ],
         },
       }
 
@@ -202,7 +206,7 @@ describe('create seller', () => {
       response.status.should.be.equal(400)
       response.body.errors[0].should.deep.include({
         code: 'LOCATION_OCCUPIED',
-        field: 'sellingLocations.boxes.0',
+        field: 'sellingLocations.boxes.1',
         message: 'Box already occupied by other seller',
       })
       response.body.errors[0].occupiedBy.should.deep.include({
@@ -699,6 +703,31 @@ describe('create seller', () => {
     })
   })
   describe('invalid store', () => {
+    it('should not be able to create a seller when store is already occupied', async () => {
+      const reqBody = {
+        name: 'Fake Olivia Palito',
+        sellingLocations: {
+          stores: [
+            { sector_color: 'red', block_number: 2, store_number: 6 }, //free
+            { sector_color: 'orange', block_number: 1, store_number: 1 }, //occupied
+          ],
+        },
+      }
+
+      const response = await postSeller(reqBody)
+      response.status.should.be.equal(400)
+      response.body.errors[0].should.deep.include({
+        code: 'LOCATION_OCCUPIED',
+        field: 'sellingLocations.stores.1',
+        message: 'Store already occupied by other seller',
+      })
+      response.body.errors[0].occupiedBy.should.deep.include({
+        name: 'Olivia Palito moda feminina',
+      })
+
+      const seller = await findSeller(reqBody.name)
+      seller?.should.be.null
+    })
     it('should not be able to create a seller whith invalid store -> block_number 10 and store_number 20', async () => {
       const reqBody = {
         name: 'Teste',
