@@ -10,6 +10,7 @@ import type {
   registerSellerSchema,
   updateSellerSchema,
 } from '../schemas/sellerSchema'
+import type { StoreType } from '../schemas/storeSchema'
 import { validateBoxe } from './validate-boxes'
 
 type NewSellerType = z.infer<typeof registerSellerSchema>
@@ -150,12 +151,10 @@ async function validateBoxes(
   return errors
 }
 
-async function validateStores(
-  stores: NewSellerType['sellingLocations']['stores'],
-  ignoredSellerId?: string
-) {
+async function validateStores(stores: StoreType[], ignoredSellerId?: string) {
   const errors = []
-  for (const store of stores || []) {
+  for (let i = 0; i < stores.length; i++) {
+    const store = stores[i]
     //validações lojas externas
     if (
       ['blue', 'orange', 'red', 'green'].includes(store.sector_color) &&
@@ -223,7 +222,7 @@ async function validateStores(
     if (storeLocation) {
       errors.push({
         code: errorsIds.LOCATION_OCCUPIED,
-        field: 'sellingLocations.stores',
+        field: `sellingLocations.stores.${i}`,
         message: 'Store already occupied by other seller',
         occupiedBy: {
           id: storeLocation.seller_id,
