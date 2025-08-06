@@ -367,7 +367,7 @@ describe('update seller', () => {
     res.status.should.equal(400)
     res.body.errors[0].should.deep.include({
       code: 'LOCATION_OCCUPIED',
-      field: 'sellingLocations.boxes',
+      field: 'sellingLocations.boxes.2',
       message: 'Box already occupied by other seller',
     })
     res.body.errors[0].occupiedBy.should.deep.include({

@@ -202,7 +202,7 @@ describe('create seller', () => {
       response.status.should.be.equal(400)
       response.body.errors[0].should.deep.include({
         code: 'LOCATION_OCCUPIED',
-        field: 'sellingLocations.boxes',
+        field: 'sellingLocations.boxes.0',
         message: 'Box already occupied by other seller',
       })
       response.body.errors[0].occupiedBy.should.deep.include({

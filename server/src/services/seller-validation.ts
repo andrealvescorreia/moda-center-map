@@ -119,7 +119,8 @@ async function validateBoxes(
   }
   if (errors.length) return errors
 
-  for (const box of boxes || []) {
+  for (let i = 0; i < boxes.length; i++) {
+    const box = boxes[i]
     const boxLocation = await Boxe.findOne({
       where: {
         [Op.and]: [
@@ -136,7 +137,7 @@ async function validateBoxes(
     if (boxLocation) {
       errors.push({
         code: errorsIds.LOCATION_OCCUPIED,
-        field: 'sellingLocations.boxes',
+        field: `sellingLocations.boxes.${i}`,
         message: 'Box already occupied by other seller',
         occupiedBy: {
           id: boxLocation.seller_id,
