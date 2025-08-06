@@ -1,10 +1,10 @@
+import { Op } from 'sequelize'
 import type z from 'zod'
 import errorsIds from '../../../shared/operation-errors'
 import Boxe from '../database/models/boxe'
 import ProductCategory from '../database/models/product-category'
 import Seller from '../database/models/seller'
 import Store from '../database/models/store'
-const { Op } = require('sequelize')
 import type {
   registerSellerSchema,
   updateSellerSchema,
