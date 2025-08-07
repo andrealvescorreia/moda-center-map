@@ -7,10 +7,14 @@ import ProductCategory from '../database/models/product-category'
 import Seller from '../database/models/seller'
 import Store from '../database/models/store'
 import User from '../database/models/user'
+import { boxeSchema } from '../schemas/boxeSchema'
+import { queryOptionsSchema } from '../schemas/queryOptionsSchema'
+import { type SearchType, searchSchema } from '../schemas/searchSchema'
 import {
   registerSellerSchema,
   updateSellerSchema,
 } from '../schemas/sellerSchema'
+import { storeSchema } from '../schemas/storeSchema'
 import {
   boxesChanges,
   storesChanges,
@@ -21,12 +25,8 @@ import {
 } from '../services/seller-validation'
 
 export async function index(req: Request, res: Response, next: NextFunction) {
-  const optionalParams = z.object({
-    order_by: z.string().optional(),
-    order: z.enum(['ASC', 'DESC', 'asc', 'desc']).optional(),
-  })
   try {
-    const parsed = optionalParams.parse(req.query)
+    const parsed = queryOptionsSchema.parse(req.query)
     const sellers = await Seller.findAll({
       order: [
         [
@@ -59,6 +59,7 @@ export async function index(req: Request, res: Response, next: NextFunction) {
     return next(error)
   }
 }
+
 async function findSellerById(id: string) {
   return await Seller.findOne({
     where: { id },
@@ -122,12 +123,6 @@ export async function show(req: Request, res: Response, next: NextFunction) {
   }
 }
 
-const boxeSchema = z.object({
-  sector_color: z.string(),
-  street_letter: z.string(),
-  box_number: z.coerce.number(),
-})
-
 export async function showByBoxe(
   req: Request,
   res: Response,
@@ -153,11 +148,6 @@ export async function showByBoxe(
   }
 }
 
-const storeSchema = z.object({
-  sector_color: z.string(),
-  block_number: z.coerce.number(),
-  store_number: z.coerce.number(),
-})
 export async function showByStore(
   req: Request,
   res: Response,
@@ -185,12 +175,6 @@ export async function showByStore(
   }
 }
 
-const searchSchema = z.object({
-  searchTerm: z.string(),
-  limit: z.number().optional().default(10),
-  offset: z.number().optional().default(0),
-})
-
 export async function search(req: Request, res: Response, next: NextFunction) {
   try {
     const parsed = searchSchema.parse(req.query)
@@ -204,8 +188,7 @@ export async function search(req: Request, res: Response, next: NextFunction) {
   }
 }
 
-type Search = z.infer<typeof searchSchema>
-async function searchSeller({ searchTerm, limit, offset }: Search) {
+async function searchSeller({ searchTerm, limit, offset }: SearchType) {
   const results = await Seller.findAll({
     where: Sequelize.literal(`
       search_vector @@ plainto_tsquery('portuguese', :searchTerm)
