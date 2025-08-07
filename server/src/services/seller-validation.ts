@@ -11,7 +11,8 @@ import type {
   updateSellerSchema,
 } from '../schemas/sellerSchema'
 import type { StoreType } from '../schemas/storeSchema'
-import { validateBoxe } from './validate-boxes'
+import { validateBoxe } from './validate-boxe'
+import { validateStore } from './validate-store'
 
 type NewSellerType = z.infer<typeof registerSellerSchema>
 type UpdateSellerType = z.infer<typeof updateSellerSchema>
@@ -156,53 +157,14 @@ async function validateStores(stores: StoreType[], ignoredSellerId?: string) {
   for (let i = 0; i < stores.length; i++) {
     const store = stores[i]
     const field = `sellingLocations.stores.${i}`
-    if (
-      ['blue', 'orange', 'red', 'green'].includes(store.sector_color) &&
-      store.block_number < 8 &&
-      store.store_number > 15
-    ) {
-      errors.push({
-        code: errorsIds.TOO_BIG,
-        field: `${field}.store_number`,
-        message:
-          'Number must be less than or equal to 15 for blocks between 1 and 7 of this sector',
-      })
-    }
-    if (
-      ['blue', 'orange'].includes(store.sector_color) &&
-      store.block_number === 8 &&
-      store.store_number > 14
-    ) {
-      errors.push({
-        code: errorsIds.TOO_BIG,
-        field: `${field}.store_number`,
-        message:
-          'Number must be less than or equal to 14 for block 8 of this sector',
-      })
-    }
-    if (
-      ['red', 'green'].includes(store.sector_color) &&
-      store.block_number === 8 &&
-      store.store_number > 6
-    ) {
-      errors.push({
-        code: errorsIds.TOO_BIG,
-        field: `${field}.store_number`,
-        message:
-          'Number must be less than or equal to 6 for block 8 of this sector',
-      })
-    }
-    if (
-      ['yellow', 'white'].includes(store.sector_color) &&
-      store.block_number <= 4 &&
-      store.store_number > 18
-    ) {
-      errors.push({
-        code: errorsIds.TOO_BIG,
-        field: `${field}.store_number`,
-        message:
-          'Number must be less than or equal to 18 for blocks between 1 and 4 of this sector',
-      })
+    const storeErrors = validateStore(store)
+
+    for (const storeError of storeErrors) {
+      const auxBoxeError: ValidationError = {
+        ...storeError,
+        field: storeError.field ? `${field}.${storeError.field}` : field,
+      }
+      errors.push(auxBoxeError)
     }
     if (errors.length > 0) return errors
     // verifica se a loja está ocupada
