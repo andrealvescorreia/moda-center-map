@@ -76,13 +76,14 @@ async function setupProductCategories() {
 }
 
 export async function setupDatabase() {
-  await sync()
-  await setupProductCategories()
-  if (process.env.NODE_ENV !== 'test') {
-    postgreSetupSellerSearch(sequelize)
-      .then(() => console.log('Banco de dados configurado'))
-      .catch((err) =>
-        console.error('Erro ao configurar o banco de dados:', err)
-      )
+  try {
+    await sync()
+    await setupProductCategories()
+    if (sequelize.getDialect() === 'postgres') {
+      await postgreSetupSellerSearch(sequelize)
+    }
+    console.log('Conectado ao banco de dados.')
+  } catch (error) {
+    console.log('Ocorreu um erro ao configurar o BD: ', error)
   }
 }
