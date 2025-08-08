@@ -25,16 +25,16 @@ const models = [
 ]
 
 let sequelize: Sequelize
-if (process.env.NODE_ENV !== 'test') {
-  sequelize = new Sequelize(env.POSTGRES_URL, {
-    ...configs,
-    models,
-  })
-} else {
+if (process.env.NODE_ENV === 'test') {
   sequelize = new Sequelize({
     dialect: 'sqlite' as Dialect,
     storage: ':memory:',
     logging: false,
+    models,
+  })
+} else {
+  sequelize = new Sequelize(env.POSTGRES_URL, {
+    ...configs,
     models,
   })
 }
