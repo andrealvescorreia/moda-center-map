@@ -2,6 +2,7 @@ import type { Dialect } from 'sequelize'
 import { Sequelize } from 'sequelize-typescript'
 import configs from '../config/database'
 import { env } from '../env'
+import { defaultProductCategories } from './default-product-categories'
 import Boxe from './models/boxe'
 import Notes from './models/note'
 import ProductCategory from './models/product-category'
@@ -44,31 +45,7 @@ async function sync() {
 }
 
 async function setupProductCategories() {
-  // evite remover categorias existentes, apenas adicionar caso necessário
-  for (const category of [
-    'Calças',
-    'Camisetas',
-    'Shorts',
-    'Saias',
-    'Vestidos',
-    'Blusas',
-    'Bebês',
-    'Jeans',
-    'Acessórios',
-    'Beleza',
-    'Calçados',
-    'Casa',
-    'Casual',
-    'Evangélica',
-    'Fitness',
-    'Infantil',
-    'Íntima',
-    'Plus Size',
-    'Praia',
-    'Sleepwear',
-    'Social',
-    'Outros',
-  ]) {
+  for (const category of defaultProductCategories) {
     await ProductCategory.findOrCreate({
       where: { category },
     })
