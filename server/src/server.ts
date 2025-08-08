@@ -1,12 +1,12 @@
 import './database/index' //executes the database connection
 import app from './app'
 
-import { setup } from './database/index'
+import { setupDatabase } from './database/index'
 import { env, serverUrl } from './env'
 import { setupSwaggerDocs } from './swagger'
 setupSwaggerDocs(app)
 
-setup().then(() => {
+setupDatabase().then(() => {
   app.listen(env.PORT, () => {
     console.log(`\nRunning on ${serverUrl}`)
   })

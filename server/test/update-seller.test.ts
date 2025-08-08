@@ -2,7 +2,7 @@ const chai = require('chai')
 const request = require('supertest')
 const should = chai.should()
 import app from '../src/app'
-import sequelize, { setup } from '../src/database'
+import sequelize, { setupDatabase } from '../src/database'
 import Boxe from '../src/database/models/boxe'
 import ProductCategory from '../src/database/models/product-category'
 import Seller from '../src/database/models/seller'
@@ -69,7 +69,7 @@ describe('update seller', () => {
   }
 
   before(async () => {
-    await setup()
+    await setupDatabase()
     await sequelize.sync({ force: true })
     await setupAuth()
     await setupProductCategories()
