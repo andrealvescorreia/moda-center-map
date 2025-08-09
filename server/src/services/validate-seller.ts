@@ -93,15 +93,26 @@ async function validateSellingLocations(
   }
 
   errors = errors.concat(
-    await validateBoxes(sellingLocations.boxes || [], ignoredSellerId)
+    await validateSellerBoxes(sellingLocations.boxes || [], ignoredSellerId)
   )
   errors = errors.concat(
-    await validateStores(sellingLocations.stores || [], ignoredSellerId)
+    await validateSellerStores(sellingLocations.stores || [], ignoredSellerId)
   )
   return errors
 }
 
-async function validateBoxes(
+async function findBoxe(box: BoxeType) {
+  return await Boxe.findOne({
+    where: {
+      sector_color: box.sector_color,
+      box_number: box.box_number,
+      street_letter: box.street_letter,
+    },
+    include: [Seller],
+  })
+}
+
+async function validateSellerBoxes(
   boxes: BoxeType[],
   ignoredSellerId?: string
 ): Promise<ValidationError[]> {
@@ -125,27 +136,15 @@ async function validateBoxes(
 
   for (let i = 0; i < boxes.length; i++) {
     const box = boxes[i]
-    const boxLocation = await Boxe.findOne({
-      where: {
-        [Op.and]: [
-          {
-            sector_color: box.sector_color,
-            box_number: box.box_number,
-            street_letter: box.street_letter,
-          },
-          ignoredSellerId ? { seller_id: { [Op.ne]: ignoredSellerId } } : {},
-        ],
-      },
-      include: [Seller],
-    })
-    if (boxLocation) {
+    const existingBoxe = await findBoxe(box)
+    if (existingBoxe && existingBoxe.seller_id !== ignoredSellerId) {
       errors.push({
         code: errorsIds.LOCATION_OCCUPIED,
         field: `sellingLocations.boxes.${i}`,
         message: 'Box already occupied by other seller',
         occupiedBy: {
-          id: boxLocation.seller_id,
-          name: boxLocation.seller?.name,
+          id: existingBoxe.seller_id,
+          name: existingBoxe.seller?.name,
         },
       })
     }
@@ -154,7 +153,21 @@ async function validateBoxes(
   return errors
 }
 
-async function validateStores(stores: StoreType[], ignoredSellerId?: string) {
+async function findStore(store: StoreType) {
+  return await Store.findOne({
+    where: {
+      sector_color: store.sector_color,
+      block_number: store.block_number,
+      store_number: store.store_number,
+    },
+    include: [Seller],
+  })
+}
+
+async function validateSellerStores(
+  stores: StoreType[],
+  ignoredSellerId?: string
+) {
   const errors = []
   for (let i = 0; i < stores.length; i++) {
     const store = stores[i]
@@ -162,35 +175,23 @@ async function validateStores(stores: StoreType[], ignoredSellerId?: string) {
     const storeErrors = validateStore(store)
 
     for (const storeError of storeErrors) {
-      const auxBoxeError: ValidationError = {
+      const auxStoreError: ValidationError = {
         ...storeError,
         field: storeError.field ? `${field}.${storeError.field}` : field,
       }
-      errors.push(auxBoxeError)
+      errors.push(auxStoreError)
     }
     if (errors.length > 0) return errors
+    const existingStore = await findStore(store)
     // verifica se a loja está ocupada
-    const storeLocation = await Store.findOne({
-      where: {
-        [Op.and]: [
-          {
-            sector_color: store.sector_color,
-            block_number: store.block_number,
-            store_number: store.store_number,
-          },
-          ignoredSellerId ? { seller_id: { [Op.ne]: ignoredSellerId } } : {},
-        ],
-      },
-      include: [Seller],
-    })
-    if (storeLocation) {
+    if (existingStore && existingStore.seller_id !== ignoredSellerId) {
       errors.push({
         code: errorsIds.LOCATION_OCCUPIED,
         field,
         message: 'Store already occupied by other seller',
         occupiedBy: {
-          id: storeLocation.seller_id,
-          name: storeLocation.seller?.name,
+          id: existingStore.seller_id,
+          name: existingStore.seller?.name,
         },
       })
     }
