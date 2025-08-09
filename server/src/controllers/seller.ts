@@ -20,7 +20,7 @@ import {
   storesChanges,
 } from '../services/sell-location-change-detection'
 import {
-  validateNewSeller,
+  validateSellerCreate,
   validateSellerUpdate,
 } from '../services/seller-validation'
 
@@ -229,7 +229,7 @@ export async function create(req: Request, res: Response, next: NextFunction) {
       phone_number: req.body.phone_number?.replace(/\D/g, '').trim(),
       name: req.body.name?.trim(),
     })
-    const errors = await validateNewSeller(parsed)
+    const errors = await validateSellerCreate(parsed)
     if (errors.length > 0) {
       res.status(400).json({ errors })
       return

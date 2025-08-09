@@ -26,7 +26,7 @@ type ValidationError = {
   }
 }
 
-export async function validateNewSeller({
+export async function validateSellerCreate({
   name,
   sellingLocations,
   phone_number,
