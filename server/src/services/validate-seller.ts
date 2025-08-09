@@ -55,14 +55,16 @@ export async function validateSellerUpdate(
   return errors
 }
 
+async function findSellerByName(name: string) {
+  return await Seller.findOne({
+    where: { name },
+  })
+}
+
 async function validateName(name: string, ignoredId?: string) {
   const errors = []
-  const seller = await Seller.findOne({
-    where: {
-      [Op.and]: [{ name }, ignoredId ? { id: { [Op.ne]: ignoredId } } : {}],
-    },
-  })
-  if (seller) {
+  const seller = await findSellerByName(name)
+  if (seller && seller.id !== ignoredId) {
     errors.push({
       code: errorsIds.ALREADY_IN_USE,
       field: 'name',

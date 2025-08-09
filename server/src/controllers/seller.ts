@@ -22,7 +22,7 @@ import {
 import {
   validateSellerCreate,
   validateSellerUpdate,
-} from '../services/seller-validation'
+} from '../services/validate-seller'
 
 export async function index(req: Request, res: Response, next: NextFunction) {
   try {
