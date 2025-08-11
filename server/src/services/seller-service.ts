@@ -13,12 +13,17 @@ import type {
 } from '../schemas/sellerSchema'
 import type { StoreType } from '../schemas/storeSchema'
 import { boxesChanges, storesChanges } from './sell-location-change-detection'
-import { validateSellerCreate, validateSellerUpdate } from './validate-seller'
+import {
+  validateSellerCreate,
+  validateSellerDelete,
+  validateSellerUpdate,
+} from './validate-seller'
 
 export class SellerService {
   private defaultOrderBy = 'createdAt'
   private defaultOrder = 'DESC'
 
+  //TODO: add limit and offset
   async findAll({ order_by, order }: QueryOptionsType) {
     return await Seller.findAll({
       order: [
@@ -223,6 +228,13 @@ export class SellerService {
       await t.rollback()
       throw error
     }
+  }
+
+  async delete(id: string) {
+    const errors = await validateSellerDelete(id)
+    if (errors.length > 0) return { errors }
+    await Seller.destroy({ where: { id } })
+    return true
   }
 
   private getDefaultIncludes() {

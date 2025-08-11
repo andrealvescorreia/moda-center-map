@@ -169,11 +169,16 @@ export async function update(req: Request, res: Response, next: NextFunction) {
 
 export async function destroy(req: Request, res: Response, next: NextFunction) {
   try {
-    const seller = await findSellerByReqId(req, res)
-    if (!seller) return
-
-    await Seller.destroy({ where: { id: req.params.id } })
-    res.status(204).send()
+    const deletion = await sellerService.delete(req.params.id)
+    if (typeof deletion === 'object' && 'errors' in deletion) {
+      if (deletion.errors.some((err) => err.code === errorsIds.NOT_FOUND)) {
+        res.status(404).json({ errors: deletion.errors })
+        return
+      }
+      res.status(400).json({ errors: deletion.errors })
+      return
+    }
+    res.status(204).send({ message: 'Seller deleted' })
     return
   } catch (error) {
     return next(error)

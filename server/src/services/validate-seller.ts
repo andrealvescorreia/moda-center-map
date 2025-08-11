@@ -69,6 +69,10 @@ export async function validateSellerUpdate(
   return errors
 }
 
+export async function validateSellerDelete(sellerId: string) {
+  return await validateSellerId(sellerId)
+}
+
 async function findSellerByName(name: string) {
   return await Seller.findOne({
     where: { name },
