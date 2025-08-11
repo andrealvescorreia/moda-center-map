@@ -126,8 +126,15 @@ describe('update seller', () => {
       boxes: [{ sector_color: 'blue', box_number: 2, street_letter: 'A' }],
     })
     res.status.should.equal(404)
-    res.body.should.have.property('message')
-    res.body.message.should.equal('Seller not found')
+    res.body.should.be.deep.equal({
+      errors: [
+        {
+          code: 'NOT_FOUND',
+          field: 'id',
+          message: 'Seller not found',
+        },
+      ],
+    })
   })
 
   it('should be able to update seller name', async () => {
