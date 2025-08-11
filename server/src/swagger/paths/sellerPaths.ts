@@ -463,9 +463,13 @@ const sellerPaths: OpenAPIV3.PathsObject = {
                     },
                   },
                 },
-                example: {
-                  message: 'Seller not found',
-                },
+                example: [
+                  {
+                    code: 'NOT_FOUND',
+                    field: 'id',
+                    message: 'Seller not found',
+                  },
+                ],
               },
             },
           },
