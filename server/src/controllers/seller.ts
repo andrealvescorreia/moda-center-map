@@ -1,7 +1,6 @@
 import type { NextFunction, Request, Response } from 'express'
 import z from 'zod'
 import errorsIds from '../../../shared/operation-errors'
-import sequelize from '../database'
 import Boxe from '../database/models/boxe'
 import ProductCategory from '../database/models/product-category'
 import Seller from '../database/models/seller'
@@ -15,12 +14,7 @@ import {
   updateSellerSchema,
 } from '../schemas/sellerSchema'
 import { storeSchema } from '../schemas/storeSchema'
-import {
-  boxesChanges,
-  storesChanges,
-} from '../services/sell-location-change-detection'
 import { SellerService } from '../services/seller-service'
-import { validateSellerUpdate } from '../services/validate-seller'
 
 const sellerService = new SellerService()
 
