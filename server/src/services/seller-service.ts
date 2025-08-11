@@ -1,5 +1,4 @@
-import { Sequelize } from 'sequelize'
-import z from 'zod'
+import { Sequelize, type Transaction } from 'sequelize'
 import sequelize from '../database'
 import Boxe from '../database/models/boxe'
 import ProductCategory from '../database/models/product-category'
@@ -118,6 +117,83 @@ export class SellerService {
     }
   }
 
+  private async updateBoxes(
+    seller: Seller,
+    updatedBoxes: BoxeType[] | undefined,
+    t?: Transaction
+  ) {
+    const { addedBoxes, removedBoxes } = await boxesChanges(
+      seller.id,
+      updatedBoxes
+    )
+    if (addedBoxes.length > 0) {
+      const createdBoxes = await Boxe.bulkCreate(addedBoxes, {
+        transaction: t,
+      })
+      await seller.$add('boxes', createdBoxes, { transaction: t })
+    }
+    if (removedBoxes.length > 0) {
+      await Boxe.destroy({
+        where: { id: removedBoxes.map((box) => box.id) },
+        transaction: t,
+      })
+    }
+  }
+  private async updateStores(
+    seller: Seller,
+    updatedStores: StoreType[] | undefined,
+    t?: Transaction
+  ) {
+    const { addedStores, removedStores } = await storesChanges(
+      seller.id,
+      updatedStores
+    )
+    if (addedStores.length > 0) {
+      const createdStores = await Store.bulkCreate(addedStores, {
+        transaction: t,
+      })
+      await seller.$add('stores', createdStores, { transaction: t })
+    }
+    if (removedStores.length > 0) {
+      await Store.destroy({
+        where: { id: removedStores.map((store) => store.id) },
+        transaction: t,
+      })
+    }
+  }
+
+  private async updateProductCategories(
+    seller: Seller,
+    updatedPG: string[] | undefined,
+    t?: Transaction
+  ) {
+    // Find all ProductCategory instances for the updated list
+    const updatedCategories = updatedPG || []
+    const foundCategories: ProductCategory[] = []
+    for (const category of updatedCategories) {
+      const found = await ProductCategory.findOne({ where: { category } })
+      if (found) foundCategories.push(found)
+    }
+
+    // Add new categories to the seller
+    if (foundCategories.length > 0) {
+      await seller.$add('product_categories', foundCategories, {
+        transaction: t,
+      })
+    }
+
+    // Remove categories that are no longer present
+    const currentCategories = seller.product_categories || []
+    const categoriesToRemove = currentCategories.filter(
+      ({ category }) => !updatedCategories.includes(category)
+    )
+    if (categoriesToRemove.length > 0) {
+      await seller.$remove('product_categories', categoriesToRemove, {
+        transaction: t,
+      })
+    }
+  }
+
   async update(seller: UpdateSellerType, id: string) {
     const errors = await validateSellerUpdate(id, seller)
     if (errors.length > 0) return { errors }
@@ -125,69 +201,23 @@ export class SellerService {
     if (!foundSeller) return null
     const t = await sequelize.transaction()
     try {
-      await Seller.update(
+      await foundSeller.update(
         {
           name: seller.name,
-          phone_number: seller.phone_number ? seller.phone_number : null,
+          phone_number: seller.phone_number ?? null,
         },
-        { where: { id }, transaction: t }
+        { transaction: t }
       )
 
-      const { addedBoxes, removedBoxes } = await boxesChanges(
-        foundSeller.id,
-        seller.boxes
+      await this.updateBoxes(foundSeller, seller.boxes, t)
+      await this.updateStores(foundSeller, seller.stores, t)
+      await this.updateProductCategories(
+        foundSeller,
+        seller.product_categories,
+        t
       )
-      const { addedStores, removedStores } = await storesChanges(
-        foundSeller.id,
-        seller.stores
-      )
-
-      if (addedBoxes.length > 0) {
-        const createdBoxes = await Boxe.bulkCreate(addedBoxes, {
-          transaction: t,
-        })
-        await foundSeller.$add('boxes', createdBoxes, { transaction: t })
-      }
-      if (removedBoxes.length > 0) {
-        await Boxe.destroy({
-          where: { id: removedBoxes.map((box) => box.id) },
-          transaction: t,
-        })
-      }
-      if (addedStores.length > 0) {
-        const createdStores = await Store.bulkCreate(addedStores, {
-          transaction: t,
-        })
-        await foundSeller.$add('stores', createdStores, { transaction: t })
-      }
-      if (removedStores.length > 0) {
-        await Store.destroy({
-          where: { id: removedStores.map((store) => store.id) },
-          transaction: t,
-        })
-      }
-      const newSellerProductCategories: ProductCategory[] = []
-      for (const category of seller.product_categories || []) {
-        const foundCategory = await ProductCategory.findOne({
-          where: { category },
-        })
-        if (foundCategory) newSellerProductCategories.push(foundCategory)
-      }
-      await foundSeller.$add('product_categories', newSellerProductCategories, {
-        transaction: t,
-      })
-
-      const removedCategories = foundSeller.product_categories.filter(
-        ({ category }) =>
-          !newSellerProductCategories.some((c) => c.category === category)
-      )
-      if (removedCategories.length)
-        await foundSeller.$remove('product_categories', removedCategories, {
-          transaction: t,
-        })
 
       await t.commit()
-
       return foundSeller
     } catch (error) {
       await t.rollback()
