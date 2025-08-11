@@ -1,5 +1,4 @@
-import { Op } from 'sequelize'
-import type z from 'zod'
+import z from 'zod'
 import errorsIds from '../../../shared/operation-errors'
 import Boxe from '../database/models/boxe'
 import ProductCategory from '../database/models/product-category'
@@ -11,20 +10,12 @@ import type {
   updateSellerSchema,
 } from '../schemas/sellerSchema'
 import type { StoreType } from '../schemas/storeSchema'
+import type { ValidationError } from '../schemas/validationErrorType'
 import { validateBoxe } from './validate-boxe'
 import { validateStore } from './validate-store'
 
 type NewSellerType = z.infer<typeof registerSellerSchema>
 type UpdateSellerType = z.infer<typeof updateSellerSchema>
-type ValidationError = {
-  code: string
-  field: string
-  message: string
-  occupiedBy?: {
-    id: string
-    name: string
-  }
-}
 
 export async function validateSellerCreate({
   name,
@@ -40,11 +31,34 @@ export async function validateSellerCreate({
   return errors
 }
 
+async function validateSellerId(id: string) {
+  const errors: ValidationError[] = []
+  if (!z.string().uuid().safeParse(id).success) {
+    errors.push({
+      code: errorsIds.INVALID,
+      field: 'id',
+      message: 'Invalid seller ID format',
+    })
+    return errors
+  }
+  const foundSeller = await Seller.findOne({ where: { id } })
+  if (!foundSeller) {
+    errors.push({
+      code: errorsIds.NOT_FOUND,
+      field: 'id',
+      message: 'Seller not found',
+    })
+  }
+  return errors
+}
+
 export async function validateSellerUpdate(
   sellerId: string,
   { name, boxes, stores, phone_number, product_categories }: UpdateSellerType
 ) {
   let errors: ValidationError[] = []
+  errors = errors.concat(await validateSellerId(sellerId))
+  if (errors.length > 0) return errors
 
   errors = errors.concat(await validateName(name, sellerId))
 
