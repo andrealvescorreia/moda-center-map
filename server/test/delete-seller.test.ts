@@ -71,4 +71,46 @@ describe('delete seller', () => {
     const sellerProductCategories = await SellerProductCategories.findAll()
     sellerProductCategories.length.should.be.equal(0)
   })
+  it('should return 404 when trying to delete a seller with a non-existent id', async () => {
+    const nonExistentId = '1e68649f-30f5-401f-91d1-147e3820348a'
+    const deleteResponse = await request(app)
+      .delete(`/seller/id/${nonExistentId}`)
+      .set('Cookie', authHeader['set-cookie'])
+
+    deleteResponse.status.should.be.equal(404)
+    deleteResponse.body.should.have.property('errors')
+  })
+
+  it('should not delete other sellers when deleting one seller', async () => {
+    // Create two sellers
+    const seller1 = await postSeller({
+      name: 'Seller One',
+      sellingLocations: {
+        boxes: [{ sector_color: 'red', box_number: 3, street_letter: 'B' }],
+        stores: [{ sector_color: 'red', store_number: 2, block_number: 2 }],
+      },
+      phone_number: '31988888888',
+      productCategories: ['Acessórios'],
+    })
+    const seller2 = await postSeller({
+      name: 'Seller Two',
+      sellingLocations: {
+        boxes: [{ sector_color: 'green', box_number: 4, street_letter: 'C' }],
+        stores: [{ sector_color: 'green', store_number: 3, block_number: 3 }],
+      },
+      phone_number: '31977777777',
+      productCategories: ['Moda Íntima'],
+    })
+
+    // Delete seller1
+    const deleteResponse = await request(app)
+      .delete(`/seller/id/${seller1.body.id}`)
+      .set('Cookie', authHeader['set-cookie'])
+    deleteResponse.status.should.be.equal(204)
+
+    // seller2 should still exist
+    const sellers = await Seller.findAll()
+    sellers.length.should.be.equal(1)
+    sellers[0].name.should.be.equal('Seller Two')
+  })
 })
