@@ -9,5 +9,6 @@ setupSwaggerDocs(app)
 setupDatabase().then(() => {
   app.listen(env.PORT, () => {
     console.log(`\nRunning on ${serverUrl}`)
+    console.log(`\nAPI DOCS ${serverUrl}/api-docs`)
   })
 })
