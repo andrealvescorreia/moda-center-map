@@ -21,4 +21,17 @@ export class UserService {
     await user.$add('favorite_sellers', seller)
     return { success: true, errors }
   }
+
+  async removeFavoriteSeller(userId: string, sellerId: string) {
+    let errors = await validateEntityId(userId, User)
+    errors = errors.concat(await validateEntityId(sellerId, Seller))
+    if (errors.length > 0) return { success: false, errors }
+
+    const user = await this.findOne(userId)
+    const seller = await this.sellerService.findOne(sellerId)
+    if (!seller || !user) return { success: false, errors }
+
+    await user.$remove('favorite_sellers', seller)
+    return { success: true, errors }
+  }
 }

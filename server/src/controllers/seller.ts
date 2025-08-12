@@ -205,12 +205,15 @@ export async function unfavorite(
   next: NextFunction
 ) {
   try {
-    const seller = await findSellerByReqId(req, res)
-    if (!seller) return
-    const user = await findUserByReqId(req, res)
-    if (!user) return
-
-    await user.$remove('favorite_sellers', seller)
+    const result = await userService.removeFavoriteSeller(
+      req.body.userId,
+      req.params.id
+    )
+    if (!result.success) {
+      const statusCode = validationErrorsToHttpCode(result.errors)
+      res.status(statusCode).json({ errors: result.errors })
+      return
+    }
     res.status(200).json({ message: 'Seller unfavorited' })
     return
   } catch (error) {
