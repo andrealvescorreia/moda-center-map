@@ -246,13 +246,17 @@ export async function isFavorite(
   next: NextFunction
 ) {
   try {
-    const seller = await findSellerByReqId(req, res)
-    if (!seller) return
-    const user = await findUserByReqId(req, res)
-    if (!user) return
+    const result = await userService.sellerIsFavorite(
+      req.body.userId,
+      req.params.id
+    )
+    if (!result.success) {
+      const statusCode = validationErrorsToHttpCode(result.errors)
+      res.status(statusCode).json({ errors: result.errors })
+      return
+    }
 
-    const isFavorite = await user.$has('favorite_sellers', seller)
-    res.status(200).json({ isFavorite })
+    res.status(200).json({ isFavorite: result.isFavorite })
     return
   } catch (error) {
     return next(error)

@@ -57,4 +57,16 @@ export class UserService {
     })
     return { success: true, data: favoriteSellers, errors }
   }
+
+  async sellerIsFavorite(userId: string, sellerId: string) {
+    let errors = await validateEntityId(userId, User)
+    errors = errors.concat(await validateEntityId(sellerId, Seller))
+    if (errors.length > 0) return { success: false, errors, isFavorite: false }
+
+    const user = await this.findOne(userId)
+    const seller = await this.sellerService.findOne(sellerId)
+    if (!seller || !user) return { success: false, errors, isFavorite: false }
+    const isFavorite = await user.$has('favorite_sellers', seller)
+    return { success: true, errors, isFavorite }
+  }
 }
