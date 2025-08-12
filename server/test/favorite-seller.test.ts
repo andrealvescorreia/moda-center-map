@@ -54,7 +54,6 @@ describe('favorite seller', () => {
       productCategories: ['Roupas', 'Calçados'],
     }
     const response = await postSeller(reqBody)
-
     const favoriteResponse = await request(app)
       .post(`/seller/favorite/${response.body.id}`)
       .set('Cookie', authHeader['set-cookie'])
