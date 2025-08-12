@@ -227,21 +227,13 @@ export async function indexFavorites(
   next: NextFunction
 ) {
   try {
-    const user = await findUserByReqId(req, res)
-    if (!user) return
-
-    const favoriteSellers = await user.$get('favorite_sellers', {
-      include: [
-        { model: Boxe, attributes: { exclude: ['createdAt', 'updatedAt'] } },
-        { model: Store, attributes: { exclude: ['createdAt', 'updatedAt'] } },
-        {
-          model: ProductCategory,
-          attributes: { exclude: ['createdAt', 'updatedAt'] },
-        },
-      ],
-      attributes: { exclude: ['createdAt', 'updatedAt', 'search_vector'] },
-    })
-    res.status(200).json(favoriteSellers)
+    const result = await userService.findAllFavoriteSellers(req.body.userId)
+    if (!result.success) {
+      const statusCode = validationErrorsToHttpCode(result.errors)
+      res.status(statusCode).json({ errors: result.errors })
+      return
+    }
+    res.status(200).json(result.data)
     return
   } catch (error) {
     return next(error)
