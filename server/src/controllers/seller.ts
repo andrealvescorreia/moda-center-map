@@ -1,9 +1,7 @@
 import type { NextFunction, Request, Response } from 'express'
 import z from 'zod'
-import errorsIds from '../../../shared/operation-errors'
 import Boxe from '../database/models/boxe'
 import ProductCategory from '../database/models/product-category'
-import Seller from '../database/models/seller'
 import Store from '../database/models/store'
 import User from '../database/models/user'
 import { boxeSchema } from '../schemas/boxeSchema'
@@ -15,8 +13,11 @@ import {
 } from '../schemas/sellerSchema'
 import { storeSchema } from '../schemas/storeSchema'
 import { SellerService } from '../services/seller-service'
+import { UserService } from '../services/user-service'
+import { validationErrorsToHttpCode } from '../services/validation-errors-to-http-code'
 
 const sellerService = new SellerService()
+const userService = new UserService()
 
 export async function index(req: Request, res: Response, next: NextFunction) {
   try {
@@ -151,13 +152,8 @@ export async function update(req: Request, res: Response, next: NextFunction) {
     })
     const updatedSeller = await sellerService.update(parsed, req.params.id)
     if (updatedSeller && 'errors' in updatedSeller) {
-      if (
-        updatedSeller.errors.some((err) => err.code === errorsIds.NOT_FOUND)
-      ) {
-        res.status(404).json({ errors: updatedSeller.errors })
-        return
-      }
-      res.status(400).json({ errors: updatedSeller.errors })
+      const statusCode = validationErrorsToHttpCode(updatedSeller.errors)
+      res.status(statusCode).json({ errors: updatedSeller.errors })
       return
     }
     res.status(200).json(updatedSeller)
@@ -171,11 +167,8 @@ export async function destroy(req: Request, res: Response, next: NextFunction) {
   try {
     const deletion = await sellerService.delete(req.params.id)
     if (typeof deletion === 'object' && 'errors' in deletion) {
-      if (deletion.errors.some((err) => err.code === errorsIds.NOT_FOUND)) {
-        res.status(404).json({ errors: deletion.errors })
-        return
-      }
-      res.status(400).json({ errors: deletion.errors })
+      const statusCode = validationErrorsToHttpCode(deletion.errors)
+      res.status(statusCode).json({ errors: deletion.errors })
       return
     }
     res.status(204).send({ message: 'Seller deleted' })
@@ -191,12 +184,15 @@ export async function favorite(
   next: NextFunction
 ) {
   try {
-    const seller = await findSellerByReqId(req, res)
-    if (!seller) return
-    const user = await findUserByReqId(req, res)
-    if (!user) return
-
-    await user.$add('favorite_sellers', seller)
+    const result = await userService.addFavoriteSeller(
+      req.body.userId,
+      req.params.id
+    )
+    if (!result.success) {
+      const statusCode = validationErrorsToHttpCode(result.errors)
+      res.status(statusCode).json({ errors: result.errors })
+      return
+    }
     res.status(200).json({ message: 'Seller favorited' })
     return
   } catch (error) {

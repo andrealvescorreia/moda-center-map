@@ -1,4 +1,4 @@
-import z from 'zod'
+import type z from 'zod'
 import errorsIds from '../../../shared/operation-errors'
 import Boxe from '../database/models/boxe'
 import ProductCategory from '../database/models/product-category'
@@ -12,6 +12,7 @@ import type {
 import type { StoreType } from '../schemas/storeSchema'
 import type { ValidationError } from '../schemas/validationErrorType'
 import { validateBoxe } from './validate-boxe'
+import { validateEntityId } from './validate-id'
 import { validateStore } from './validate-store'
 
 type NewSellerType = z.infer<typeof registerSellerSchema>
@@ -32,24 +33,7 @@ export async function validateSellerCreate({
 }
 
 async function validateSellerId(id: string) {
-  const errors: ValidationError[] = []
-  if (!z.string().uuid().safeParse(id).success) {
-    errors.push({
-      code: errorsIds.INVALID,
-      field: 'id',
-      message: 'Invalid seller ID format',
-    })
-    return errors
-  }
-  const foundSeller = await Seller.findOne({ where: { id } })
-  if (!foundSeller) {
-    errors.push({
-      code: errorsIds.NOT_FOUND,
-      field: 'id',
-      message: 'Seller not found',
-    })
-  }
-  return errors
+  return await validateEntityId(id, Seller)
 }
 
 export async function validateSellerUpdate(
