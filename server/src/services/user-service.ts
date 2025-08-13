@@ -4,12 +4,37 @@ import type Seller from '../database/models/seller'
 import Store from '../database/models/store'
 import User from '../database/models/user'
 import type { OperationReport } from '../interfaces/operation-report'
+import type { UserRegisterType } from '../schemas/userSchema'
 import type { ValidationError } from '../schemas/validationErrorType'
 import { SellerService } from './seller-service'
 import { validateEntityId } from './validate-id'
+import { validateUserCreate } from './validate-user'
 
 export class UserService {
   private sellerService = new SellerService()
+
+  async create(user: UserRegisterType) {
+    const errors = await validateUserCreate(user)
+    if (errors.length > 0) {
+      return {
+        success: false,
+        data: null,
+        errors,
+      }
+    }
+    const createdUser = await User.create({
+      username: user.username,
+      password: user.password,
+    })
+    return {
+      success: true,
+      data: {
+        id: createdUser.id,
+        username: createdUser.username,
+      },
+      errors,
+    }
+  }
 
   async findOne(id: string): Promise<OperationReport & { data: User | null }> {
     const errors = await validateEntityId(id, User)
