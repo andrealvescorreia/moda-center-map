@@ -30,24 +30,15 @@ export async function index(req: Request, res: Response, next: NextFunction) {
   }
 }
 
-async function findSellerByReqId(req: Request, res: Response) {
-  if (!z.string().uuid().safeParse(req.params.id).success) {
-    res.status(400).json({ message: 'Invalid id' })
-    return
-  }
-  const seller = await sellerService.findOne(req.params.id)
-  if (!seller.data) {
-    res.status(404).json({ message: 'Seller not found' })
-    return
-  }
-  return seller.data
-}
-
 export async function show(req: Request, res: Response, next: NextFunction) {
   try {
-    const seller = await findSellerByReqId(req, res)
-    if (!seller) return
-    res.status(200).json(seller)
+    const sellerResult = await sellerService.findOne(req.params.id)
+    if (sellerResult.errors.length > 0 || !sellerResult.data) {
+      const statusCode = validationErrorsToHttpCode(sellerResult.errors)
+      res.status(statusCode).json({ errors: sellerResult.errors })
+      return
+    }
+    res.status(200).json(sellerResult.data)
     return
   } catch (error) {
     console.log(error)
