@@ -2,6 +2,7 @@ import Boxe from '../database/models/boxe'
 import ProductCategory from '../database/models/product-category'
 import Store from '../database/models/store'
 import User from '../database/models/user'
+import type { ValidationError } from '../schemas/validationErrorType'
 import { SellerService } from './seller-service'
 import { validateEntityId } from './validate-id'
 
@@ -117,5 +118,34 @@ export class UserService {
     }
   }
 
-  //async findOneNote(userId: string, sellerId: string) {}
+  async findOneNote(userId: string, sellerId: string) {
+    const errors: ValidationError[] = []
+    const userResult = await this.findOne(userId)
+    if (userResult.errors.length > 0 || !userResult.data) {
+      return { success: false, errors: userResult.errors, data: null }
+    }
+    const user = userResult.data
+
+    const sellerResult = await this.sellerService.findOne(sellerId)
+    if (sellerResult.errors.length > 0 || !sellerResult.data) {
+      return { success: false, errors: sellerResult.errors, data: null }
+    }
+    const seller = sellerResult.data
+
+    const notes = await user.$get('notes', {
+      where: { seller_id: seller.id },
+    })
+    if (notes.length === 0) {
+      return {
+        success: true,
+        errors,
+        data: null,
+      }
+    }
+    return {
+      success: true,
+      errors,
+      data: { id: notes[0].id, text: notes[0].text },
+    }
+  }
 }
