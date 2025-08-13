@@ -6,7 +6,7 @@ import Seller from '../database/models/seller'
 import Store from '../database/models/store'
 import type { BoxeType } from '../schemas/boxeSchema'
 import type {
-  registerSellerSchema,
+  createSellerSchema,
   updateSellerSchema,
 } from '../schemas/sellerSchema'
 import type { StoreType } from '../schemas/storeSchema'
@@ -15,7 +15,7 @@ import { validateBoxe } from './validate-boxe'
 import { validateEntityId } from './validate-id'
 import { validateStore } from './validate-store'
 
-type NewSellerType = z.infer<typeof registerSellerSchema>
+type NewSellerType = z.infer<typeof createSellerSchema>
 type UpdateSellerType = z.infer<typeof updateSellerSchema>
 
 export async function validateSellerCreate({

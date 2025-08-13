@@ -7,10 +7,7 @@ import User from '../database/models/user'
 import { boxeSchema } from '../schemas/boxeSchema'
 import { queryOptionsSchema } from '../schemas/queryOptionsSchema'
 import { searchSchema } from '../schemas/searchSchema'
-import {
-  registerSellerSchema,
-  updateSellerSchema,
-} from '../schemas/sellerSchema'
+import { createSellerSchema, updateSellerSchema } from '../schemas/sellerSchema'
 import { storeSchema } from '../schemas/storeSchema'
 import { SellerService } from '../services/seller-service'
 import { UserService } from '../services/user-service'
@@ -102,7 +99,7 @@ export async function search(req: Request, res: Response, next: NextFunction) {
 
 export async function create(req: Request, res: Response, next: NextFunction) {
   try {
-    const parsed = registerSellerSchema.parse({
+    const parsed = createSellerSchema.parse({
       ...req.body,
       phone_number: req.body.phone_number?.replace(/\D/g, '').trim(),
       name: req.body.name?.trim(),

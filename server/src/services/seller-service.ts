@@ -8,7 +8,7 @@ import type { BoxeType } from '../schemas/boxeSchema'
 import type { QueryOptionsType } from '../schemas/queryOptionsSchema'
 import type { SearchType } from '../schemas/searchSchema'
 import type {
-  RegisterSellerType,
+  CreateSellerType,
   UpdateSellerType,
 } from '../schemas/sellerSchema'
 import type { StoreType } from '../schemas/storeSchema'
@@ -89,7 +89,7 @@ export class SellerService {
     })
   }
 
-  async create(seller: RegisterSellerType) {
+  async create(seller: CreateSellerType) {
     const errors = await validateSellerCreate(seller)
     if (errors.length > 0) {
       return { errors }

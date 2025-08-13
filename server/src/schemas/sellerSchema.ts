@@ -2,7 +2,7 @@ import z from 'zod'
 import { boxeSchema } from './boxeSchema'
 import { storeSchema } from './storeSchema'
 
-export const registerSellerSchema = z.object({
+export const createSellerSchema = z.object({
   name: z.string().min(3).max(255),
   phone_number: z.string().min(10).max(11).optional(),
   product_categories: z.array(z.string()).optional(),
@@ -20,5 +20,5 @@ export const updateSellerSchema = z.object({
   stores: z.array(storeSchema).optional(),
 })
 
-export type RegisterSellerType = z.infer<typeof registerSellerSchema>
+export type CreateSellerType = z.infer<typeof createSellerSchema>
 export type UpdateSellerType = z.infer<typeof updateSellerSchema>
