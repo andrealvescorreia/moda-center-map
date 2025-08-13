@@ -66,7 +66,32 @@ export class UserService {
     const user = await this.findOne(userId)
     const seller = await this.sellerService.findOne(sellerId)
     if (!seller || !user) return { success: false, errors, isFavorite: false }
+
     const isFavorite = await user.$has('favorite_sellers', seller)
     return { success: true, errors, isFavorite }
   }
+
+  //TODO: refactor to reduce validation copy paste
+  async putNoteOnSeller(userId: string, sellerId: string, text: string) {
+    let errors = await validateEntityId(userId, User)
+    errors = errors.concat(await validateEntityId(sellerId, Seller))
+    if (errors.length > 0) return { success: false, errors, data: null }
+
+    const user = await this.findOne(userId)
+    const seller = await this.sellerService.findOne(sellerId)
+    if (!seller || !user) return { success: false, errors, data: null }
+
+    await user.$add('sellers_notes', seller, { through: { text } })
+    const note = await user.$get('notes', {
+      where: { seller_id: seller.id },
+    })
+
+    return {
+      success: true,
+      data: { id: note[0].id, text: note[0].text },
+      errors,
+    }
+  }
+
+  //async findOneNote(userId: string, sellerId: string) {}
 }

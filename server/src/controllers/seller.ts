@@ -265,21 +265,22 @@ export async function isFavorite(
 
 export async function putNote(req: Request, res: Response, next: NextFunction) {
   try {
-    const seller = await findSellerByReqId(req, res)
-    if (!seller) return
-    const user = await findUserByReqId(req, res)
-    if (!user) return
-
     const text = req.body.text
     if (text === undefined || text === null) {
       res.status(400).json({ message: 'text is required' })
       return
     }
-    await user.$add('sellers_notes', seller, { through: { text } })
-    const notes = await user.$get('notes', {
-      where: { seller_id: seller.id },
-    })
-    res.status(200).json({ id: notes[0].id, text: notes[0].text })
+    const result = await userService.putNoteOnSeller(
+      req.body.userId,
+      req.params.id,
+      text
+    )
+    if (!result.success) {
+      const statusCode = validationErrorsToHttpCode(result.errors)
+      res.status(statusCode).json({ errors: result.errors })
+      return
+    }
+    res.status(200).json(result.data)
     return
   } catch (error) {
     return next(error)
@@ -292,7 +293,6 @@ export async function getNote(req: Request, res: Response, next: NextFunction) {
     if (!seller) return
     const user = await findUserByReqId(req, res)
     if (!user) return
-
     const notes = await user.$get('notes', {
       where: { seller_id: seller.id },
     })
