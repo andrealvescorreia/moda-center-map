@@ -1,14 +1,17 @@
 import Boxe from '../database/models/boxe'
 import ProductCategory from '../database/models/product-category'
+import type Seller from '../database/models/seller'
 import Store from '../database/models/store'
 import User from '../database/models/user'
+import type { OperationReport } from '../interfaces/operation-report'
 import type { ValidationError } from '../schemas/validationErrorType'
 import { SellerService } from './seller-service'
 import { validateEntityId } from './validate-id'
 
 export class UserService {
   private sellerService = new SellerService()
-  async findOne(id: string) {
+
+  async findOne(id: string): Promise<OperationReport & { data: User | null }> {
     const errors = await validateEntityId(id, User)
     if (errors.length > 0) {
       return {
@@ -19,12 +22,15 @@ export class UserService {
     }
     return {
       success: true,
-      data: await User.findByPk(id),
       errors,
+      data: await User.findByPk(id),
     }
   }
 
-  async addFavoriteSeller(userId: string, sellerId: string) {
+  async addFavoriteSeller(
+    userId: string,
+    sellerId: string
+  ): Promise<OperationReport> {
     const findUserResult = await this.findOne(userId)
     if (findUserResult.errors.length > 0 || !findUserResult.data) {
       return { success: false, errors: findUserResult.errors }
@@ -39,7 +45,10 @@ export class UserService {
     return { success: true, errors: [] }
   }
 
-  async removeFavoriteSeller(userId: string, sellerId: string) {
+  async removeFavoriteSeller(
+    userId: string,
+    sellerId: string
+  ): Promise<OperationReport> {
     const findUserResult = await this.findOne(userId)
     if (findUserResult.errors.length > 0 || !findUserResult.data) {
       return { success: false, errors: findUserResult.errors }
@@ -55,10 +64,12 @@ export class UserService {
     return { success: true, errors: [] }
   }
 
-  async findAllFavoriteSellers(userId: string) {
+  async findAllFavoriteSellers(
+    userId: string
+  ): Promise<OperationReport & { data: Seller[] }> {
     const findUserResult = await this.findOne(userId)
     if (findUserResult.errors.length > 0 || !findUserResult.data) {
-      return { success: false, errors: findUserResult.errors }
+      return { success: false, errors: findUserResult.errors, data: [] }
     }
     const user = findUserResult.data
 
@@ -73,17 +84,28 @@ export class UserService {
       ],
       attributes: { exclude: ['createdAt', 'updatedAt', 'search_vector'] },
     })
-    return { success: true, data: favoriteSellers, errors: [] }
+    return { success: true, errors: [], data: favoriteSellers }
   }
 
-  async sellerIsFavorite(userId: string, sellerId: string) {
+  async sellerIsFavorite(
+    userId: string,
+    sellerId: string
+  ): Promise<OperationReport & { isFavorite: boolean }> {
     const findUserResult = await this.findOne(userId)
     if (findUserResult.errors.length > 0 || !findUserResult.data) {
-      return { success: false, errors: findUserResult.errors }
+      return {
+        success: false,
+        errors: findUserResult.errors,
+        isFavorite: false,
+      }
     }
     const findSellerResult = await this.sellerService.findOne(sellerId)
     if (findSellerResult.errors.length > 0 || !findSellerResult.data) {
-      return { success: false, errors: findSellerResult.errors }
+      return {
+        success: false,
+        errors: findSellerResult.errors,
+        isFavorite: false,
+      }
     }
     const user = findUserResult.data
     const seller = findSellerResult.data
@@ -92,17 +114,20 @@ export class UserService {
     return { success: true, errors: [], isFavorite }
   }
 
-  //TODO: refactor to reduce validation copy paste
-  async putNoteOnSeller(userId: string, sellerId: string, text: string) {
+  async putNoteOnSeller(
+    userId: string,
+    sellerId: string,
+    text: string
+  ): Promise<OperationReport & { data: { id: string; text: string } | null }> {
     const userResult = await this.findOne(userId)
     if (userResult.errors.length > 0 || !userResult.data) {
-      return { success: false, errors: userResult.errors }
+      return { success: false, errors: userResult.errors, data: null }
     }
     const user = userResult.data
 
     const sellerResult = await this.sellerService.findOne(sellerId)
     if (sellerResult.errors.length > 0 || !sellerResult.data) {
-      return { success: false, errors: sellerResult.errors }
+      return { success: false, errors: sellerResult.errors, data: null }
     }
     const seller = sellerResult.data
 
@@ -118,7 +143,10 @@ export class UserService {
     }
   }
 
-  async findOneNote(userId: string, sellerId: string) {
+  async findOneNote(
+    userId: string,
+    sellerId: string
+  ): Promise<OperationReport & { data: { id: string; text: string } | null }> {
     const errors: ValidationError[] = []
     const userResult = await this.findOne(userId)
     if (userResult.errors.length > 0 || !userResult.data) {
