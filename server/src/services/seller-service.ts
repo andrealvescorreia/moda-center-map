@@ -13,6 +13,7 @@ import type {
 } from '../schemas/sellerSchema'
 import type { StoreType } from '../schemas/storeSchema'
 import { boxesChanges, storesChanges } from './sell-location-change-detection'
+import { validateEntityId } from './validate-id'
 import {
   validateSellerCreate,
   validateSellerDelete,
@@ -38,23 +39,33 @@ export class SellerService {
   }
 
   async findOne(id: string) {
-    return await Seller.findOne({
-      where: { id },
-      include: this.getDefaultIncludes(),
-      attributes: { exclude: this.getDefaultExcludes() },
-    })
+    const errors = await validateEntityId(id, Seller)
+    if (errors.length > 0) {
+      return {
+        errors,
+        data: null,
+      }
+    }
+    return {
+      data: await Seller.findOne({
+        where: { id },
+        include: this.getDefaultIncludes(),
+        attributes: { exclude: this.getDefaultExcludes() },
+      }),
+      errors,
+    }
   }
 
   async findOneByBoxe(boxe: BoxeType) {
     const existingBoxe = await Boxe.findOne({ where: boxe })
     if (!existingBoxe) return null
-    return await this.findOne(existingBoxe.seller_id)
+    return (await this.findOne(existingBoxe.seller_id)).data
   }
 
   async findOneByStore(store: StoreType) {
     const existingStore = await Store.findOne({ where: store })
     if (!existingStore) return null
-    return await this.findOne(existingStore.seller_id)
+    return (await this.findOne(existingStore.seller_id)).data
   }
 
   async search({ searchTerm, limit, offset }: SearchType) {
@@ -202,8 +213,10 @@ export class SellerService {
   async update(seller: UpdateSellerType, id: string) {
     const errors = await validateSellerUpdate(id, seller)
     if (errors.length > 0) return { errors }
-    const foundSeller = await this.findOne(id)
-    if (!foundSeller) return null
+    const sellerResult = await this.findOne(id)
+    if (!sellerResult.data) return { errors: sellerResult.errors }
+    const foundSeller = sellerResult.data
+
     const t = await sequelize.transaction()
     try {
       await foundSeller.update(

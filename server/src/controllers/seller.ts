@@ -36,11 +36,11 @@ async function findSellerByReqId(req: Request, res: Response) {
     return
   }
   const seller = await sellerService.findOne(req.params.id)
-  if (!seller) {
+  if (!seller.data) {
     res.status(404).json({ message: 'Seller not found' })
     return
   }
-  return seller
+  return seller.data
 }
 
 //TODO: move to UserService?

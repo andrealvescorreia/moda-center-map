@@ -1,6 +1,5 @@
 import Boxe from '../database/models/boxe'
 import ProductCategory from '../database/models/product-category'
-import Seller from '../database/models/seller'
 import Store from '../database/models/store'
 import User from '../database/models/user'
 import { SellerService } from './seller-service'
@@ -9,40 +8,58 @@ import { validateEntityId } from './validate-id'
 export class UserService {
   private sellerService = new SellerService()
   async findOne(id: string) {
-    return await User.findByPk(id)
+    const errors = await validateEntityId(id, User)
+    if (errors.length > 0) {
+      return {
+        success: false,
+        errors,
+        data: null,
+      }
+    }
+    return {
+      success: true,
+      data: await User.findByPk(id),
+      errors,
+    }
   }
 
   async addFavoriteSeller(userId: string, sellerId: string) {
-    let errors = await validateEntityId(userId, User)
-    errors = errors.concat(await validateEntityId(sellerId, Seller))
-    if (errors.length > 0) return { success: false, errors }
-
-    const user = await this.findOne(userId)
-    const seller = await this.sellerService.findOne(sellerId)
-    if (!seller || !user) return { success: false, errors }
-
+    const findUserResult = await this.findOne(userId)
+    if (findUserResult.errors.length > 0 || !findUserResult.data) {
+      return { success: false, errors: findUserResult.errors }
+    }
+    const findSellerResult = await this.sellerService.findOne(sellerId)
+    if (findSellerResult.errors.length > 0 || !findSellerResult.data) {
+      return { success: false, errors: findSellerResult.errors }
+    }
+    const user = findUserResult.data
+    const seller = findSellerResult.data
     await user.$add('favorite_sellers', seller)
-    return { success: true, errors }
+    return { success: true, errors: [] }
   }
 
   async removeFavoriteSeller(userId: string, sellerId: string) {
-    let errors = await validateEntityId(userId, User)
-    errors = errors.concat(await validateEntityId(sellerId, Seller))
-    if (errors.length > 0) return { success: false, errors }
-
-    const user = await this.findOne(userId)
-    const seller = await this.sellerService.findOne(sellerId)
-    if (!seller || !user) return { success: false, errors }
+    const findUserResult = await this.findOne(userId)
+    if (findUserResult.errors.length > 0 || !findUserResult.data) {
+      return { success: false, errors: findUserResult.errors }
+    }
+    const findSellerResult = await this.sellerService.findOne(sellerId)
+    if (findSellerResult.errors.length > 0 || !findSellerResult.data) {
+      return { success: false, errors: findSellerResult.errors }
+    }
+    const user = findUserResult.data
+    const seller = findSellerResult.data
 
     await user.$remove('favorite_sellers', seller)
-    return { success: true, errors }
+    return { success: true, errors: [] }
   }
 
   async findAllFavoriteSellers(userId: string) {
-    const errors = await validateEntityId(userId, User)
-    const user = await this.findOne(userId)
-    if (errors.length > 0 || !user)
-      return { success: false, errors, data: null }
+    const findUserResult = await this.findOne(userId)
+    if (findUserResult.errors.length > 0 || !findUserResult.data) {
+      return { success: false, errors: findUserResult.errors }
+    }
+    const user = findUserResult.data
 
     const favoriteSellers = await user.$get('favorite_sellers', {
       include: [
@@ -55,31 +72,38 @@ export class UserService {
       ],
       attributes: { exclude: ['createdAt', 'updatedAt', 'search_vector'] },
     })
-    return { success: true, data: favoriteSellers, errors }
+    return { success: true, data: favoriteSellers, errors: [] }
   }
 
   async sellerIsFavorite(userId: string, sellerId: string) {
-    let errors = await validateEntityId(userId, User)
-    errors = errors.concat(await validateEntityId(sellerId, Seller))
-    if (errors.length > 0) return { success: false, errors, isFavorite: false }
-
-    const user = await this.findOne(userId)
-    const seller = await this.sellerService.findOne(sellerId)
-    if (!seller || !user) return { success: false, errors, isFavorite: false }
+    const findUserResult = await this.findOne(userId)
+    if (findUserResult.errors.length > 0 || !findUserResult.data) {
+      return { success: false, errors: findUserResult.errors }
+    }
+    const findSellerResult = await this.sellerService.findOne(sellerId)
+    if (findSellerResult.errors.length > 0 || !findSellerResult.data) {
+      return { success: false, errors: findSellerResult.errors }
+    }
+    const user = findUserResult.data
+    const seller = findSellerResult.data
 
     const isFavorite = await user.$has('favorite_sellers', seller)
-    return { success: true, errors, isFavorite }
+    return { success: true, errors: [], isFavorite }
   }
 
   //TODO: refactor to reduce validation copy paste
   async putNoteOnSeller(userId: string, sellerId: string, text: string) {
-    let errors = await validateEntityId(userId, User)
-    errors = errors.concat(await validateEntityId(sellerId, Seller))
-    if (errors.length > 0) return { success: false, errors, data: null }
+    const userResult = await this.findOne(userId)
+    if (userResult.errors.length > 0 || !userResult.data) {
+      return { success: false, errors: userResult.errors }
+    }
+    const user = userResult.data
 
-    const user = await this.findOne(userId)
-    const seller = await this.sellerService.findOne(sellerId)
-    if (!seller || !user) return { success: false, errors, data: null }
+    const sellerResult = await this.sellerService.findOne(sellerId)
+    if (sellerResult.errors.length > 0 || !sellerResult.data) {
+      return { success: false, errors: sellerResult.errors }
+    }
+    const seller = sellerResult.data
 
     await user.$add('sellers_notes', seller, { through: { text } })
     const note = await user.$get('notes', {
@@ -89,7 +113,7 @@ export class UserService {
     return {
       success: true,
       data: { id: note[0].id, text: note[0].text },
-      errors,
+      errors: [],
     }
   }
 
