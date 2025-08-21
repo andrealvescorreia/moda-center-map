@@ -4,7 +4,7 @@ import type { Loja } from '../../../interfaces/Loja'
 import type { Route } from '../../../interfaces/Route'
 import { ModaCenterGridMap } from '../../../models/ModaCenterGridMap'
 import { useClickContext } from '../../../providers/ClickProvider'
-import { SearchStore } from './SearchSellingPoint'
+import { SearchDestiny } from './SearchDestiny'
 
 import {
   ArrowLeft,
@@ -403,7 +403,7 @@ const RouteEditor = ({
 
   if (isAddingDestiny && !isAddingDestinyFromMap) {
     return (
-      <SearchStore
+      <SearchDestiny
         onCancel={notAddingDestiny}
         onChooseOnMap={() => {
           setIsAddingDestinyFromMap(true)

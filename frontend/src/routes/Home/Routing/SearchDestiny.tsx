@@ -13,7 +13,7 @@ import type { Loja } from '../../../interfaces/Loja'
 import { colorMap } from '../../../utils/utils'
 import SellerList from '../../Sellers/seller-list'
 
-interface SearchStoreProps {
+interface SearchDestinyProps {
   onCancel?: () => void
   onChooseOnMap?: () => void
   onSellectSeller?: (
@@ -23,11 +23,11 @@ interface SearchStoreProps {
   ) => void
 }
 
-export function SearchStore({
+export function SearchDestiny({
   onChooseOnMap,
   onCancel,
   onSellectSeller,
-}: SearchStoreProps) {
+}: SearchDestinyProps) {
   const [searchTerm, setSearchTerm] = useState('')
   const [searchedSellers, setSearchedSellers] = useState<SellerResponse[]>([])
   const [favoriteSellers, setFavoriteSellers] = useState<SellerResponse[]>([])
