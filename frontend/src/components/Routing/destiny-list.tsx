@@ -190,7 +190,10 @@ function DestinyLiItem({
           className="ml-auto"
           onClick={() => onClickRemoveDestiny?.(index)}
         >
-          <X size={16} className="hover:cursor-pointer" />
+          <X
+            size={18}
+            className="hover:cursor-pointer hover:bg-gray-300 rounded-2xl active:bg-gray-300"
+          />
         </button>
       )}
     </li>
