@@ -84,13 +84,10 @@ export function SearchDestiny({
   }, [])
 
   function handleSelectSeller(sellerId: string, locationId?: string) {
-    let seller = searchedSellers.find((seller) => seller.id === sellerId)
-    if (!seller) {
-      seller = favoriteSellers.find((seller) => seller.id === sellerId)
-    }
-    if (!seller) {
-      seller = allSellers.find((seller) => seller.id === sellerId)
-    }
+    const seller =
+      searchedSellers.find((s) => s.id === sellerId) ||
+      favoriteSellers.find((s) => s.id === sellerId) ||
+      allSellers.find((s) => s.id === sellerId)
     if (!seller) return
     const location =
       seller.boxes.find((box) => box.id === locationId) ||
@@ -137,12 +134,10 @@ export function SearchDestiny({
             />
             <InputIcon>
               {searchTerm.length > 0 && (
-                <InputIcon>
-                  <CircleX
-                    className="cursor-pointer"
-                    onClick={() => setSearchTerm('')}
-                  />
-                </InputIcon>
+                <CircleX
+                  className="cursor-pointer"
+                  onClick={() => setSearchTerm('')}
+                />
               )}
             </InputIcon>
           </InputRoot>
