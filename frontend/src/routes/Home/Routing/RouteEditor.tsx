@@ -262,9 +262,19 @@ const RouteEditor = ({
           type="button"
           className="px-3 py-1 text-green-primary hover:cursor-pointer"
           onClick={() => {
-            if (removedDestiny.sellingLocation && removedDestiny.sellerName) {
+            let sellingLocation = removedDestiny.sellingLocation
+            if (
+              sellingLocation &&
+              'bloco' in sellingLocation &&
+              sellingLocation.getEntrance === undefined
+            ) {
+              // this happens when the sellingLocation is a Store that was restored from localStorage, which means it doesn't have the getEntrance method
+              sellingLocation =
+                gridMap.getSellingLocation(sellingLocation) ?? null
+            }
+            if (sellingLocation && removedDestiny.sellerName) {
               addDestiny(
-                removedDestiny.sellingLocation,
+                sellingLocation,
                 removedDestiny.sellerName,
                 removedDestiny.sellerId
               )
