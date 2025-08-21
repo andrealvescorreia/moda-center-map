@@ -40,7 +40,7 @@ export default function App() {
         setUser(response.data)
       } catch (error) {
         setUser(undefined)
-        console.log(error)
+        //console.log(error)
       } finally {
         setLoading(false)
       }
