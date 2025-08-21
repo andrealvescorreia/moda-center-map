@@ -69,7 +69,6 @@ export default function RouteFollower({
       sellingLocation: currentDestiny.sellingLocation,
     }
     newRoute.destinos = newRoute.destinos.slice(1)
-    //setRoute(newRoute)
     onUpdateRoute(newRoute)
   }
 
@@ -78,19 +77,19 @@ export default function RouteFollower({
     <>
       <div className="ui absolute top-0 w-[90%] md:max-w-110 ml-[50%] mt-4 -translate-x-1/2">
         <div className="w-full bg-[#4CA866] text-white  flex items-center p-2 rounded-t-2xl rounded-br-2xl gap-2">
-          <MoveUp size={40} strokeWidth={3} />
-          <span>
-            <h2 className="text-2xl font-semibold">
+          <MoveUp size={35} strokeWidth={3} />
+          <span className="w-[85%]">
+            <h2 className="text-xl font-semibold overflow-hidden whitespace-nowrap text-ellipsis max-w-[98%] ">
               {currentDestiny.sellerName}
             </h2>
-            <p className="text-lg -mt-1 font-light">
+            <p className="-mt-1 font-light">
               {locationToText(currentDestiny.sellingLocation)}
             </p>
           </span>
         </div>
         {nextDestiny && (
-          <div className="bg-green-secondary text-white p-2 w-[70%] px-3 rounded-b-2xl">
-            <p className="font-light">
+          <div className="bg-green-secondary text-white p-2 pl-4 w-[80%] px-3 rounded-b-2xl">
+            <p className="font-light overflow-hidden whitespace-nowrap text-ellipsis">
               Depois, <b> {nextDestiny.sellerName}</b>{' '}
             </p>
             <p className="text-sm -mt-1.5 text-gray06 font-light">
