@@ -9,6 +9,10 @@ a.active {
   font-weight: bold;
 }
 
+.notistack-SnackbarContainer.z-alert {
+  z-index: 10000;
+}
+
 html, body{
   margin: 0;
   padding: 0;

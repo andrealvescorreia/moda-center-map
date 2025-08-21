@@ -57,7 +57,6 @@ const RoutingManager = forwardRef(
       }
 
       newRoute.destinos = removeDuplicates(newRoute.destinos)
-
       if (newRoute.inicio) {
         const routeCalculator = new RouteCalculator({
           grid: gridMap.getGrid(),
@@ -81,9 +80,7 @@ const RoutingManager = forwardRef(
         destinos: destinosMelhorOrdem.slice(1),
         passos: melhoresPassos,
       }
-      if (JSON.stringify(route) !== JSON.stringify(newBestRoute)) {
-        setRoute(newBestRoute)
-      }
+      setRoute(newBestRoute)
     }
 
     function cancelRoute() {

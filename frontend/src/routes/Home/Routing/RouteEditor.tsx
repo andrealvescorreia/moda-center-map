@@ -13,6 +13,7 @@ import {
   PersonStanding,
   Trash,
 } from 'lucide-react'
+import { type SnackbarKey, closeSnackbar, enqueueSnackbar } from 'notistack'
 import { Sheet, type SheetRef } from 'react-modal-sheet'
 import { DialogAction } from '../../../components/Routing/dialog-action'
 import ActionModal from '../../../components/action-modal'
@@ -21,6 +22,7 @@ import SellerByLocation from '../../../components/seller-by-location'
 import { SheetHeaderTitle } from '../../../components/sheet-header-title'
 import { getSellerByBox, getSellerByStore } from '../../../http/api'
 import type { Boxe } from '../../../interfaces/Boxe'
+import type { Destiny } from '../../../interfaces/Destiny'
 import type { BoxeSchema } from '../../../schemas/box'
 import type { StoreSchema } from '../../../schemas/store'
 import { colorToEnglishMap } from '../../../utils/utils'
@@ -232,7 +234,7 @@ const RouteEditor = ({
           }
         : sellingLocation.getEntrance()
 
-    onUpdate({
+    const newRoute = {
       ...route,
       destinos: [
         ...route.destinos,
@@ -243,7 +245,8 @@ const RouteEditor = ({
           sellerId,
         },
       ],
-    })
+    }
+    onUpdate(newRoute)
   }
 
   const cancel = () => {
@@ -251,6 +254,37 @@ const RouteEditor = ({
     notAddingDestiny()
     onCancel()
   }
+
+  const snackbarActions =
+    (removedDestiny: Destiny) => (snackbarId: SnackbarKey) => (
+      <div className="flex gap-2">
+        <button
+          type="button"
+          className="px-3 py-1 text-green-primary hover:cursor-pointer"
+          onClick={() => {
+            if (removedDestiny.sellingLocation && removedDestiny.sellerName) {
+              addDestiny(
+                removedDestiny.sellingLocation,
+                removedDestiny.sellerName,
+                removedDestiny.sellerId
+              )
+            }
+            closeSnackbar(snackbarId)
+          }}
+        >
+          Desfazer
+        </button>
+        <button
+          type="button"
+          className="px-3 py-1 text-danger hover:cursor-pointer"
+          onClick={() => {
+            closeSnackbar(snackbarId)
+          }}
+        >
+          Fechar
+        </button>
+      </div>
+    )
 
   if (isEditingMarcadorInicio) {
     return (
@@ -386,7 +420,16 @@ const RouteEditor = ({
                 <div className="pr-3 md:text-xs pb-15">
                   <DestinyList
                     route={{ ...bestRoute, inicio: route.inicio }}
-                    onClickRemoveDestiny={removeDestiny}
+                    onClickRemoveDestiny={(index) => {
+                      enqueueSnackbar(
+                        `${route.destinos[index].sellerName} removido da rota`,
+                        {
+                          action: snackbarActions(route.destinos[index]),
+                          autoHideDuration: 6000,
+                        }
+                      )
+                      removeDestiny(index)
+                    }}
                     onClickDestiny={(destiny) => {
                       if (!destiny.sellingLocation) return
                       setDestinyView(destiny.sellingLocation)
