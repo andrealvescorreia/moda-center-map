@@ -1,4 +1,3 @@
-import { useLocalStorage } from '@uidotdev/usehooks'
 import React, { useEffect, useState } from 'react'
 import type { ReactNode } from 'react'
 import type { Route } from '../interfaces/Route'
@@ -11,18 +10,35 @@ const RouteContext = React.createContext<{
   setRoute: () => {},
 })
 
-const RouteProvider = ({ children }: { children: ReactNode }) => {
-  const [storedRoute, saveStoredRoute] = useLocalStorage<Route>('route', {
-    inicio: null,
-    destinos: [],
-    passos: [],
-  })
-  const [route, setRoute] = useState<Route | undefined>(storedRoute)
-  useEffect(() => {
-    if (route) {
-      saveStoredRoute(route)
+function getStoredRoute() {
+  const storedRoute = localStorage.getItem('local-route')
+  if (storedRoute) {
+    try {
+      return JSON.parse(storedRoute)
+    } catch (e) {
+      console.error('Failed to parse stored route:', e)
     }
-  }, [route, saveStoredRoute])
+  }
+  return undefined
+}
+
+function setStoredRoute(route: Route) {
+  localStorage.setItem('local-route', JSON.stringify(route))
+}
+
+const RouteProvider = ({ children }: { children: ReactNode }) => {
+  const [route, setRoute] = useState<Route | undefined>(undefined)
+
+  useEffect(() => {
+    //retrieve storedRoute on load
+    const storedRoute = getStoredRoute()
+    if (storedRoute) setRoute(storedRoute)
+  }, [])
+
+  useEffect(() => {
+    if (route) setStoredRoute(route)
+  }, [route])
+
   return (
     <RouteContext.Provider value={{ route, setRoute }}>
       {children}

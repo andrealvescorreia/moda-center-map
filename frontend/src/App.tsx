@@ -10,7 +10,6 @@ import { Frown } from 'lucide-react'
 import LoadingOverlay from './components/loading-overlay'
 import NavBar from './components/nav'
 import { useLoadingContext } from './providers/LoadingProvider'
-import RouteProvider from './providers/RouteProvider'
 import EditSeller from './routes/EditSeller'
 import NewSeller from './routes/NewSeller'
 import SellerPage from './routes/SellerPage'
@@ -52,25 +51,11 @@ export default function App() {
     <>
       {loading && <LoadingOverlay />}
       <Routes>
-        <Route
-          path=""
-          element={
-            <RouteProvider>
-              <Home />
-            </RouteProvider>
-          }
-        />
+        <Route path="" element={<Home />} />
         <Route path="register" element={<Register />} />
         <Route path="login" element={<Login />} />
         <Route path="sellers" element={<Sellers />} />
-        <Route
-          path="sellers/:id"
-          element={
-            <RouteProvider>
-              <SellerPage />
-            </RouteProvider>
-          }
-        />
+        <Route path="sellers/:id" element={<SellerPage />} />
 
         <Route path="sellers/:id/edit" element={<EditSeller />} />
         <Route path="new-seller" element={<NewSeller />} />
