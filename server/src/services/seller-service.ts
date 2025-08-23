@@ -82,15 +82,18 @@ export class SellerService {
       raw: true,
     })
     if (results.length === 0) {
+      const terms = searchTerm.trim().split(' ')
       // uses the ILIKE operator if no results where found using ts_vector
       return await Seller.findAll({
         where: {
           name: {
-            [Op.iLike]: `%${searchTerm}%`,
+            [Op.iLike]: `%${terms.join('%')}%`,
           },
         },
         include: this.getDefaultIncludes(),
         attributes: { exclude: this.getDefaultExcludes() },
+        limit,
+        offset,
       })
     }
     return await Seller.findAll({
