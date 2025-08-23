@@ -1,4 +1,4 @@
-import { Sequelize, type Transaction } from 'sequelize'
+import { Op, Sequelize, type Transaction } from 'sequelize'
 import sequelize from '../database'
 import Boxe from '../database/models/boxe'
 import ProductCategory from '../database/models/product-category'
@@ -81,7 +81,18 @@ export class SellerService {
       replacements: { searchTerm },
       raw: true,
     })
-
+    if (results.length === 0) {
+      // uses the ILIKE operator if no results where found using ts_vector
+      return await Seller.findAll({
+        where: {
+          name: {
+            [Op.iLike]: `%${searchTerm}%`,
+          },
+        },
+        include: this.getDefaultIncludes(),
+        attributes: { exclude: this.getDefaultExcludes() },
+      })
+    }
     return await Seller.findAll({
       where: { id: results.map((result) => result.id) },
       include: this.getDefaultIncludes(),
