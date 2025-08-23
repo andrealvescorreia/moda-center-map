@@ -186,14 +186,9 @@ function Home() {
         minZoom={1}
         center={modaCenterGridMap.getCenter()}
         zoom={2}
-        whenCreated={(mapInstance) => {
-          mapRef.current = mapInstance
-        }}
         rotate={true}
         touchRotate={true}
-        rotateControl={{
-          closeOnZeroBearing: false,
-        }}
+        rotateControl={true}
         bearing={0}
       >
         <MapMaxBoundsUpdater />
