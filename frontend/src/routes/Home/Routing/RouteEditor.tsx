@@ -29,7 +29,6 @@ import { colorToEnglishMap } from '../../../utils/utils'
 interface RouteEditorProps {
   gridMap: ModaCenterGridMap
   route: Route
-  bestRoute: Route
   onUpdate: (route: Route) => void
   onCancel: () => void
   onStart: () => void
@@ -38,7 +37,6 @@ interface RouteEditorProps {
 const RouteEditor = ({
   gridMap,
   route,
-  bestRoute,
   onUpdate,
   onCancel,
   onStart,
@@ -212,7 +210,7 @@ const RouteEditor = ({
   const removeDestiny = (index: number) => {
     const otherDestinies = route.destinos.filter(
       (destiny) =>
-        destiny.sellingLocation !== bestRoute.destinos[index].sellingLocation
+        destiny.sellingLocation !== route.destinos[index].sellingLocation
     )
     const newRoute = {
       ...route,
@@ -334,7 +332,7 @@ const RouteEditor = ({
 
         <div className="ui ml-[50%] -translate-x-1/2 absolute w-[95%] flex justify-center items-center top-1 shadow max-h-45 overflow-auto md:size-0">
           <DestinyList
-            route={{ ...bestRoute, inicio: route.inicio }}
+            route={{ ...route, inicio: route.inicio }}
             onClickRemoveDestiny={removeDestiny}
             reducedView={true}
           />
@@ -429,7 +427,7 @@ const RouteEditor = ({
               <Sheet.Scroller>
                 <div className="pr-3 md:text-xs pb-15">
                   <DestinyList
-                    route={{ ...bestRoute, inicio: route.inicio }}
+                    route={{ ...route, inicio: route.inicio }}
                     onClickRemoveDestiny={(index) => {
                       enqueueSnackbar(
                         `${route.destinos[index].sellerName} removido da rota`,

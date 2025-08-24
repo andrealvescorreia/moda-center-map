@@ -20,28 +20,19 @@ const RoutingManager = forwardRef(
     const [isCreatingRoute, setIsCreatingRoute] = useState(true)
     const [isFollowingRoute, setIsFollowingRoute] = useState(false)
 
-    const [bestRoute, setBestRoute] = useState<Route>({
-      inicio: null,
-      destinos: route?.destinos || [],
-    })
-
     useImperativeHandle(ref, () => ({
       handleUpdate,
     }))
 
     const handleUpdate = (newRoute: Route) => {
-      if (!newRoute) return
       if (!newRoute?.inicio && newRoute?.destinos.length >= 0) {
+        // when destinies where added from the seller's page before the starting point was set.
         setRoute(newRoute)
-        setBestRoute(newRoute)
         return
       }
       if (newRoute.destinos.length === 0) {
         const newBestRoute = { ...newRoute, passos: [] }
-        if (JSON.stringify(route) !== JSON.stringify(newBestRoute)) {
-          setRoute(newBestRoute)
-        }
-        setBestRoute(newRoute)
+        setRoute(newBestRoute)
         return
       }
 
@@ -70,10 +61,6 @@ const RoutingManager = forwardRef(
 
         destinosMelhorOrdem = optimalRoute.destiniesBestOrder
         melhoresPassos = optimalRoute.steps
-        setBestRoute({
-          inicio: newRoute.inicio,
-          destinos: destinosMelhorOrdem.slice(1),
-        })
       }
       const newBestRoute = {
         inicio: newRoute.inicio,
@@ -103,7 +90,7 @@ const RoutingManager = forwardRef(
           <RouteEditor
             gridMap={gridMap}
             route={route || { inicio: null, destinos: [] }}
-            bestRoute={bestRoute}
+            //bestRoute={bestRoute}
             onUpdate={(newRoute) => {
               handleUpdate(newRoute)
             }}
