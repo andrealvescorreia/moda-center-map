@@ -21,7 +21,6 @@ import RoutingManager from './Routing/RoutingManager'
 import { changeStartingPoint } from './Routing/route-service'
 import SearchSeller from './search-seller'
 const modaCenterGridMap = new ModaCenterGridMap()
-const minZoomLevelToRenderMarkers = 5
 
 function Home() {
   const { route, setRoute } = useRouteContext()
@@ -164,10 +163,7 @@ function Home() {
         zoom={2}
       >
         <MapMaxBoundsUpdater />
-        <MapDrawer
-          gridMap={modaCenterGridMap}
-          minZoomLevelToRenderMarkers={minZoomLevelToRenderMarkers}
-        />
+        <MapDrawer gridMap={modaCenterGridMap} />
         {isManagingRoute && (
           <span>
             {route && (
