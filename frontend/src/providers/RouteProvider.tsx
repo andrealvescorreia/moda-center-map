@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import type { ReactNode } from 'react'
 import type { Route } from '../interfaces/Route'
+import { ModaCenterGridMap } from '../models/ModaCenterGridMap'
 
 const RouteContext = React.createContext<{
   route?: Route
@@ -10,11 +11,25 @@ const RouteContext = React.createContext<{
   setRoute: () => {},
 })
 
+const gridMap = new ModaCenterGridMap()
+
 function getStoredRoute() {
   const storedRoute = localStorage.getItem('local-route')
   if (storedRoute) {
     try {
-      return JSON.parse(storedRoute)
+      const route: Route = JSON.parse(storedRoute)
+      if (!route) return undefined
+      for (const destino of route.destinos) {
+        if (!destino.sellingLocation) continue
+        const restoredSellingLocation = gridMap.getSellingLocation(
+          destino.sellingLocation
+        )
+        if (!restoredSellingLocation) return undefined
+        // when the sellingLocation is a Store that was restored from localStorage,
+        // it does not have the getEntrance() method. So we must restore it.
+        destino.sellingLocation = restoredSellingLocation
+      }
+      return route as Route
     } catch (e) {
       console.error('Failed to parse stored route:', e)
     }
