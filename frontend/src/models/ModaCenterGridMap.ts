@@ -143,4 +143,9 @@ export class ModaCenterGridMap {
     }
     return nearestBoxe
   }
+
+  isInsideGridMap(y: number, x: number) {
+    const [rows, cols] = this.getDimensions()
+    return y >= 0 && y < rows && x >= 0 && x < cols
+  }
 }

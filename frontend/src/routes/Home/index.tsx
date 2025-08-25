@@ -68,14 +68,10 @@ function Home() {
     childRef.current.handleUpdate(newRoute)
   }
 
-  function isInsideGridMap(lat: number, lng: number) {
-    const [rows, cols] = modaCenterGridMap.getDimensions()
-    return lat >= 0 && lat < rows && lng >= 0 && lng < cols
-  }
   function handleChangeStartPoint(newPosition: [number, number]) {
     const y = Math.round(newPosition[0])
     const x = Math.round(newPosition[1])
-    if (!isInsideGridMap(y, x)) {
+    if (!modaCenterGridMap.isInsideGridMap(y, x)) {
       setInitialPosition([
         route?.inicio?.position.y ?? 0,
         route?.inicio?.position.x ?? 0,
