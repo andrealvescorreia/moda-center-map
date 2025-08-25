@@ -3,7 +3,6 @@ import MapDrawer from '../../components/Map/map-drawer'
 import 'leaflet/dist/leaflet.css'
 import L from 'leaflet'
 import { useEffect, useState } from 'react'
-import { useRef } from 'react'
 import Logo from '../../assets/logo.png'
 import { ClickPosition } from '../../components/Map/click-position'
 import FlyTo from '../../components/Map/fly-to'
@@ -11,7 +10,7 @@ import RouteButton from '../../components/Routing/route-button'
 import CallToLogin from '../../components/call-to-login'
 import { InputField, InputIcon, InputRoot } from '../../components/input'
 import NavBar from '../../components/nav'
-import type { Route } from '../../interfaces/Route'
+import type { Destiny } from '../../interfaces/Destiny'
 import { ModaCenterGridMap } from '../../models/ModaCenterGridMap'
 import { useNavContext } from '../../providers/NavProvider'
 import { useRouteContext } from '../../providers/RouteProvider'
@@ -19,6 +18,7 @@ import { useUserContext } from '../../providers/UserProvider'
 import DraggableMarker from './Routing/DraggableMarker'
 import RouteDrawer from './Routing/RouteDrawer'
 import RoutingManager from './Routing/RoutingManager'
+import { changeStartingPoint } from './Routing/route-service'
 import SearchSeller from './search-seller'
 const modaCenterGridMap = new ModaCenterGridMap()
 const minZoomLevelToRenderMarkers = 5
@@ -29,11 +29,6 @@ function Home() {
   const { user } = useUserContext()
   const [isSearching, setIsSearching] = useState(false)
   const [isManagingRoute, setIsManagingRoute] = useState(false)
-
-  type RoutingManagerRef = {
-    handleUpdate: (route: Route) => void
-  }
-  const childRef = useRef<RoutingManagerRef>(null)
 
   useEffect(() => {
     if (isManagingRoute) {
@@ -46,27 +41,6 @@ function Home() {
   useEffect(() => {
     setShow(true)
   }, [setShow])
-  if (isSearching) {
-    return <SearchSeller onCancel={() => setIsSearching(false)} />
-  }
-
-  function setInitialPosition(position: [number, number]) {
-    if (!route) return
-    const newRoute = {
-      ...route,
-      inicio: {
-        position: { x: position[1], y: position[0] },
-        sellingLocation: modaCenterGridMap.findNearestBoxe(
-          position[0],
-          position[1]
-        ),
-      },
-      destinos: route?.destinos ?? [],
-      passos: route?.passos ?? [],
-    }
-    if (!childRef.current) return
-    childRef.current.handleUpdate(newRoute)
-  }
 
   function handleChangeStartPoint(newPosition: [number, number]) {
     const y = Math.round(newPosition[0])
@@ -76,7 +50,7 @@ function Home() {
         route?.inicio?.position.y ?? 0,
         route?.inicio?.position.x ?? 0,
       ])
-      setRoute((prev) => (prev ? { ...prev } : undefined)) // force re-render to update marker position
+      setRoute((prev) => (prev ? { ...prev } : undefined)) // change to previous value
       return
     }
 
@@ -93,11 +67,25 @@ function Home() {
         route?.inicio?.position.y ?? 0,
         route?.inicio?.position.x ?? 0,
       ])
-      setRoute((prev) => (prev ? { ...prev } : undefined)) // force re-render to update marker position
+      setRoute((prev) => (prev ? { ...prev } : undefined)) // change to previous value
       return
     }
 
     setInitialPosition([y, adjustedX])
+  }
+
+  function setInitialPosition(position: [number, number]) {
+    if (!route) return
+
+    const newInitial: Destiny = {
+      position: { y: position[0], x: position[1] },
+      sellingLocation: modaCenterGridMap.findNearestBoxe(
+        position[0],
+        position[1]
+      ),
+    }
+    const newRoute = changeStartingPoint(route, newInitial)
+    setRoute(newRoute)
   }
 
   function MapMaxBoundsUpdater() {
@@ -119,6 +107,9 @@ function Home() {
     return null
   }
 
+  if (isSearching) {
+    return <SearchSeller onCancel={() => setIsSearching(false)} />
+  }
   return (
     <>
       <NavBar />
@@ -149,7 +140,6 @@ function Home() {
         </span>
       ) : (
         <RoutingManager
-          ref={childRef}
           gridMap={modaCenterGridMap}
           onStopManagingRoute={() => setIsManagingRoute(false)}
         />
@@ -172,7 +162,6 @@ function Home() {
         minZoom={1}
         center={modaCenterGridMap.getCenter()}
         zoom={2}
-        //preferCanvas={true}
       >
         <MapMaxBoundsUpdater />
         <MapDrawer
