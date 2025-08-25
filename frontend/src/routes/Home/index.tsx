@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react'
 import Logo from '../../assets/logo.png'
 import { ClickPosition } from '../../components/Map/click-position'
 import FlyTo from '../../components/Map/fly-to'
+import PanTo from '../../components/Map/pan-to'
 import RouteButton from '../../components/Routing/route-button'
 import CallToLogin from '../../components/call-to-login'
 import { InputField, InputIcon, InputRoot } from '../../components/input'
@@ -178,7 +179,7 @@ function Home() {
                 onUpdatePosition={handleChangeStartPoint}
               />
             )}
-            {route?.inicio && <FlyTo position={route.inicio.position} />}
+            {route?.inicio && <PanTo position={route.inicio.position} />}
           </span>
         )}
         <ClickPosition />
