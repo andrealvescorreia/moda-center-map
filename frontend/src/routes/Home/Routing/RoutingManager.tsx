@@ -25,9 +25,10 @@ const RoutingManager = forwardRef(
     }))
 
     const handleUpdate = (newRoute: Route) => {
-      if (!newRoute?.inicio && newRoute?.destinos.length >= 0) {
-        // when destinies where added from the seller's page before the starting point was set.
-        setRoute(newRoute)
+      if (!newRoute?.inicio) {
+        // might happen when destinies where added from the seller's page
+        // before the starting point was set.
+        setRoute({ ...newRoute, passos: [] })
         return
       }
       if (newRoute.destinos.length === 0) {
@@ -48,20 +49,19 @@ const RoutingManager = forwardRef(
       }
 
       newRoute.destinos = removeDuplicates(newRoute.destinos)
-      if (newRoute.inicio) {
-        const routeCalculator = new RouteCalculator({
-          grid: gridMap.getGrid(),
-          tspSolver: new TSPSolverNN(),
-        })
 
-        const optimalRoute = routeCalculator.calculateBestRoute({
-          startPos: newRoute.inicio,
-          destinies: newRoute.destinos,
-        })
+      const routeCalculator = new RouteCalculator({
+        grid: gridMap.getGrid(),
+        tspSolver: new TSPSolverNN(),
+      })
 
-        destinosMelhorOrdem = optimalRoute.destiniesBestOrder
-        melhoresPassos = optimalRoute.steps
-      }
+      const optimalRoute = routeCalculator.calculateBestRoute({
+        startPos: newRoute.inicio,
+        destinies: newRoute.destinos,
+      })
+
+      destinosMelhorOrdem = optimalRoute.destiniesBestOrder
+      melhoresPassos = optimalRoute.steps
       const newBestRoute = {
         inicio: newRoute.inicio,
         destinos: destinosMelhorOrdem.slice(1),
@@ -90,7 +90,6 @@ const RoutingManager = forwardRef(
           <RouteEditor
             gridMap={gridMap}
             route={route || { inicio: null, destinos: [] }}
-            //bestRoute={bestRoute}
             onUpdate={(newRoute) => {
               handleUpdate(newRoute)
             }}
