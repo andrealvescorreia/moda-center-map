@@ -1,16 +1,23 @@
+import { CircularProgress } from '@mui/material'
 import { ArrowLeft } from 'lucide-react'
 import { useState } from 'react'
 import { useRef } from 'react'
 import { createPortal } from 'react-dom'
-import { InputField, InputRoot } from '../input'
+import { InputField, InputIcon, InputRoot } from '../input'
 
 interface NoteProps {
   defaultNote?: string
   onSave?: (note: string) => void
   onClose?: (note: string) => void
+  loading?: boolean
 }
 
-export default function Note({ defaultNote, onSave, onClose }: NoteProps) {
+export default function Note({
+  defaultNote,
+  onSave,
+  onClose,
+  loading,
+}: NoteProps) {
   const [modalOpen, setModalOpen] = useState(false)
   const noteRef = useRef<HTMLTextAreaElement>(null)
   const openModal = () => setModalOpen(true)
@@ -23,7 +30,6 @@ export default function Note({ defaultNote, onSave, onClose }: NoteProps) {
     closeModal()
   }
   const handleClose = () => {
-    console.log('Fechando nota:', noteRef.current?.value)
     if (noteRef.current && onClose) {
       onClose(noteRef.current.value)
     }
@@ -37,11 +43,18 @@ export default function Note({ defaultNote, onSave, onClose }: NoteProps) {
         onClick={() => openModal()}
       >
         <InputField
+          className={`${loading ? 'opacity-50' : ''}`}
           placeholder="Escrever uma nota..."
           defaultValue={defaultNote}
           readOnly
         />
+        {loading && (
+          <InputIcon className="pt-2">
+            <CircularProgress size={20} style={{ color: 'gray' }} />
+          </InputIcon>
+        )}
       </InputRoot>
+
       {createPortal(
         <span>
           {modalOpen && (

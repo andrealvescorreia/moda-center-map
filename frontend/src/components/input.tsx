@@ -34,10 +34,13 @@ export function InputIcon(props: InputIconProps) {
 }
 
 type InputField = ComponentProps<'input'>
-export function InputField(props: InputField) {
+export function InputField({ className, ...props }: InputField) {
   return (
     <input
-      className="text-black w-full outline-0 placeholder:text-gray03"
+      className={twMerge(
+        'text-black w-full outline-0 placeholder:text-gray03',
+        className
+      )}
       {...props}
     />
   )
