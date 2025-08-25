@@ -32,18 +32,6 @@ function Home() {
   const [isSearching, setIsSearching] = useState(false)
   const [isManagingRoute, setIsManagingRoute] = useState(false)
 
-  const mapRef = useRef()
-
-  // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
-  useEffect(() => {
-    console.log('mapRef.current', mapRef)
-  }, [mapRef])
-
-  type RoutingManagerRef = {
-    handleUpdate: (route: Route) => void
-  }
-  const childRef = useRef<RoutingManagerRef>(null)
-
   useEffect(() => {
     if (isManagingRoute) {
       setShow(false)
