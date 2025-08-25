@@ -31,12 +31,10 @@ interface MapInfo {
 
 interface GridDrawerProps {
   gridMap: ModaCenterGridMap
-  minZoomLevelToRenderMarkers?: number
   minZoomLevelToRenderBoxes?: number
 }
 const MapDrawer = ({
   gridMap,
-  //minZoomLevelToRenderMarkers = 5,
   minZoomLevelToRenderBoxes = 2,
 }: GridDrawerProps) => {
   const markers: JSX.Element[] = []

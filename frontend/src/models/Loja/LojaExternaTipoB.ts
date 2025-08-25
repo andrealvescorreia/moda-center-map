@@ -1,4 +1,3 @@
-//TODO
 import { z } from 'zod'
 import type { Loja } from '../../interfaces/Loja'
 import type { Position } from '../../interfaces/Position'

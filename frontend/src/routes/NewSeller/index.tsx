@@ -1,6 +1,6 @@
 import { useNetworkState } from '@uidotdev/usehooks'
 import { AxiosError } from 'axios'
-import { SnackbarProvider, enqueueSnackbar } from 'notistack'
+import { enqueueSnackbar } from 'notistack'
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import errorsCode from '../../../../shared/operation-errors'
@@ -87,7 +87,7 @@ export default function NewSeller() {
         }
       }
       if (errorMessages.length === 0) {
-        errorMessages.push('Erro desconhecido')
+        errorMessages.push('Erro Inesperado')
       }
       setErrors(errorMessages)
       setDialogOpen(true)
@@ -101,7 +101,6 @@ export default function NewSeller() {
 
   return (
     <div className="h-screen flex md:justify-center items-center flex-col w-full ">
-      <SnackbarProvider />
       {dialogOpen && (
         <AlertDialog
           isOpen={true}

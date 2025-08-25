@@ -2,7 +2,7 @@ const chai = require('chai')
 const request = require('supertest')
 const should = chai.should()
 import app from '../src/app'
-import sequelize, { setup } from '../src/database'
+import sequelize, { setupDatabase } from '../src/database'
 import ProductCategory from '../src/database/models/product-category'
 
 import UserFavoriteSellers from '../src/database/models/user-favorite-sellers'
@@ -23,7 +23,7 @@ describe('favorite seller', () => {
   }
 
   before(async () => {
-    await setup()
+    await setupDatabase()
     await sequelize.sync({ force: true })
     const registerRes = await request(app)
       .post('/user')
@@ -54,7 +54,6 @@ describe('favorite seller', () => {
       productCategories: ['Roupas', 'Calçados'],
     }
     const response = await postSeller(reqBody)
-
     const favoriteResponse = await request(app)
       .post(`/seller/favorite/${response.body.id}`)
       .set('Cookie', authHeader['set-cookie'])

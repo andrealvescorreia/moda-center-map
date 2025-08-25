@@ -2,7 +2,7 @@ const chai = require('chai')
 const request = require('supertest')
 const should = chai.should()
 import app from '../src/app'
-import sequelize, { setup } from '../src/database'
+import sequelize, { setupDatabase } from '../src/database'
 import Boxe from '../src/database/models/boxe'
 import ProductCategory from '../src/database/models/product-category'
 import Seller from '../src/database/models/seller'
@@ -69,7 +69,7 @@ describe('update seller', () => {
   }
 
   before(async () => {
-    await setup()
+    await setupDatabase()
     await sequelize.sync({ force: true })
     await setupAuth()
     await setupProductCategories()
@@ -126,8 +126,15 @@ describe('update seller', () => {
       boxes: [{ sector_color: 'blue', box_number: 2, street_letter: 'A' }],
     })
     res.status.should.equal(404)
-    res.body.should.have.property('message')
-    res.body.message.should.equal('Seller not found')
+    res.body.should.be.deep.equal({
+      errors: [
+        {
+          code: 'NOT_FOUND',
+          field: 'id',
+          message: 'Seller not found',
+        },
+      ],
+    })
   })
 
   it('should be able to update seller name', async () => {
@@ -367,7 +374,7 @@ describe('update seller', () => {
     res.status.should.equal(400)
     res.body.errors[0].should.deep.include({
       code: 'LOCATION_OCCUPIED',
-      field: 'sellingLocations.boxes',
+      field: 'sellingLocations.boxes.2',
       message: 'Box already occupied by other seller',
     })
     res.body.errors[0].occupiedBy.should.deep.include({
@@ -418,7 +425,7 @@ describe('update seller', () => {
     res.status.should.equal(400)
     res.body.errors[0].should.deep.include({
       code: 'LOCATION_OCCUPIED',
-      field: 'sellingLocations.stores',
+      field: 'sellingLocations.stores.0',
       message: 'Store already occupied by other seller',
     })
     res.body.errors[0].occupiedBy.should.deep.include({

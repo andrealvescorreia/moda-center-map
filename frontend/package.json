@@ -42,6 +42,7 @@
     "react-transition-group": "^4.4.5",
     "tailwind-merge": "^3.0.2",
     "tailwindcss": "^4.0.12",
+    "tsp-solver-nn": "^1.0.0",
     "use-mask-input": "^3.4.2",
     "workbox-core": "^7.3.0",
     "workbox-precaching": "^7.3.0",
