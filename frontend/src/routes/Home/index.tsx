@@ -23,12 +23,28 @@ import { changeStartingPoint } from './Routing/route-service'
 import SearchSeller from './search-seller'
 const modaCenterGridMap = new ModaCenterGridMap()
 
+function updateMaxBounds(map: L.map) {
+  const zoomLevel = map.getZoom()
+  const offset = 5 + 2.4 ** (7 - zoomLevel)
+  map.setMaxBounds([
+    [
+      modaCenterGridMap.getBounds()[0][0] - offset,
+      modaCenterGridMap.getBounds()[0][1] - offset / 2,
+    ],
+    [
+      modaCenterGridMap.getBounds()[1][0] + offset,
+      modaCenterGridMap.getBounds()[1][1] + offset / 2,
+    ],
+  ])
+}
+
 function Home() {
   const { route, setRoute } = useRouteContext()
   const { show, setShow } = useNavContext()
   const { user } = useUserContext()
   const [isSearching, setIsSearching] = useState(false)
   const [isManagingRoute, setIsManagingRoute] = useState(false)
+  const [map, setMap] = useState<L.Map | null>(null)
   const [searchParams, setSearchParams] = useSearchParams()
   const state = searchParams.get('state')
 
@@ -107,24 +123,14 @@ function Home() {
     setRoute(newRoute)
   }
 
-  function MapMaxBoundsUpdater() {
-    const map = useMap()
-    map.on('zoom', () => {
-      const zoomLevel = map.getZoom()
-      const offset = 5 + 2.4 ** (7 - zoomLevel)
-      map.setMaxBounds([
-        [
-          modaCenterGridMap.getBounds()[0][0] - offset,
-          modaCenterGridMap.getBounds()[0][1] - offset / 2,
-        ],
-        [
-          modaCenterGridMap.getBounds()[1][0] + offset,
-          modaCenterGridMap.getBounds()[1][1] + offset / 2,
-        ],
-      ])
-    })
-    return null
-  }
+  useEffect(() => {
+    if (map) {
+      updateMaxBounds(map) // executes on first render
+      map.on('zoom', () => {
+        updateMaxBounds(map)
+      })
+    }
+  }, [map])
 
   if (isSearching) {
     return (
@@ -181,24 +187,14 @@ function Home() {
       )}
 
       <MapContainer
+        ref={setMap}
         crs={L.CRS.Simple}
         bounds={modaCenterGridMap.getBounds()}
-        maxBounds={[
-          [
-            modaCenterGridMap.getBounds()[0][0] - 85,
-            modaCenterGridMap.getBounds()[0][1] - 85 / 2,
-          ],
-          [
-            modaCenterGridMap.getBounds()[1][0] + 85,
-            modaCenterGridMap.getBounds()[1][1] + 85 / 2,
-          ],
-        ]}
         maxZoom={6}
         minZoom={1}
         center={modaCenterGridMap.getCenter()}
         zoom={2}
       >
-        <MapMaxBoundsUpdater />
         <MapDrawer gridMap={modaCenterGridMap} />
         {isManagingRoute && (
           <span>
