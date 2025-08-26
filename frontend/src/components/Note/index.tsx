@@ -1,20 +1,57 @@
+import { CircularProgress } from '@mui/material'
 import { ArrowLeft } from 'lucide-react'
-import { useState } from 'react'
-import { useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
-import { InputField, InputRoot } from '../input'
+import { useSearchParams } from 'react-router-dom'
+import { InputField, InputIcon, InputRoot } from '../input'
 
 interface NoteProps {
   defaultNote?: string
   onSave?: (note: string) => void
   onClose?: (note: string) => void
+  loading?: boolean
 }
 
-export default function Note({ defaultNote, onSave, onClose }: NoteProps) {
+export default function Note({
+  defaultNote,
+  onSave,
+  onClose,
+  loading,
+}: NoteProps) {
   const [modalOpen, setModalOpen] = useState(false)
   const noteRef = useRef<HTMLTextAreaElement>(null)
-  const openModal = () => setModalOpen(true)
-  const closeModal = () => setModalOpen(false)
+
+  const [searchParams, setSearchParams] = useSearchParams()
+  const state = searchParams.get('edit-note')
+
+  const enterEditMode = () => setSearchParams({ 'edit-note': 'true' })
+  const clearState = () => setSearchParams({})
+
+  useEffect(() => {
+    if (state === 'true') {
+      setModalOpen(true)
+    } else {
+      setModalOpen(false)
+    }
+  }, [state])
+
+  useEffect(() => {
+    if (modalOpen && noteRef.current) {
+      noteRef.current.focus()
+      // Move o cursor para o final do texto
+      const length = noteRef.current.value.length
+      noteRef.current.setSelectionRange(length, length)
+    }
+  }, [modalOpen])
+
+  const openModal = () => {
+    setModalOpen(true)
+    enterEditMode()
+  }
+  const closeModal = () => {
+    setModalOpen(false)
+    clearState()
+  }
 
   const handleSave = () => {
     if (noteRef.current && onSave) {
@@ -23,7 +60,6 @@ export default function Note({ defaultNote, onSave, onClose }: NoteProps) {
     closeModal()
   }
   const handleClose = () => {
-    console.log('Fechando nota:', noteRef.current?.value)
     if (noteRef.current && onClose) {
       onClose(noteRef.current.value)
     }
@@ -37,11 +73,18 @@ export default function Note({ defaultNote, onSave, onClose }: NoteProps) {
         onClick={() => openModal()}
       >
         <InputField
+          className={`${loading ? 'opacity-50' : ''}`}
           placeholder="Escrever uma nota..."
           defaultValue={defaultNote}
           readOnly
         />
+        {loading && (
+          <InputIcon className="pt-2">
+            <CircularProgress size={20} style={{ color: 'gray' }} />
+          </InputIcon>
+        )}
       </InputRoot>
+
       {createPortal(
         <span>
           {modalOpen && (
@@ -57,14 +100,12 @@ export default function Note({ defaultNote, onSave, onClose }: NoteProps) {
                   <textarea
                     className="w-full h-[38dvh] md:h-90 p-2 border-none rounded-lg focus:outline-none resize-none"
                     placeholder="Escrever uma nota..."
-                    // biome-ignore lint/a11y/noAutofocus: <explanation>
-                    autoFocus={!defaultNote}
                     defaultValue={defaultNote}
                     ref={noteRef}
                   />
                   <div className="flex justify-end">
                     <button
-                      className="hover:cursor-pointer"
+                      className="hover:cursor-pointer p-2.5 font-bold"
                       onClick={() => handleSave()}
                       type="button"
                     >

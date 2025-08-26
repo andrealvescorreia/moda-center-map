@@ -8,22 +8,32 @@ interface SellerNoteProps {
 
 export default function SellerNote({ seller_id }: SellerNoteProps) {
   const [sellerNote, setSellerNote] = useState<string>('')
+  const [isFetching, setIsFetching] = useState(false)
+
   useEffect(() => {
+    setIsFetching(true)
     getNote(seller_id)
       .then((response) => {
         setSellerNote(response.data.text || '')
       })
       .catch(() => {})
+      .finally(() => {
+        setIsFetching(false)
+      })
   }, [seller_id])
 
   const handleSave = (note: string) => {
     if (note === sellerNote) return
+    setIsFetching(true)
     putNote(seller_id, note)
       .then(() => {
         setSellerNote(note)
       })
       .catch((error) => {
         console.error('Erro ao atualizar nota:', error)
+      })
+      .finally(() => {
+        setIsFetching(false)
       })
   }
 
@@ -32,6 +42,7 @@ export default function SellerNote({ seller_id }: SellerNoteProps) {
       defaultNote={sellerNote}
       onSave={(note) => handleSave(note)}
       onClose={(note) => handleSave(note)}
+      loading={isFetching}
     />
   )
 }

@@ -1,11 +1,14 @@
-import type z from 'zod'
+// Helper functions to determine the differences between a seller's provided selling locations and those stored in the database.
+
 import Boxe from '../database/models/boxe'
-
 import Store from '../database/models/store'
-import type { updateSellerSchema } from '../schemas/sellerSchema'
+import type { BoxeType } from '../schemas/boxeSchema'
+import type { StoreType } from '../schemas/storeSchema'
 
-type boxesType = z.infer<typeof updateSellerSchema>['boxes']
-export async function boxesChanges(sellerId: string, updatedBoxes: boxesType) {
+export async function boxesChanges(
+  sellerId: string,
+  updatedBoxes: BoxeType[] | undefined
+) {
   if (!updatedBoxes) return { addedBoxes: [], removedBoxes: [] }
 
   const existingBoxes = await Boxe.findAll({
@@ -38,10 +41,9 @@ export async function boxesChanges(sellerId: string, updatedBoxes: boxesType) {
   }
 }
 
-type storesType = z.infer<typeof updateSellerSchema>['stores']
 export async function storesChanges(
   sellerId: string,
-  updatedStores: storesType
+  updatedStores: StoreType[] | undefined
 ) {
   if (!updatedStores) return { addedStores: [], removedStores: [] }
 

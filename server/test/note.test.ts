@@ -2,11 +2,13 @@ const chai = require('chai')
 const request = require('supertest')
 const should = chai.should()
 import app from '../src/app'
-import sequelize, { setup } from '../src/database'
+import sequelize, { setupDatabase } from '../src/database'
 import Notes from '../src/database/models/note'
 import Seller from '../src/database/models/seller'
+import User from '../src/database/models/user'
 
 describe('seller note', () => {
+  const username = 'user1'
   let authHeader: { [key: string]: string | string[] }
   const postSeller = async (
     // biome-ignore lint/complexity/noBannedTypes: <explanation>
@@ -19,12 +21,10 @@ describe('seller note', () => {
       .send(reqBody)
 
   const setupAuth = async () => {
-    await request(app)
-      .post('/user')
-      .send({ username: 'user1', password: 'test123' })
+    await request(app).post('/user').send({ username, password: 'test123' })
     const { header } = await request(app)
       .post('/auth')
-      .send({ username: 'user1', password: 'test123' })
+      .send({ username, password: 'test123' })
     authHeader = header
   }
   const setupSellers = async () => {
@@ -49,7 +49,7 @@ describe('seller note', () => {
   }
 
   before(async () => {
-    await setup()
+    await setupDatabase()
     await sequelize.sync({ force: true })
     await setupAuth()
     await setupSellers()
@@ -98,6 +98,39 @@ describe('seller note', () => {
     response.body.should.have.property('id')
     response.body.should.have.property('text')
     response.body.text.should.equal('Note has been changed')
+  })
+
+  it('user should not be able to create multiple notes for the same seller', async () => {
+    const seller = await findSellerByName('Olivia Palito moda feminina')
+    const user = await User.findOne({
+      where: {
+        username,
+      },
+    })
+    await request(app)
+      .put(`/seller/id/${seller?.id}/note`)
+      .set('Cookie', authHeader['set-cookie'])
+      .send({ text: 'note 1' })
+
+    await request(app)
+      .put(`/seller/id/${seller?.id}/note`)
+      .set('Cookie', authHeader['set-cookie'])
+      .send({ text: 'note 2' })
+
+    const notes = await Notes.findAll({
+      where: {
+        seller_id: seller?.id,
+        user_id: user?.id,
+      },
+    })
+    notes.length.should.equal(1)
+    notes[0].text.should.equal('note 2')
+    const note1 = await Notes.findOne({
+      where: {
+        text: 'note 1',
+      },
+    })
+    should.not.exist(note1)
   })
 
   it('should edit a note for a seller when text is empty', async () => {

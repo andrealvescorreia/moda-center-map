@@ -13,7 +13,7 @@ import type { Loja } from '../../../interfaces/Loja'
 import { colorMap } from '../../../utils/utils'
 import SellerList from '../../Sellers/seller-list'
 
-interface SearchStoreProps {
+interface SearchDestinyProps {
   onCancel?: () => void
   onChooseOnMap?: () => void
   onSellectSeller?: (
@@ -23,11 +23,11 @@ interface SearchStoreProps {
   ) => void
 }
 
-export function SearchStore({
+export function SearchDestiny({
   onChooseOnMap,
   onCancel,
   onSellectSeller,
-}: SearchStoreProps) {
+}: SearchDestinyProps) {
   const [searchTerm, setSearchTerm] = useState('')
   const [searchedSellers, setSearchedSellers] = useState<SellerResponse[]>([])
   const [favoriteSellers, setFavoriteSellers] = useState<SellerResponse[]>([])
@@ -84,13 +84,10 @@ export function SearchStore({
   }, [])
 
   function handleSelectSeller(sellerId: string, locationId?: string) {
-    let seller = searchedSellers.find((seller) => seller.id === sellerId)
-    if (!seller) {
-      seller = favoriteSellers.find((seller) => seller.id === sellerId)
-    }
-    if (!seller) {
-      seller = allSellers.find((seller) => seller.id === sellerId)
-    }
+    const seller =
+      searchedSellers.find((s) => s.id === sellerId) ||
+      favoriteSellers.find((s) => s.id === sellerId) ||
+      allSellers.find((s) => s.id === sellerId)
     if (!seller) return
     const location =
       seller.boxes.find((box) => box.id === locationId) ||
@@ -137,12 +134,10 @@ export function SearchStore({
             />
             <InputIcon>
               {searchTerm.length > 0 && (
-                <InputIcon>
-                  <CircleX
-                    className="cursor-pointer"
-                    onClick={() => setSearchTerm('')}
-                  />
-                </InputIcon>
+                <CircleX
+                  className="cursor-pointer"
+                  onClick={() => setSearchTerm('')}
+                />
               )}
             </InputIcon>
           </InputRoot>

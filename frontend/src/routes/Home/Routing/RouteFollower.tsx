@@ -11,24 +11,24 @@ import { SheetHeaderTitle } from '../../../components/sheet-header-title'
 import type { Boxe } from '../../../interfaces/Boxe'
 import type { Loja } from '../../../interfaces/Loja'
 import type { Position } from '../../../interfaces/Position'
-import type { Route } from '../../../interfaces/Route'
 import { ModaCenterGridMap } from '../../../models/ModaCenterGridMap'
+import { useRouteContext } from '../../../providers/RouteProvider'
+import RouteContent from './RouteContent'
+import { removeDestiny } from './route-service'
 
 export default function RouteFollower({
-  route,
   onCancel,
   onFinish,
   onChooseToEdit,
   gridMap,
-  onUpdateRoute,
 }: {
-  route: Route
   onCancel: () => void
   onFinish: () => void
   onChooseToEdit: () => void
   gridMap: ModaCenterGridMap
-  onUpdateRoute: (newRoute: Route) => void
 }) {
+  const { route, setRoute } = useRouteContext()
+  if (!route) return null
   const ref = useRef<SheetRef>(null)
 
   function locationToText(sellingLocation: Boxe | Loja | null | undefined) {
@@ -58,7 +58,7 @@ export default function RouteFollower({
     return { x, y }
   }
 
-  const currentDestiny = route.destinos[0]
+  const currentDestiny = route.destinos[0] || null
   const nextDestiny = route.destinos.length > 1 ? route.destinos[1] : null
 
   function handleNextDestiny() {
@@ -68,9 +68,12 @@ export default function RouteFollower({
       position: getNearestFreePath(currentDestiny.position),
       sellingLocation: currentDestiny.sellingLocation,
     }
-    newRoute.destinos = newRoute.destinos.slice(1)
-    //setRoute(newRoute)
-    onUpdateRoute(newRoute)
+    setRoute(removeDestiny(newRoute, 0))
+  }
+
+  if (!currentDestiny) {
+    onCancel()
+    return null
   }
 
   const snapTo = (i: number) => ref.current?.snapTo(i)
@@ -78,20 +81,20 @@ export default function RouteFollower({
     <>
       <div className="ui absolute top-0 w-[90%] md:max-w-110 ml-[50%] mt-4 -translate-x-1/2">
         <div className="w-full bg-[#4CA866] text-white  flex items-center p-2 rounded-t-2xl rounded-br-2xl gap-2">
-          <MoveUp size={40} strokeWidth={3} />
-          <span>
-            <h2 className="text-2xl font-semibold">
+          <MoveUp size={35} strokeWidth={3} />
+          <span className="w-[85%]">
+            <h2 className="text-xl font-semibold overflow-hidden whitespace-nowrap text-ellipsis max-w-[98%] ">
               {currentDestiny.sellerName}
             </h2>
-            <p className="text-lg -mt-1 font-light">
+            <p className="-mt-1 font-light">
               {locationToText(currentDestiny.sellingLocation)}
             </p>
           </span>
         </div>
         {nextDestiny && (
-          <div className="bg-green-secondary text-white p-2 w-[70%] px-3 rounded-b-2xl">
-            <p className="font-light">
-              Depois, <b> {nextDestiny.sellerName}</b>{' '}
+          <div className="bg-green-secondary text-white p-2 pl-4 w-[80%] px-3 rounded-b-2xl">
+            <p className="font-light overflow-hidden whitespace-nowrap text-ellipsis">
+              Depois, <b>{nextDestiny.sellerName}</b>{' '}
             </p>
             <p className="text-sm -mt-1.5 text-gray06 font-light">
               {locationToText(nextDestiny.sellingLocation)}
@@ -102,10 +105,10 @@ export default function RouteFollower({
       <Sheet
         ref={ref}
         isOpen={true}
-        snapPoints={[120]}
+        snapPoints={[1, 360, 100]}
         onClose={() => snapTo(0)}
-        onOpenEnd={() => snapTo(0)}
-        initialSnap={0}
+        onOpenEnd={() => snapTo(2)}
+        initialSnap={2}
         className="md:max-w-95  md:ml-[50%] md:-translate-x-1/2"
       >
         <Sheet.Container>
@@ -115,8 +118,8 @@ export default function RouteFollower({
               <h2 className="text-lg"> {inicioText} </h2>
             </div>
           </SheetHeaderTitle>
-          <Sheet.Content className="flex gap-3 pl-5 pt-4">
-            <div className="flex gap-4 overflow-x-auto ">
+          <Sheet.Content className="flex gap-3 pl-3 pt-3">
+            <div className="flex gap-4 overflow-x-auto min-h-10">
               <IconButton
                 className="shrink-0"
                 type="submit"
@@ -137,6 +140,9 @@ export default function RouteFollower({
                 Editar rota
               </IconButton>
             </div>
+            <Sheet.Scroller>
+              <RouteContent />
+            </Sheet.Scroller>
           </Sheet.Content>
         </Sheet.Container>
       </Sheet>

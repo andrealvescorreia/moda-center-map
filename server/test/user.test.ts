@@ -190,7 +190,7 @@ describe('user tests', () => {
     })
   })
 
-  it('shoukd be able to retrieve user data when logged in', async () => {
+  it('should be able to retrieve user data when logged in', async () => {
     const loginResponse = await request(app).post('/auth').send({
       username: 'JohnDoe',
       password: '123456',
