@@ -1,7 +1,6 @@
 import { CircularProgress } from '@mui/material'
 import { ArrowLeft } from 'lucide-react'
-import { useState } from 'react'
-import { useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { InputField, InputIcon, InputRoot } from '../input'
 
@@ -20,6 +19,16 @@ export default function Note({
 }: NoteProps) {
   const [modalOpen, setModalOpen] = useState(false)
   const noteRef = useRef<HTMLTextAreaElement>(null)
+
+  useEffect(() => {
+    if (modalOpen && noteRef.current) {
+      noteRef.current.focus()
+      // Move o cursor para o final do texto
+      const length = noteRef.current.value.length
+      noteRef.current.setSelectionRange(length, length)
+    }
+  }, [modalOpen])
+
   const openModal = () => setModalOpen(true)
   const closeModal = () => setModalOpen(false)
 
@@ -70,8 +79,6 @@ export default function Note({
                   <textarea
                     className="w-full h-90 p-2 border-none rounded-lg focus:outline-none resize-none"
                     placeholder="Escrever uma nota..."
-                    // biome-ignore lint/a11y/noAutofocus: <explanation>
-                    autoFocus={!defaultNote}
                     defaultValue={defaultNote}
                     ref={noteRef}
                   />
