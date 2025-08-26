@@ -1,4 +1,5 @@
 import { MapPinPlus, Navigation, PersonStanding, Trash } from 'lucide-react'
+import { enqueueSnackbar } from 'notistack'
 import { useEffect, useRef, useState } from 'react'
 import { Sheet, type SheetRef } from 'react-modal-sheet'
 import { DestinyList } from '../../../components/Routing/destiny-list'
@@ -148,7 +149,13 @@ const RouteEditor = ({ gridMap, onCancel, onStart }: RouteEditorProps) => {
   async function addDestinyFromMap(click: { lat: number; lng: number }) {
     if (!route) return
     const destiny = await getDestinyFromMap(click)
-    const newRoute = destiny ? addDestiny(route, destiny) : route
+    if (!destiny) {
+      enqueueSnackbar('O local clicado não é um destino válido', {
+        variant: 'error',
+      })
+      return
+    }
+    const newRoute = addDestiny(route, destiny)
     setRoute(newRoute)
     notAddingDestiny()
   }
