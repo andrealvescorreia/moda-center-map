@@ -3,6 +3,7 @@ import MapDrawer from '../../components/Map/map-drawer'
 import 'leaflet/dist/leaflet.css'
 import L from 'leaflet'
 import { useEffect, useState } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import Logo from '../../assets/logo.png'
 import { ClickPosition } from '../../components/Map/click-position'
 import PanTo from '../../components/Map/pan-to'
@@ -28,6 +29,25 @@ function Home() {
   const { user } = useUserContext()
   const [isSearching, setIsSearching] = useState(false)
   const [isManagingRoute, setIsManagingRoute] = useState(false)
+  const [searchParams, setSearchParams] = useSearchParams()
+  const state = searchParams.get('state')
+
+  const enterRouteMode = () => setSearchParams({ state: 'route' })
+  const enterSearchMode = () => setSearchParams({ state: 'search' })
+  const clearState = () => setSearchParams({})
+
+  useEffect(() => {
+    if (state === 'route') {
+      setIsManagingRoute(true)
+    } else {
+      setIsManagingRoute(false)
+    }
+    if (state === 'search') {
+      setIsSearching(true)
+    } else {
+      setIsSearching(false)
+    }
+  }, [state])
 
   useEffect(() => {
     if (isManagingRoute) {
@@ -107,7 +127,14 @@ function Home() {
   }
 
   if (isSearching) {
-    return <SearchSeller onCancel={() => setIsSearching(false)} />
+    return (
+      <SearchSeller
+        onCancel={() => {
+          setIsSearching(false)
+          clearState()
+        }}
+      />
+    )
   }
   return (
     <>
@@ -123,7 +150,10 @@ function Home() {
               </InputIcon>
               <InputField
                 placeholder="Busque pontos de venda"
-                onClick={() => setIsSearching(true)}
+                onClick={() => {
+                  setIsSearching(true)
+                  enterSearchMode()
+                }}
               />
             </InputRoot>
           </div>
@@ -131,16 +161,22 @@ function Home() {
       </div>
 
       {!isManagingRoute ? (
-        <span className="absolute  ui bottom-20 right-5">
+        <span className="absolute ui bottom-20 right-5">
           <RouteButton
-            onClick={() => setIsManagingRoute(true)}
+            onClick={() => {
+              setIsManagingRoute(true)
+              enterRouteMode()
+            }}
             className="relative"
           />
         </span>
       ) : (
         <RoutingManager
           gridMap={modaCenterGridMap}
-          onStopManagingRoute={() => setIsManagingRoute(false)}
+          onStopManagingRoute={() => {
+            setIsManagingRoute(false)
+            clearState()
+          }}
         />
       )}
 

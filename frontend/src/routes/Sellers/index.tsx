@@ -1,7 +1,7 @@
 import { useNetworkState } from '@uidotdev/usehooks'
 import { CloudOff, Plus, Search } from 'lucide-react'
 import { useEffect, useState } from 'react'
-import { NavLink, useNavigate } from 'react-router-dom'
+import { NavLink, useNavigate, useSearchParams } from 'react-router-dom'
 import { IconButton } from '../../components/icon-button'
 import { InputField, InputIcon, InputRoot } from '../../components/input'
 import NavBar from '../../components/nav'
@@ -20,6 +20,21 @@ export default function Sellers() {
   const [isSearching, setIsSearching] = useState(false)
   const navigate = useNavigate()
   const network = useNetworkState()
+
+  const [searchParams, setSearchParams] = useSearchParams()
+  const state = searchParams.get('state')
+
+  const enterSearchMode = () => setSearchParams({ state: 'search' })
+  const clearState = () => setSearchParams({})
+
+  useEffect(() => {
+    if (state === 'search') {
+      setIsSearching(true)
+    } else {
+      setIsSearching(false)
+    }
+  }, [state])
+
   useEffect(() => {
     setShow(true)
   }, [setShow])
@@ -41,7 +56,14 @@ export default function Sellers() {
   }, [setLoading])
 
   if (isSearching) {
-    return <SearchSeller onCancel={() => setIsSearching(false)} />
+    return (
+      <SearchSeller
+        onCancel={() => {
+          setIsSearching(false)
+          clearState()
+        }}
+      />
+    )
   }
   return (
     <div className="h-[100dvh] w-[100dvw] fixed overflow-y-auto">
@@ -58,7 +80,10 @@ export default function Sellers() {
             </InputIcon>
             <InputField
               placeholder="Buscar"
-              onClick={() => setIsSearching(true)}
+              onClick={() => {
+                setIsSearching(true)
+                enterSearchMode()
+              }}
             />
           </InputRoot>
         </div>
