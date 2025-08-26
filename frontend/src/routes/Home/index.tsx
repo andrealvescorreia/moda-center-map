@@ -1,5 +1,4 @@
-import { MapContainer, useMap } from 'react-leaflet'
-
+import { MapContainer } from 'react-leaflet'
 import MapDrawer from '../../components/Map/map-drawer'
 import 'leaflet/dist/leaflet.css'
 import L from 'leaflet'
@@ -23,20 +22,21 @@ import RoutingManager from './Routing/RoutingManager'
 import { changeStartingPoint } from './Routing/route-service'
 import SearchSeller from './search-seller'
 import 'leaflet-rotate'
+import RotateButton from '../../components/Map/rotate-button'
 
 const modaCenterGridMap = new ModaCenterGridMap()
 
-function updateMaxBounds(map: L.map) {
+function updateMaxBounds(map: L.Map) {
   const zoomLevel = map.getZoom()
-  const offset = 5 + 2.4 ** (7 - zoomLevel)
+  const offset = 20 + 2.4 ** (7.5 - zoomLevel)
   map.setMaxBounds([
     [
       modaCenterGridMap.getBounds()[0][0] - offset,
-      modaCenterGridMap.getBounds()[0][1] - offset / 2,
+      modaCenterGridMap.getBounds()[0][1] - offset / 2.2,
     ],
     [
       modaCenterGridMap.getBounds()[1][0] + offset,
-      modaCenterGridMap.getBounds()[1][1] + offset / 2,
+      modaCenterGridMap.getBounds()[1][1] + offset / 2.2,
     ],
   ])
 }
@@ -47,6 +47,7 @@ function Home() {
   const { user } = useUserContext()
   const [isSearching, setIsSearching] = useState(false)
   const [isManagingRoute, setIsManagingRoute] = useState(false)
+  const [rotateMode, setRotateMode] = useState(true)
   const [map, setMap] = useState<L.Map | null>(null)
   const [searchParams, setSearchParams] = useSearchParams()
   const state = searchParams.get('state')
@@ -128,12 +129,24 @@ function Home() {
 
   useEffect(() => {
     if (map) {
-      updateMaxBounds(map) // executes on first render
-      map.on('zoom', () => {
+      console.log(map.getCenter())
+      if (rotateMode) {
+        // biome-ignore lint/suspicious/noExplicitAny: <explanation>
+        ;(map as any).touchRotate?.enable?.()
+        map.setBearing(map.getBearing() || 0)
+        map.setMaxBounds(undefined)
+      } else {
+        // biome-ignore lint/suspicious/noExplicitAny: <explanation>
+        ;(map as any).touchRotate?.disable?.()
+        map.setBearing(0)
         updateMaxBounds(map)
+      }
+      map.on('zoom', () => {
+        if (rotateMode) map.setMaxBounds(undefined)
+        else updateMaxBounds(map)
       })
     }
-  }, [map])
+  }, [map, rotateMode])
 
   if (isSearching) {
     return (
@@ -169,6 +182,15 @@ function Home() {
         )}
       </div>
 
+      <span className="absolute ui bottom-40 right-5">
+        <RotateButton
+          onClick={() => {
+            setRotateMode((prev) => !prev)
+          }}
+          className="relative"
+          active={rotateMode}
+        />
+      </span>
       {!isManagingRoute ? (
         <span className="absolute ui bottom-20 right-5">
           <RouteButton
@@ -196,10 +218,9 @@ function Home() {
         maxZoom={6}
         minZoom={1}
         center={modaCenterGridMap.getCenter()}
-        zoom={2}
-        rotate={true}
-        touchRotate={true}
-        rotateControl={true}
+        zoom={1}
+        rotate={rotateMode}
+        touchRotate={rotateMode}
         bearing={0}
       >
         <MapDrawer gridMap={modaCenterGridMap} />
