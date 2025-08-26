@@ -1,4 +1,4 @@
-import { MapContainer, useMap } from 'react-leaflet'
+import { MapContainer } from 'react-leaflet'
 import MapDrawer from '../../components/Map/map-drawer'
 import 'leaflet/dist/leaflet.css'
 import L from 'leaflet'
@@ -23,9 +23,9 @@ import { changeStartingPoint } from './Routing/route-service'
 import SearchSeller from './search-seller'
 const modaCenterGridMap = new ModaCenterGridMap()
 
-function updateMaxBounds(map: L.map) {
+function updateMaxBounds(map: L.Map) {
   const zoomLevel = map.getZoom()
-  const offset = 5 + 2.4 ** (7 - zoomLevel)
+  const offset = 15 + 2.4 ** (7.5 - zoomLevel)
   map.setMaxBounds([
     [
       modaCenterGridMap.getBounds()[0][0] - offset,
