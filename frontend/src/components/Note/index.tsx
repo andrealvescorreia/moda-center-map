@@ -2,6 +2,7 @@ import { CircularProgress } from '@mui/material'
 import { ArrowLeft } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
+import { useSearchParams } from 'react-router-dom'
 import { InputField, InputIcon, InputRoot } from '../input'
 
 interface NoteProps {
@@ -20,6 +21,20 @@ export default function Note({
   const [modalOpen, setModalOpen] = useState(false)
   const noteRef = useRef<HTMLTextAreaElement>(null)
 
+  const [searchParams, setSearchParams] = useSearchParams()
+  const state = searchParams.get('edit-note')
+
+  const enterEditMode = () => setSearchParams({ 'edit-note': 'true' })
+  const clearState = () => setSearchParams({})
+
+  useEffect(() => {
+    if (state === 'true') {
+      setModalOpen(true)
+    } else {
+      setModalOpen(false)
+    }
+  }, [state])
+
   useEffect(() => {
     if (modalOpen && noteRef.current) {
       noteRef.current.focus()
@@ -29,8 +44,14 @@ export default function Note({
     }
   }, [modalOpen])
 
-  const openModal = () => setModalOpen(true)
-  const closeModal = () => setModalOpen(false)
+  const openModal = () => {
+    setModalOpen(true)
+    enterEditMode()
+  }
+  const closeModal = () => {
+    setModalOpen(false)
+    clearState()
+  }
 
   const handleSave = () => {
     if (noteRef.current && onSave) {
