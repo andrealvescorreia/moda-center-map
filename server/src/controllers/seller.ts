@@ -1,132 +1,42 @@
 import type { NextFunction, Request, Response } from 'express'
-import { Sequelize } from 'sequelize'
-import z from 'zod'
-import sequelize from '../database'
-import Boxe from '../database/models/boxe'
-import ProductCategory from '../database/models/product-category'
-import Seller from '../database/models/seller'
-import Store from '../database/models/store'
-import User from '../database/models/user'
-import {
-  registerSellerSchema,
-  updateSellerSchema,
-} from '../schemas/sellerSchema'
-import {
-  boxesChanges,
-  storesChanges,
-} from '../services/sell-location-change-detection'
-import {
-  validateNewSeller,
-  validateSellerUpdate,
-} from '../services/seller-validation'
+import { boxeSchema } from '../schemas/boxeSchema'
+import { queryOptionsSchema } from '../schemas/queryOptionsSchema'
+import { searchSchema } from '../schemas/searchSchema'
+import { createSellerSchema, updateSellerSchema } from '../schemas/sellerSchema'
+import { storeSchema } from '../schemas/storeSchema'
+import { SellerService } from '../services/seller-service'
+import { UserService } from '../services/user-service'
+import { validationErrorsToHttpCode } from '../services/validation-errors-to-http-code'
+
+const sellerService = new SellerService()
+const userService = new UserService()
 
 export async function index(req: Request, res: Response, next: NextFunction) {
-  const optionalParams = z.object({
-    order_by: z.string().optional(),
-    order: z.enum(['ASC', 'DESC', 'asc', 'desc']).optional(),
-  })
   try {
-    const parsed = optionalParams.parse(req.query)
-    const sellers = await Seller.findAll({
-      order: [
-        [
-          parsed.order_by ? parsed.order_by : 'createdAt',
-          parsed.order ? parsed.order : 'DESC',
-        ],
-      ],
-      include: [
-        {
-          model: Boxe,
-          attributes: { exclude: ['createdAt', 'updatedAt', 'seller_id'] },
-        },
-        {
-          model: Store,
-          attributes: { exclude: ['createdAt', 'updatedAt', 'seller_id'] },
-        },
-        {
-          model: ProductCategory,
-          attributes: {
-            exclude: ['createdAt', 'updatedAt'],
-          },
-          through: { attributes: [] }, // Exclude the join table attributes (SellerProductCategories)
-        },
-      ],
-      attributes: { exclude: ['updatedAt', 'search_vector'] },
-    })
+    const parsed = queryOptionsSchema.parse(req.query)
+    const sellers = await sellerService.findAll(parsed)
     res.status(200).json(sellers)
     return
   } catch (error) {
     return next(error)
   }
 }
-async function findSellerById(id: string) {
-  return await Seller.findOne({
-    where: { id },
-    include: [
-      {
-        model: Boxe,
-        attributes: { exclude: ['createdAt', 'updatedAt', 'seller_id'] },
-      },
-      {
-        model: Store,
-        attributes: { exclude: ['createdAt', 'updatedAt', 'seller_id'] },
-      },
-      {
-        model: ProductCategory,
-        attributes: {
-          exclude: ['createdAt', 'updatedAt'],
-        },
-        through: { attributes: [] },
-      },
-    ],
-    attributes: { exclude: ['createdAt', 'updatedAt', 'search_vector'] },
-  })
-}
-
-async function findSellerByReqId(req: Request, res: Response) {
-  if (!z.string().uuid().safeParse(req.params.id).success) {
-    res.status(400).json({ message: 'Invalid id' })
-    return
-  }
-  const seller = await findSellerById(req.params.id)
-  if (!seller) {
-    res.status(404).json({ message: 'Seller not found' })
-    return
-  }
-  return seller
-}
-
-const findUserByReqId = async (req: Request, res: Response) => {
-  const user_id = req.body.userId
-  if (!user_id) {
-    res.status(401).json({ message: 'Unauthorized' })
-    return
-  }
-  const user = await User.findOne({ where: { id: user_id } })
-  if (!user) {
-    res.status(404).json({ message: 'User not found' })
-    return
-  }
-  return user
-}
 
 export async function show(req: Request, res: Response, next: NextFunction) {
   try {
-    const seller = await findSellerByReqId(req, res)
-    if (!seller) return
-    res.status(200).json(seller)
+    const sellerResult = await sellerService.findOne(req.params.id)
+    if (sellerResult.errors.length > 0 || !sellerResult.data) {
+      const statusCode = validationErrorsToHttpCode(sellerResult.errors)
+      res.status(statusCode).json({ errors: sellerResult.errors })
+      return
+    }
+    res.status(200).json(sellerResult.data)
     return
   } catch (error) {
     console.log(error)
     return next(error)
   }
 }
-
-const boxeSchema = z.object({
-  sector_color: z.string(),
-  street_letter: z.string(),
-  box_number: z.coerce.number(),
-})
 
 export async function showByBoxe(
   req: Request,
@@ -135,16 +45,11 @@ export async function showByBoxe(
 ) {
   try {
     const parsed = boxeSchema.parse(req.query)
-    const boxe = await Boxe.findOne({
-      where: parsed,
-      include: [Seller],
-    })
-    if (!boxe) {
+    const seller = await sellerService.findOneByBoxe(parsed)
+    if (!seller) {
       res.status(404).json({ message: 'This boxe does not belong to a seller' })
       return
     }
-
-    const seller = await findSellerById(boxe.seller_id)
 
     res.status(200).json(seller)
     return
@@ -153,11 +58,6 @@ export async function showByBoxe(
   }
 }
 
-const storeSchema = z.object({
-  sector_color: z.string(),
-  block_number: z.coerce.number(),
-  store_number: z.coerce.number(),
-})
 export async function showByStore(
   req: Request,
   res: Response,
@@ -165,18 +65,13 @@ export async function showByStore(
 ) {
   try {
     const parsed = storeSchema.parse(req.query)
-    const store = await Store.findOne({
-      where: parsed,
-      include: [Seller],
-    })
-    if (!store) {
+    const seller = await sellerService.findOneByStore(parsed)
+    if (!seller) {
       res
         .status(404)
         .json({ message: 'This store does not belong to a seller' })
       return
     }
-
-    const seller = await findSellerById(store.seller_id)
 
     res.status(200).json(seller)
     return
@@ -185,17 +80,10 @@ export async function showByStore(
   }
 }
 
-const searchSchema = z.object({
-  searchTerm: z.string(),
-  limit: z.number().optional().default(10),
-  offset: z.number().optional().default(0),
-})
-
 export async function search(req: Request, res: Response, next: NextFunction) {
   try {
     const parsed = searchSchema.parse(req.query)
-
-    const sellers = await searchSeller(parsed)
+    const sellers = await sellerService.search(parsed)
     res.status(200).json(sellers)
     return
   } catch (error) {
@@ -204,93 +92,20 @@ export async function search(req: Request, res: Response, next: NextFunction) {
   }
 }
 
-type Search = z.infer<typeof searchSchema>
-async function searchSeller({ searchTerm, limit, offset }: Search) {
-  const results = await Seller.findAll({
-    where: Sequelize.literal(`
-      search_vector @@ plainto_tsquery('portuguese', :searchTerm)
-    `),
-    order: Sequelize.literal(`
-      ts_rank(search_vector, plainto_tsquery('portuguese', :searchTerm)) DESC
-    `),
-    limit,
-    offset,
-    replacements: { searchTerm },
-
-    attributes: { exclude: ['createdAt', 'updatedAt', 'search_vector'] },
-    raw: true,
-  })
-
-  const sellers = await Seller.findAll({
-    where: { id: results.map((result) => result.id) },
-    include: [
-      { model: Boxe, attributes: { exclude: ['createdAt', 'updatedAt'] } },
-      { model: Store, attributes: { exclude: ['createdAt', 'updatedAt'] } },
-      {
-        model: ProductCategory,
-        attributes: {
-          exclude: ['createdAt', 'updatedAt'],
-        },
-      },
-    ],
-    attributes: { exclude: ['createdAt', 'updatedAt', 'search_vector'] },
-  })
-
-  return sellers
-}
-
 export async function create(req: Request, res: Response, next: NextFunction) {
   try {
-    const parsed = registerSellerSchema.parse({
+    const parsed = createSellerSchema.parse({
       ...req.body,
       phone_number: req.body.phone_number?.replace(/\D/g, '').trim(),
       name: req.body.name?.trim(),
     })
-    const errors = await validateNewSeller(parsed)
-    if (errors.length > 0) {
-      res.status(400).json({ errors })
+    const newSeller = await sellerService.create(parsed)
+    if (newSeller !== null && 'errors' in newSeller) {
+      res.status(400).json({ errors: newSeller.errors })
       return
     }
-
-    const t = await sequelize.transaction()
-
-    try {
-      const newSeller = await Seller.create(
-        { name: parsed.name, phone_number: parsed.phone_number },
-        { transaction: t }
-      )
-      const boxes = await Boxe.bulkCreate(parsed.sellingLocations.boxes || [], {
-        transaction: t,
-      })
-      await newSeller.$add('boxes', boxes, {
-        transaction: t,
-      })
-      const stores = await Store.bulkCreate(
-        parsed.sellingLocations.stores || [],
-        { transaction: t }
-      )
-      await newSeller.$add('stores', stores, {
-        transaction: t,
-      })
-
-      const seller_product_categories: ProductCategory[] = []
-      for (const category of parsed.product_categories || []) {
-        const foundCategory = await ProductCategory.findOne({
-          where: { category },
-        })
-        if (foundCategory) seller_product_categories.push(foundCategory)
-      }
-      await newSeller.$add('product_categories', seller_product_categories, {
-        transaction: t,
-      })
-
-      await t.commit()
-      res.status(201).json(newSeller)
-      return
-    } catch (error) {
-      await t.rollback()
-      return next(error)
-    }
+    res.status(201).json(newSeller)
+    return
   } catch (error) {
     return next(error)
   }
@@ -298,95 +113,19 @@ export async function create(req: Request, res: Response, next: NextFunction) {
 
 export async function update(req: Request, res: Response, next: NextFunction) {
   try {
-    const seller = await findSellerByReqId(req, res)
-    if (!seller) return
-
     const parsed = updateSellerSchema.parse({
       ...req.body,
       phone_number: req.body.phone_number?.replace(/\D/g, '').trim(),
       name: req.body.name?.trim(),
     })
-
-    const errors = await validateSellerUpdate(seller?.id, parsed)
-    if (errors.length > 0) {
-      res.status(400).json({ errors })
+    const updatedSeller = await sellerService.update(parsed, req.params.id)
+    if (updatedSeller && 'errors' in updatedSeller) {
+      const statusCode = validationErrorsToHttpCode(updatedSeller.errors)
+      res.status(statusCode).json({ errors: updatedSeller.errors })
       return
     }
-
-    const t = await sequelize.transaction()
-    try {
-      await Seller.update(
-        {
-          name: parsed.name,
-          phone_number: parsed.phone_number ? parsed.phone_number : null,
-        },
-        { where: { id: req.params.id }, transaction: t }
-      )
-
-      const { addedBoxes, removedBoxes } = await boxesChanges(
-        seller.id,
-        parsed.boxes
-      )
-      const { addedStores, removedStores } = await storesChanges(
-        seller.id,
-        parsed.stores
-      )
-
-      if (addedBoxes.length > 0) {
-        const createdBoxes = await Boxe.bulkCreate(addedBoxes, {
-          transaction: t,
-        })
-        await seller.$add('boxes', createdBoxes, { transaction: t })
-      }
-      if (removedBoxes.length > 0) {
-        await Boxe.destroy({
-          where: { id: removedBoxes.map((box) => box.id) },
-          transaction: t,
-        })
-      }
-      if (addedStores.length > 0) {
-        const createdStores = await Store.bulkCreate(addedStores, {
-          transaction: t,
-        })
-        await seller.$add('stores', createdStores, { transaction: t })
-      }
-      if (removedStores.length > 0) {
-        await Store.destroy({
-          where: { id: removedStores.map((store) => store.id) },
-          transaction: t,
-        })
-      }
-      const newSellerProductCategories: ProductCategory[] = []
-      for (const category of parsed.product_categories || []) {
-        const foundCategory = await ProductCategory.findOne({
-          where: { category },
-        })
-        if (foundCategory) newSellerProductCategories.push(foundCategory)
-      }
-      await seller.$add('product_categories', newSellerProductCategories, {
-        transaction: t,
-      })
-
-      const removedCategories = seller.product_categories.filter(
-        ({ category }) =>
-          !newSellerProductCategories.some((c) => c.category === category)
-      )
-      if (removedCategories.length)
-        await seller.$remove('product_categories', removedCategories, {
-          transaction: t,
-        })
-
-      await t.commit()
-
-      const updatedSeller = await findSellerById(req.params.id)
-      if (!updatedSeller) return
-
-      res.status(200).json(updatedSeller)
-      return
-    } catch (error) {
-      await t.rollback()
-      return next(error)
-    }
+    res.status(200).json(updatedSeller)
+    return
   } catch (error) {
     return next(error)
   }
@@ -394,11 +133,13 @@ export async function update(req: Request, res: Response, next: NextFunction) {
 
 export async function destroy(req: Request, res: Response, next: NextFunction) {
   try {
-    const seller = await findSellerByReqId(req, res)
-    if (!seller) return
-
-    await Seller.destroy({ where: { id: req.params.id } })
-    res.status(204).send()
+    const deletion = await sellerService.delete(req.params.id)
+    if (typeof deletion === 'object' && 'errors' in deletion) {
+      const statusCode = validationErrorsToHttpCode(deletion.errors)
+      res.status(statusCode).json({ errors: deletion.errors })
+      return
+    }
+    res.status(200).json({ message: 'Seller deleted' })
     return
   } catch (error) {
     return next(error)
@@ -411,12 +152,15 @@ export async function favorite(
   next: NextFunction
 ) {
   try {
-    const seller = await findSellerByReqId(req, res)
-    if (!seller) return
-    const user = await findUserByReqId(req, res)
-    if (!user) return
-
-    await user.$add('favorite_sellers', seller)
+    const result = await userService.addFavoriteSeller(
+      req.body.userId,
+      req.params.id
+    )
+    if (!result.success) {
+      const statusCode = validationErrorsToHttpCode(result.errors)
+      res.status(statusCode).json({ errors: result.errors })
+      return
+    }
     res.status(200).json({ message: 'Seller favorited' })
     return
   } catch (error) {
@@ -429,12 +173,15 @@ export async function unfavorite(
   next: NextFunction
 ) {
   try {
-    const seller = await findSellerByReqId(req, res)
-    if (!seller) return
-    const user = await findUserByReqId(req, res)
-    if (!user) return
-
-    await user.$remove('favorite_sellers', seller)
+    const result = await userService.removeFavoriteSeller(
+      req.body.userId,
+      req.params.id
+    )
+    if (!result.success) {
+      const statusCode = validationErrorsToHttpCode(result.errors)
+      res.status(statusCode).json({ errors: result.errors })
+      return
+    }
     res.status(200).json({ message: 'Seller unfavorited' })
     return
   } catch (error) {
@@ -448,21 +195,13 @@ export async function indexFavorites(
   next: NextFunction
 ) {
   try {
-    const user = await findUserByReqId(req, res)
-    if (!user) return
-
-    const favoriteSellers = await user.$get('favorite_sellers', {
-      include: [
-        { model: Boxe, attributes: { exclude: ['createdAt', 'updatedAt'] } },
-        { model: Store, attributes: { exclude: ['createdAt', 'updatedAt'] } },
-        {
-          model: ProductCategory,
-          attributes: { exclude: ['createdAt', 'updatedAt'] },
-        },
-      ],
-      attributes: { exclude: ['createdAt', 'updatedAt', 'search_vector'] },
-    })
-    res.status(200).json(favoriteSellers)
+    const result = await userService.findAllFavoriteSellers(req.body.userId)
+    if (!result.success) {
+      const statusCode = validationErrorsToHttpCode(result.errors)
+      res.status(statusCode).json({ errors: result.errors })
+      return
+    }
+    res.status(200).json(result.data)
     return
   } catch (error) {
     return next(error)
@@ -475,13 +214,17 @@ export async function isFavorite(
   next: NextFunction
 ) {
   try {
-    const seller = await findSellerByReqId(req, res)
-    if (!seller) return
-    const user = await findUserByReqId(req, res)
-    if (!user) return
+    const result = await userService.sellerIsFavorite(
+      req.body.userId,
+      req.params.id
+    )
+    if (!result.success) {
+      const statusCode = validationErrorsToHttpCode(result.errors)
+      res.status(statusCode).json({ errors: result.errors })
+      return
+    }
 
-    const isFavorite = await user.$has('favorite_sellers', seller)
-    res.status(200).json({ isFavorite })
+    res.status(200).json({ isFavorite: result.isFavorite })
     return
   } catch (error) {
     return next(error)
@@ -490,21 +233,22 @@ export async function isFavorite(
 
 export async function putNote(req: Request, res: Response, next: NextFunction) {
   try {
-    const seller = await findSellerByReqId(req, res)
-    if (!seller) return
-    const user = await findUserByReqId(req, res)
-    if (!user) return
-
     const text = req.body.text
     if (text === undefined || text === null) {
       res.status(400).json({ message: 'text is required' })
       return
     }
-    await user.$add('sellers_notes', seller, { through: { text } })
-    const notes = await user.$get('notes', {
-      where: { seller_id: seller.id },
-    })
-    res.status(200).json({ id: notes[0].id, text: notes[0].text })
+    const result = await userService.putNoteOnSeller(
+      req.body.userId,
+      req.params.id,
+      text
+    )
+    if (!result.success) {
+      const statusCode = validationErrorsToHttpCode(result.errors)
+      res.status(statusCode).json({ errors: result.errors })
+      return
+    }
+    res.status(200).json(result.data)
     return
   } catch (error) {
     return next(error)
@@ -513,19 +257,17 @@ export async function putNote(req: Request, res: Response, next: NextFunction) {
 
 export async function getNote(req: Request, res: Response, next: NextFunction) {
   try {
-    const seller = await findSellerByReqId(req, res)
-    if (!seller) return
-    const user = await findUserByReqId(req, res)
-    if (!user) return
-
-    const notes = await user.$get('notes', {
-      where: { seller_id: seller.id },
-    })
-    if (notes.length === 0) {
+    const result = await userService.findOneNote(req.body.userId, req.params.id)
+    if (!result.success) {
+      const statusCode = validationErrorsToHttpCode(result.errors)
+      res.status(statusCode).json({ errors: result.errors })
+      return
+    }
+    if (!result.data) {
       res.status(404).json({ message: 'Note not found' })
       return
     }
-    res.status(200).json({ id: notes[0].id, text: notes[0].text })
+    res.status(200).json(result.data)
     return
   } catch (error) {
     return next(error)

@@ -1,7 +1,7 @@
-import { useLocalStorage } from '@uidotdev/usehooks'
 import React, { useEffect, useState } from 'react'
 import type { ReactNode } from 'react'
 import type { Route } from '../interfaces/Route'
+import { ModaCenterGridMap } from '../models/ModaCenterGridMap'
 
 const RouteContext = React.createContext<{
   route?: Route
@@ -11,18 +11,55 @@ const RouteContext = React.createContext<{
   setRoute: () => {},
 })
 
-const RouteProvider = ({ children }: { children: ReactNode }) => {
-  const [storedRoute, saveStoredRoute] = useLocalStorage<Route>('route', {
-    inicio: null,
-    destinos: [],
-    passos: [],
-  })
-  const [route, setRoute] = useState<Route | undefined>(storedRoute)
-  useEffect(() => {
-    if (route) {
-      saveStoredRoute(route)
+const gridMap = new ModaCenterGridMap()
+
+function getStoredRoute() {
+  const storedRoute = localStorage.getItem('local-route')
+  if (storedRoute) {
+    try {
+      const route: Route = JSON.parse(storedRoute)
+      if (!route) return undefined
+      for (const destino of route.destinos) {
+        if (!destino.sellingLocation) continue
+        const restoredSellingLocation = gridMap.getSellingLocation(
+          destino.sellingLocation
+        )
+        if (!restoredSellingLocation) return undefined
+        // when the sellingLocation is a Store that was restored from localStorage,
+        // it does not have the getEntrance() method. So we must restore it.
+        destino.sellingLocation = restoredSellingLocation
+      }
+      return route as Route
+    } catch (e) {
+      console.error('Failed to parse stored route:', e)
     }
-  }, [route, saveStoredRoute])
+  }
+  return undefined
+}
+
+function setStoredRoute(route: Route) {
+  localStorage.setItem('local-route', JSON.stringify(route))
+}
+
+const RouteProvider = ({ children }: { children: ReactNode }) => {
+  const [route, setRoute] = useState<Route | undefined>(undefined)
+
+  useEffect(() => {
+    //retrieve storedRoute on load
+    const storedRoute = getStoredRoute()
+    if (!storedRoute)
+      setRoute({
+        destinos: [],
+        inicio: null,
+        passos: [],
+      })
+    else setRoute(storedRoute)
+  }, [])
+
+  useEffect(() => {
+    if (route) setStoredRoute(route)
+  }, [route])
+
   return (
     <RouteContext.Provider value={{ route, setRoute }}>
       {children}

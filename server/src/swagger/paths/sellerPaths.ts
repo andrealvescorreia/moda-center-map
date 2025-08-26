@@ -363,7 +363,13 @@ const sellerPaths: OpenAPIV3.PathsObject = {
                   },
                 },
                 example: {
-                  message: 'Invalid id',
+                  errors: [
+                    {
+                      code: 'INVALID',
+                      field: 'id',
+                      message: 'Invalid id',
+                    },
+                  ],
                 },
               },
             },
@@ -384,7 +390,13 @@ const sellerPaths: OpenAPIV3.PathsObject = {
                   },
                 },
                 example: {
-                  message: 'Seller not found',
+                  errors: [
+                    {
+                      code: 'NOT_FOUND',
+                      field: 'id',
+                      message: 'Seller not found',
+                    },
+                  ],
                 },
               },
             },
@@ -463,9 +475,13 @@ const sellerPaths: OpenAPIV3.PathsObject = {
                     },
                   },
                 },
-                example: {
-                  message: 'Seller not found',
-                },
+                example: [
+                  {
+                    code: 'NOT_FOUND',
+                    field: 'id',
+                    message: 'Seller not found',
+                  },
+                ],
               },
             },
           },

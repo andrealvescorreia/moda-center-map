@@ -172,7 +172,7 @@ function DestinyLiItem({
       </div>
       {/* biome-ignore lint/a11y/useKeyWithClickEvents: <explanation> */}
       <div
-        className="h-full flex flex-col relative gap-0"
+        className={`h-full flex flex-col relative gap-0 transition${isStartingPoint ? '' : ' hover:cursor-pointer hover:bg-gray-200 active:bg-gray-200 rounded'}`}
         onClick={() => onClickDestiny?.(destiny)}
       >
         <p className="text-base md:text-sm whitespace-nowrap overflow-hidden text-ellipsis max-w-[70vw]">
@@ -190,7 +190,10 @@ function DestinyLiItem({
           className="ml-auto"
           onClick={() => onClickRemoveDestiny?.(index)}
         >
-          <X size={16} className="hover:cursor-pointer" />
+          <X
+            size={18}
+            className="hover:cursor-pointer hover:bg-gray-200 rounded-2xl active:bg-gray-200 transition"
+          />
         </button>
       )}
     </li>

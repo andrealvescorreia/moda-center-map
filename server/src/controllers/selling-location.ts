@@ -1,8 +1,9 @@
 import type { NextFunction, Request, Response } from 'express'
 import z from 'zod'
 import Boxe from '../database/models/boxe'
-import Seller from '../database/models/seller'
 import Store from '../database/models/store'
+import { SellerService } from '../services/seller-service'
+const sellerService = new SellerService()
 
 export async function show(req: Request, res: Response, next: NextFunction) {
   try {
@@ -11,19 +12,12 @@ export async function show(req: Request, res: Response, next: NextFunction) {
       return
     }
 
-    async function getSeller(seller_id: string) {
-      return Seller.findOne({
-        where: { id: seller_id },
-        attributes: { exclude: ['createdAt', 'updatedAt', 'search_vector'] },
-      })
-    }
-
     const boxe = await Boxe.findOne({
       where: { id: req.params.id },
       attributes: { exclude: ['createdAt', 'updatedAt'] },
     })
     if (boxe) {
-      const seller = await getSeller(boxe.seller_id)
+      const seller = await sellerService.findOne(boxe.seller_id)
       res.status(200).json({ boxe, seller })
       return
     }
@@ -33,7 +27,7 @@ export async function show(req: Request, res: Response, next: NextFunction) {
       attributes: { exclude: ['createdAt', 'updatedAt'] },
     })
     if (store) {
-      const seller = await getSeller(store.seller_id)
+      const seller = await sellerService.findOne(store.seller_id)
       res.status(200).json({ store, seller })
       return
     }
