@@ -125,7 +125,10 @@ export default function SellerPage() {
           [y, x],
           [y + 1, x + 1],
         ]}
-        fillColor="red"
+        fillColor="white"
+        fillOpacity={0.1}
+        color="#4B9460"
+        weight={6}
       />
     )
   }

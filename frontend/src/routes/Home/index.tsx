@@ -4,6 +4,7 @@ import MapDrawer from '../../components/Map/map-drawer'
 import 'leaflet/dist/leaflet.css'
 import L from 'leaflet'
 import { useEffect, useState } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import Logo from '../../assets/logo.png'
 import { ClickPosition } from '../../components/Map/click-position'
 import PanTo from '../../components/Map/pan-to'
@@ -25,12 +26,47 @@ import 'leaflet-rotate'
 
 const modaCenterGridMap = new ModaCenterGridMap()
 
+function updateMaxBounds(map: L.map) {
+  const zoomLevel = map.getZoom()
+  const offset = 5 + 2.4 ** (7 - zoomLevel)
+  map.setMaxBounds([
+    [
+      modaCenterGridMap.getBounds()[0][0] - offset,
+      modaCenterGridMap.getBounds()[0][1] - offset / 2,
+    ],
+    [
+      modaCenterGridMap.getBounds()[1][0] + offset,
+      modaCenterGridMap.getBounds()[1][1] + offset / 2,
+    ],
+  ])
+}
+
 function Home() {
   const { route, setRoute } = useRouteContext()
   const { show, setShow } = useNavContext()
   const { user } = useUserContext()
   const [isSearching, setIsSearching] = useState(false)
   const [isManagingRoute, setIsManagingRoute] = useState(false)
+  const [map, setMap] = useState<L.Map | null>(null)
+  const [searchParams, setSearchParams] = useSearchParams()
+  const state = searchParams.get('state')
+
+  const enterRouteMode = () => setSearchParams({ state: 'route' })
+  const enterSearchMode = () => setSearchParams({ state: 'search' })
+  const clearState = () => setSearchParams({})
+
+  useEffect(() => {
+    if (state === 'route') {
+      setIsManagingRoute(true)
+    } else {
+      setIsManagingRoute(false)
+    }
+    if (state === 'search') {
+      setIsSearching(true)
+    } else {
+      setIsSearching(false)
+    }
+  }, [state])
 
   useEffect(() => {
     if (isManagingRoute) {
@@ -90,27 +126,24 @@ function Home() {
     setRoute(newRoute)
   }
 
-  function MapMaxBoundsUpdater() {
-    const map = useMap()
-    map.on('zoom', () => {
-      const zoomLevel = map.getZoom()
-      const offset = 5 + 2.4 ** (7 - zoomLevel)
-      map.setMaxBounds([
-        [
-          modaCenterGridMap.getBounds()[0][0] - offset,
-          modaCenterGridMap.getBounds()[0][1] - offset / 2,
-        ],
-        [
-          modaCenterGridMap.getBounds()[1][0] + offset,
-          modaCenterGridMap.getBounds()[1][1] + offset / 2,
-        ],
-      ])
-    })
-    return null
-  }
+  useEffect(() => {
+    if (map) {
+      updateMaxBounds(map) // executes on first render
+      map.on('zoom', () => {
+        updateMaxBounds(map)
+      })
+    }
+  }, [map])
 
   if (isSearching) {
-    return <SearchSeller onCancel={() => setIsSearching(false)} />
+    return (
+      <SearchSeller
+        onCancel={() => {
+          setIsSearching(false)
+          clearState()
+        }}
+      />
+    )
   }
   return (
     <>
@@ -126,7 +159,10 @@ function Home() {
               </InputIcon>
               <InputField
                 placeholder="Busque pontos de venda"
-                onClick={() => setIsSearching(true)}
+                onClick={() => {
+                  setIsSearching(true)
+                  enterSearchMode()
+                }}
               />
             </InputRoot>
           </div>
@@ -134,32 +170,29 @@ function Home() {
       </div>
 
       {!isManagingRoute ? (
-        <span className="absolute  ui bottom-20 right-5">
+        <span className="absolute ui bottom-20 right-5">
           <RouteButton
-            onClick={() => setIsManagingRoute(true)}
+            onClick={() => {
+              setIsManagingRoute(true)
+              enterRouteMode()
+            }}
             className="relative"
           />
         </span>
       ) : (
         <RoutingManager
           gridMap={modaCenterGridMap}
-          onStopManagingRoute={() => setIsManagingRoute(false)}
+          onStopManagingRoute={() => {
+            setIsManagingRoute(false)
+            clearState()
+          }}
         />
       )}
 
       <MapContainer
+        ref={setMap}
         crs={L.CRS.Simple}
         bounds={modaCenterGridMap.getBounds()}
-        maxBounds={[
-          [
-            modaCenterGridMap.getBounds()[0][0] - 85,
-            modaCenterGridMap.getBounds()[0][1] - 85 / 2,
-          ],
-          [
-            modaCenterGridMap.getBounds()[1][0] + 85,
-            modaCenterGridMap.getBounds()[1][1] + 85 / 2,
-          ],
-        ]}
         maxZoom={6}
         minZoom={1}
         center={modaCenterGridMap.getCenter()}
@@ -169,7 +202,6 @@ function Home() {
         rotateControl={true}
         bearing={0}
       >
-        <MapMaxBoundsUpdater />
         <MapDrawer gridMap={modaCenterGridMap} />
         {isManagingRoute && (
           <span>

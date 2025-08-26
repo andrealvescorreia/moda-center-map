@@ -47,7 +47,13 @@ const RouteProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     //retrieve storedRoute on load
     const storedRoute = getStoredRoute()
-    if (storedRoute) setRoute(storedRoute)
+    if (!storedRoute)
+      setRoute({
+        destinos: [],
+        inicio: null,
+        passos: [],
+      })
+    else setRoute(storedRoute)
   }, [])
 
   useEffect(() => {

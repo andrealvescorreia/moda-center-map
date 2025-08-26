@@ -1,8 +1,8 @@
 import { CircularProgress } from '@mui/material'
 import { ArrowLeft } from 'lucide-react'
-import { useState } from 'react'
-import { useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
+import { useSearchParams } from 'react-router-dom'
 import { InputField, InputIcon, InputRoot } from '../input'
 
 interface NoteProps {
@@ -20,8 +20,38 @@ export default function Note({
 }: NoteProps) {
   const [modalOpen, setModalOpen] = useState(false)
   const noteRef = useRef<HTMLTextAreaElement>(null)
-  const openModal = () => setModalOpen(true)
-  const closeModal = () => setModalOpen(false)
+
+  const [searchParams, setSearchParams] = useSearchParams()
+  const state = searchParams.get('edit-note')
+
+  const enterEditMode = () => setSearchParams({ 'edit-note': 'true' })
+  const clearState = () => setSearchParams({})
+
+  useEffect(() => {
+    if (state === 'true') {
+      setModalOpen(true)
+    } else {
+      setModalOpen(false)
+    }
+  }, [state])
+
+  useEffect(() => {
+    if (modalOpen && noteRef.current) {
+      noteRef.current.focus()
+      // Move o cursor para o final do texto
+      const length = noteRef.current.value.length
+      noteRef.current.setSelectionRange(length, length)
+    }
+  }, [modalOpen])
+
+  const openModal = () => {
+    setModalOpen(true)
+    enterEditMode()
+  }
+  const closeModal = () => {
+    setModalOpen(false)
+    clearState()
+  }
 
   const handleSave = () => {
     if (noteRef.current && onSave) {
@@ -70,14 +100,12 @@ export default function Note({
                   <textarea
                     className="w-full h-90 p-2 border-none rounded-lg focus:outline-none resize-none"
                     placeholder="Escrever uma nota..."
-                    // biome-ignore lint/a11y/noAutofocus: <explanation>
-                    autoFocus={!defaultNote}
                     defaultValue={defaultNote}
                     ref={noteRef}
                   />
                   <div className="flex justify-end">
                     <button
-                      className="hover:cursor-pointer"
+                      className="hover:cursor-pointer p-2.5 font-bold"
                       onClick={() => handleSave()}
                       type="button"
                     >
