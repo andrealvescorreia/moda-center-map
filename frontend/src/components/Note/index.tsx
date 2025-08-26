@@ -84,7 +84,7 @@ export default function Note({
                   />
                   <div className="flex justify-end">
                     <button
-                      className="hover:cursor-pointer"
+                      className="hover:cursor-pointer p-2.5 font-bold"
                       onClick={() => handleSave()}
                       type="button"
                     >
