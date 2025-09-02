@@ -60,7 +60,7 @@ describe('delete seller', () => {
       .delete(`/seller/id/${response.body.id}`)
       .set('Cookie', authHeader['set-cookie'])
 
-    deleteResponse.status.should.be.equal(204)
+    deleteResponse.status.should.be.equal(200)
     const sellers = await Seller.findAll()
     sellers.length.should.be.equal(0)
     const boxes = await Boxe.findAll()
@@ -106,7 +106,7 @@ describe('delete seller', () => {
     const deleteResponse = await request(app)
       .delete(`/seller/id/${seller1.body.id}`)
       .set('Cookie', authHeader['set-cookie'])
-    deleteResponse.status.should.be.equal(204)
+    deleteResponse.status.should.be.equal(200)
 
     // seller2 should still exist
     const sellers = await Seller.findAll()
