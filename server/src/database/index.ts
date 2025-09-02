@@ -4,6 +4,8 @@ import configs from '../config/database'
 import { env } from '../env'
 import { defaultProductCategories } from './default-product-categories'
 import Boxe from './models/boxe'
+import GoogleUser from './models/google-user'
+import LocalUser from './models/local-user'
 import Notes from './models/note'
 import ProductCategory from './models/product-category'
 import Seller from './models/seller'
@@ -17,6 +19,8 @@ const models = [
   ProductCategory,
   Seller,
   User,
+  LocalUser,
+  GoogleUser,
   Boxe,
   Store,
   UserFavoriteSellers,
