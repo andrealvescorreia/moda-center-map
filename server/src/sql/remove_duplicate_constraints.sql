@@ -23,6 +23,38 @@ BEGIN
     FOR r IN
         SELECT conname
         FROM pg_constraint
+        WHERE conrelid = 'public.local_users'::regclass
+          AND contype = 'u'
+          AND conname LIKE 'local_users_username_key%'
+        ORDER BY conname
+    LOOP
+        EXECUTE format('ALTER TABLE public.local_users DROP CONSTRAINT %I;', r.conname);
+    END LOOP;
+END $$;
+
+DO $$
+DECLARE
+    r RECORD;
+BEGIN
+    FOR r IN
+        SELECT conname
+        FROM pg_constraint
+        WHERE conrelid = 'public.google_users'::regclass
+          AND contype = 'u'
+          AND conname LIKE 'google_users_sub_key%'
+        ORDER BY conname
+    LOOP
+        EXECUTE format('ALTER TABLE public.google_users DROP CONSTRAINT %I;', r.conname);
+    END LOOP;
+END $$;
+
+DO $$
+DECLARE
+    r RECORD;
+BEGIN
+    FOR r IN
+        SELECT conname
+        FROM pg_constraint
         WHERE conrelid = 'public.users'::regclass
           AND contype = 'u'
           AND conname LIKE 'users_username_key%'
