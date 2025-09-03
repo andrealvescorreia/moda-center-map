@@ -1,20 +1,23 @@
+import operationErrors from '../../../shared/operation-errors'
 import Boxe from '../database/models/boxe'
+import GoogleUser from '../database/models/google-user'
+import LocalUser from '../database/models/local-user'
 import ProductCategory from '../database/models/product-category'
 import type Seller from '../database/models/seller'
 import Store from '../database/models/store'
 import User from '../database/models/user'
 import type { OperationReport } from '../interfaces/operation-report'
-import type { UserRegisterType } from '../schemas/userSchema'
+import type { LocalUserRegisterType } from '../schemas/userSchema'
 import type { ValidationError } from '../schemas/validationErrorType'
 import { SellerService } from './seller-service'
 import { validateEntityId } from './validate-id'
-import { validateUserCreate } from './validate-user'
+import { validateLocalUserCreate } from './validate-local-user'
 
 export class UserService {
   private sellerService = new SellerService()
 
-  async create(user: UserRegisterType) {
-    const errors = await validateUserCreate(user)
+  async create(user: LocalUserRegisterType) {
+    const errors = await validateLocalUserCreate(user)
     if (errors.length > 0) {
       return {
         success: false,
@@ -22,21 +25,30 @@ export class UserService {
         errors,
       }
     }
-    const createdUser = await User.create({
+    const createdUser = await User.create({ type: 'local' })
+    const localUser = await LocalUser.create({
+      id: createdUser.id,
       username: user.username,
       password: user.password,
     })
     return {
       success: true,
       data: {
-        id: createdUser.id,
-        username: createdUser.username,
+        id: localUser.id,
+        username: localUser.username,
       },
       errors,
     }
   }
 
-  async findOne(id: string): Promise<OperationReport & { data: User | null }> {
+  async findOne(id: string): Promise<
+    OperationReport & {
+      data:
+        | { user: User; localUser: LocalUser }
+        | { user: User; googleUser: GoogleUser }
+        | null
+    }
+  > {
     const errors = await validateEntityId(id, User)
     if (errors.length > 0) {
       return {
@@ -45,10 +57,43 @@ export class UserService {
         data: null,
       }
     }
+    const user = await User.findByPk(id)
+    const notFoundPayload = {
+      success: false,
+      errors: [
+        {
+          message: 'User not found',
+          code: operationErrors.NOT_FOUND,
+          field: 'id',
+        },
+      ],
+      data: null,
+    }
+    if (!user) {
+      return notFoundPayload
+    }
+
+    if (user.type === 'local') {
+      const localUser = await LocalUser.findByPk(id)
+      if (!localUser) return notFoundPayload
+      return {
+        success: true,
+        errors,
+        data: {
+          localUser,
+          user,
+        },
+      }
+    }
+    const googleUser = await GoogleUser.findByPk(id)
+    if (!googleUser) return notFoundPayload
     return {
       success: true,
       errors,
-      data: await User.findByPk(id),
+      data: {
+        googleUser,
+        user,
+      },
     }
   }
 
@@ -64,7 +109,7 @@ export class UserService {
     if (findSellerResult.errors.length > 0 || !findSellerResult.data) {
       return { success: false, errors: findSellerResult.errors }
     }
-    const user = findUserResult.data
+    const user = findUserResult.data.user
     const seller = findSellerResult.data
     await user.$add('favorite_sellers', seller)
     return { success: true, errors: [] }
@@ -82,7 +127,7 @@ export class UserService {
     if (findSellerResult.errors.length > 0 || !findSellerResult.data) {
       return { success: false, errors: findSellerResult.errors }
     }
-    const user = findUserResult.data
+    const user = findUserResult.data.user
     const seller = findSellerResult.data
 
     await user.$remove('favorite_sellers', seller)
@@ -96,8 +141,7 @@ export class UserService {
     if (findUserResult.errors.length > 0 || !findUserResult.data) {
       return { success: false, errors: findUserResult.errors, data: [] }
     }
-    const user = findUserResult.data
-
+    const user = findUserResult.data.user
     const favoriteSellers = await user.$get('favorite_sellers', {
       include: [
         { model: Boxe, attributes: { exclude: ['createdAt', 'updatedAt'] } },
@@ -132,7 +176,7 @@ export class UserService {
         isFavorite: false,
       }
     }
-    const user = findUserResult.data
+    const user = findUserResult.data.user
     const seller = findSellerResult.data
 
     const isFavorite = await user.$has('favorite_sellers', seller)
@@ -148,7 +192,7 @@ export class UserService {
     if (userResult.errors.length > 0 || !userResult.data) {
       return { success: false, errors: userResult.errors, data: null }
     }
-    const user = userResult.data
+    const user = userResult.data.user
 
     const sellerResult = await this.sellerService.findOne(sellerId)
     if (sellerResult.errors.length > 0 || !sellerResult.data) {
@@ -177,7 +221,7 @@ export class UserService {
     if (userResult.errors.length > 0 || !userResult.data) {
       return { success: false, errors: userResult.errors, data: null }
     }
-    const user = userResult.data
+    const user = userResult.data.user
 
     const sellerResult = await this.sellerService.findOne(sellerId)
     if (sellerResult.errors.length > 0 || !sellerResult.data) {

@@ -1,16 +1,16 @@
 import errorsIds from '../../../shared/operation-errors'
-import User from '../database/models/user'
-import type { UserRegisterType } from '../schemas/userSchema'
+import LocalUser from '../database/models/local-user'
+import type { LocalUserRegisterType } from '../schemas/userSchema'
 import type { ValidationError } from '../schemas/validationErrorType'
 
 async function usernameTaken(username: string) {
-  const existingUser = await User.findOne({
+  const existingUser = await LocalUser.findOne({
     where: { username },
   })
   return !!existingUser
 }
 
-export async function validateUserCreate(user: UserRegisterType) {
+export async function validateLocalUserCreate(user: LocalUserRegisterType) {
   let errors: ValidationError[] = []
   if (await usernameTaken(user.username)) {
     errors = [

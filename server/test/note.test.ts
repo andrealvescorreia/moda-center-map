@@ -3,9 +3,9 @@ const request = require('supertest')
 const should = chai.should()
 import app from '../src/app'
 import sequelize, { setupDatabase } from '../src/database'
+import LocalUser from '../src/database/models/local-user'
 import Notes from '../src/database/models/note'
 import Seller from '../src/database/models/seller'
-import User from '../src/database/models/user'
 
 describe('seller note', () => {
   const username = 'user1'
@@ -102,7 +102,7 @@ describe('seller note', () => {
 
   it('user should not be able to create multiple notes for the same seller', async () => {
     const seller = await findSellerByName('Olivia Palito moda feminina')
-    const user = await User.findOne({
+    const user = await LocalUser.findOne({
       where: {
         username,
       },

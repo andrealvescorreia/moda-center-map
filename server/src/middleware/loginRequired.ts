@@ -1,6 +1,6 @@
 import type { NextFunction, Request, Response } from 'express'
 import jwt from 'jsonwebtoken'
-import User from '../database/models/user'
+import LocalUser from '../database/models/local-user'
 import { env } from '../env'
 
 export default async (req: Request, res: Response, next: NextFunction) => {
@@ -22,7 +22,8 @@ export default async (req: Request, res: Response, next: NextFunction) => {
     }
     const { id, username } = dados
 
-    const user = await User.findOne({
+    //TODO: also account for google users!
+    const user = await LocalUser.findOne({
       where: {
         id,
         username,

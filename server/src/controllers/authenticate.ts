@@ -1,7 +1,7 @@
 import type { NextFunction, Request, Response } from 'express'
 import jwt from 'jsonwebtoken'
 import ms, { type StringValue } from 'ms'
-import User from '../database/models/user'
+import LocalUser from '../database/models/local-user'
 import { env } from '../env'
 
 //login
@@ -20,7 +20,7 @@ export async function authenticate(
       return
     }
 
-    const user = await User.findOne({ where: { username } })
+    const user = await LocalUser.findOne({ where: { username } })
 
     if (!user || user === null) {
       res.status(401).json({

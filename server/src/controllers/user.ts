@@ -2,7 +2,7 @@ import type { NextFunction, Request, Response } from 'express'
 import jwt from 'jsonwebtoken'
 import ms, { type StringValue } from 'ms'
 import { env } from '../env'
-import { userRegister } from '../schemas/userSchema'
+import { localUserRegister } from '../schemas/userSchema'
 import { UserService } from '../services/user-service'
 
 const userService = new UserService()
@@ -29,7 +29,7 @@ export async function createUser(
   next: NextFunction
 ): Promise<void> {
   try {
-    const parsed = userRegister.parse(req.body)
+    const parsed = localUserRegister.parse(req.body)
     const result = await userService.create(parsed)
     if (!result.success || !result.data) {
       res.status(400).json({
