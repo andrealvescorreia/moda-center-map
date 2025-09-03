@@ -198,13 +198,14 @@ describe('user tests', () => {
       password: '123456',
     })
     const cookies = loginResponse.headers['set-cookie']
-    const userId = loginResponse.body.id
+    const id = loginResponse.body.id
 
     const userResponse = await request(app).get('/user').set('Cookie', cookies)
     userResponse.status.should.be.equal(200)
     userResponse.body.should.be.deep.equal({
-      userId,
+      id,
       username: 'JohnDoe',
+      type: 'local',
     })
   })
 
