@@ -1,8 +1,9 @@
 import type { NextFunction, Request, Response } from 'express'
-import jwt from 'jsonwebtoken'
-import ms, { type StringValue } from 'ms'
-import { env } from '../env'
+import GoogleUser from '../database/models/google-user'
+import LocalUser from '../database/models/local-user'
+import User from '../database/models/user'
 import { localUserRegister } from '../schemas/userSchema'
+import { setAuthCookie } from '../services/cookie-service'
 import { UserService } from '../services/user-service'
 
 const userService = new UserService()
@@ -13,10 +14,26 @@ export async function showUser(
   next: NextFunction
 ): Promise<void> {
   try {
+    const userId = req.body.userId
+    const user = await User.findOne({ where: { id: userId } })
+    if (user?.type === 'local') {
+      const localUser = await LocalUser.findOne({ where: { id: userId } })
+      res.status(200).json({
+        id: userId,
+        type: 'local',
+        username: localUser?.username,
+      })
+      return
+    }
+
+    const googleUser = await GoogleUser.findOne({ where: { id: userId } })
     res.status(200).json({
-      userId: req.body.userId,
-      username: req.body.username,
+      id: userId,
+      type: 'google',
+      name: googleUser?.name,
+      sub: googleUser?.sub,
     })
+
     return
   } catch (error) {
     return next(error)
@@ -39,13 +56,7 @@ export async function createUser(
     }
     const { id, username } = result.data
 
-    const token = jwt.sign({ id, username }, env.TOKEN_SECRET, {
-      expiresIn: ms(env.TOKEN_EXPIRATION as StringValue),
-    })
-    res.cookie('authtoken', token, {
-      httpOnly: true,
-      maxAge: ms(env.TOKEN_EXPIRATION as StringValue),
-    })
+    setAuthCookie(res, id)
     res.status(201).json({
       id,
       username,

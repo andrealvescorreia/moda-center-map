@@ -35,7 +35,7 @@ export async function authenticate(
 
     const { id } = user
     setAuthCookie(res, id)
-    res.status(200).json({ id, username })
+    res.status(200).json({ id, username, type: 'local' })
     return
   } catch (error) {
     next(error)

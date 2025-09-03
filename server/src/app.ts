@@ -4,7 +4,9 @@ import express from 'express'
 import { env, serverUrl } from './env'
 import errorHandler from './middleware/errorHandler'
 import authRoutes from './routes/auth-routes'
+import oAuthRoutes from './routes/oauth-routes'
 import pCategoriesRoutes from './routes/product-categories-routes'
+import requestRoutes from './routes/request-routes'
 import sellerRoutes from './routes/seller-routes'
 import sellingLocationRoutes from './routes/selling-location-routes'
 import userRoutes from './routes/user-routes'
@@ -20,6 +22,8 @@ class App {
   routes() {
     this.app.use('/user', userRoutes)
     this.app.use('/auth', authRoutes)
+    this.app.use('/oauth', oAuthRoutes)
+    this.app.use('/request-oauth', requestRoutes)
     this.app.use('/seller', sellerRoutes)
     this.app.use('/product-categories', pCategoriesRoutes)
     this.app.use('/selling-locations', sellingLocationRoutes)
