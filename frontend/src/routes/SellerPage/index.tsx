@@ -398,10 +398,14 @@ export default function SellerPage() {
               />
               <DeleteButton
                 onClick={() => {
+                  if (!user) {
+                    navigate('/login')
+                    return
+                  }
                   setModalComponent(
                     ActionModal({
                       title: 'Deletar vendedor',
-                      content: `Você tem certeza que deseja deletar o vendedor ${seller?.name}?`,
+                      content: `Tem certeza que deseja deletar o vendedor "${seller?.name}"?`,
                       onConfirm: () => {
                         closeModal()
                         deleteSell()
