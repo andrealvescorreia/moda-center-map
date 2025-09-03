@@ -1,10 +1,11 @@
 import type { NextFunction, Request, Response } from 'express'
 import jwt from 'jsonwebtoken'
-import LocalUser from '../database/models/local-user'
+import User from '../database/models/user'
 import { env } from '../env'
+import { AUTH_COOKIE_NAME } from '../services/cookie-service'
 
 export default async (req: Request, res: Response, next: NextFunction) => {
-  const token = req.cookies?.authtoken
+  const token = req.cookies?.[AUTH_COOKIE_NAME]
   if (!token) {
     res.status(401).json({
       errors: [{ message: 'Login required' }],
@@ -20,13 +21,11 @@ export default async (req: Request, res: Response, next: NextFunction) => {
       })
       return
     }
-    const { id, username } = dados
+    const { id } = dados
 
-    //TODO: also account for google users!
-    const user = await LocalUser.findOne({
+    const user = await User.findOne({
       where: {
         id,
-        username,
       },
     })
 
@@ -42,7 +41,6 @@ export default async (req: Request, res: Response, next: NextFunction) => {
     }
 
     req.body.userId = id
-    req.body.username = username
     return next()
   } catch (e) {
     res.status(401).json({
