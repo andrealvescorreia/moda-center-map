@@ -4,7 +4,7 @@ const should = chai.should()
 import errorsId from '../../shared/operation-errors'
 import app from '../src/app'
 import sequelize from '../src/database'
-import User from '../src/database/models/user'
+import LocalUser from '../src/database/models/local-user'
 
 describe('user tests', () => {
   before(async () => {
@@ -20,7 +20,7 @@ describe('user tests', () => {
     response.headers['set-cookie'].should.satisfy((cookies: string[]) =>
       cookies.some((cookie) => cookie.includes('authtoken'))
     )
-    await User.findOne({ where: { username: 'JohnDoe' } }).then((user) => {
+    await LocalUser.findOne({ where: { username: 'JohnDoe' } }).then((user) => {
       user?.should.not.be.null
       user?.username.should.be.equal('JohnDoe')
       user?.password_hash.should.not.be.equal('123456')
@@ -47,9 +47,11 @@ describe('user tests', () => {
       ],
     })
 
-    await User.findAll({ where: { username: 'JohnDoe' } }).then((users) => {
-      users.length.should.be.equal(1)
-    })
+    await LocalUser.findAll({ where: { username: 'JohnDoe' } }).then(
+      (users) => {
+        users.length.should.be.equal(1)
+      }
+    )
   })
 
   it('should not be able to create a user with 5 characters password', async () => {
@@ -68,7 +70,7 @@ describe('user tests', () => {
       ],
     })
 
-    await User.findOne({ where: { username: 'maria' } }).then((user) => {
+    await LocalUser.findOne({ where: { username: 'maria' } }).then((user) => {
       should.not.exist(user)
     })
   })
@@ -91,7 +93,7 @@ describe('user tests', () => {
       ],
     })
 
-    await User.findOne({ where: { username: 'maria' } }).then((user) => {
+    await LocalUser.findOne({ where: { username: 'maria' } }).then((user) => {
       should.not.exist(user)
     })
   })
@@ -112,7 +114,7 @@ describe('user tests', () => {
       ],
     })
 
-    await User.findOne({ where: { username: 'ma' } }).then((user) => {
+    await LocalUser.findOne({ where: { username: 'ma' } }).then((user) => {
       should.not.exist(user)
     })
   })
@@ -134,7 +136,7 @@ describe('user tests', () => {
       ],
     })
 
-    await User.findOne({ where: { username } }).then((user) => {
+    await LocalUser.findOne({ where: { username } }).then((user) => {
       should.not.exist(user)
     })
   })
@@ -196,13 +198,14 @@ describe('user tests', () => {
       password: '123456',
     })
     const cookies = loginResponse.headers['set-cookie']
-    const userId = loginResponse.body.id
+    const id = loginResponse.body.id
 
     const userResponse = await request(app).get('/user').set('Cookie', cookies)
     userResponse.status.should.be.equal(200)
     userResponse.body.should.be.deep.equal({
-      userId,
+      id,
       username: 'JohnDoe',
+      type: 'local',
     })
   })
 

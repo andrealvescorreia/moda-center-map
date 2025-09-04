@@ -114,31 +114,73 @@ const swaggerSchemas: OpenAPIV3.ComponentsObject = {
         },
         username: {
           type: 'string',
-          description: 'The username of the user',
+          description: 'The username of the user.',
+        },
+        type: {
+          type: 'string',
+          description: 'The type of the user',
+          enum: ['local', 'google'],
         },
       },
       example: {
         id: '5b2df532-846f-4556-992d-5c8c5e2d3406',
         username: 'JohnDoe',
+        type: 'local',
       },
     },
     UserResponse: {
-      type: 'object',
-      properties: {
-        userId: {
-          type: 'string',
-          description:
-            'The id of the user, generated on creation, in UUID format',
+      oneOf: [
+        {
+          type: 'object',
+          required: ['id', 'type', 'username'],
+          properties: {
+            id: {
+              type: 'string',
+              format: 'uuid',
+            },
+            type: {
+              type: 'string',
+              enum: ['local'],
+            },
+            username: {
+              type: 'string',
+            },
+          },
+          example: {
+            id: '5b2df532-846f-4556-992d-5c8c5e2d3406',
+            type: 'local',
+            username: 'JohnDoe',
+          },
         },
-        username: {
-          type: 'string',
-          description: 'The username of the user',
+        {
+          type: 'object',
+          required: ['id', 'type', 'name', 'sub'],
+          properties: {
+            id: {
+              type: 'string',
+              format: 'uuid',
+            },
+            type: {
+              type: 'string',
+              enum: ['google'],
+            },
+            name: {
+              type: 'string',
+            },
+            sub: {
+              type: 'string',
+              description:
+                'The sub (subscriber id) field from the Google OAuth token',
+            },
+          },
+          example: {
+            id: '5b2df532-846f-4556-992d-5c8c5e2d3406',
+            type: 'google',
+            name: 'John Doe',
+            sub: 'google-oauth-sub-id',
+          },
         },
-      },
-      example: {
-        userId: '5b2df532-846f-4556-992d-5c8c5e2d3406',
-        username: 'JohnDoe',
-      },
+      ],
     },
     LoginUserBody: {
       type: 'object',

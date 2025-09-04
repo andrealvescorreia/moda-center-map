@@ -1,12 +1,11 @@
 import { useNetworkState } from '@uidotdev/usehooks'
 import { AxiosError } from 'axios'
 import { enqueueSnackbar } from 'notistack'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import errorsCode from '../../../../shared/operation-errors'
 import SellerForm from '../../components/SellerForm'
 import AlertDialog from '../../components/alert-dialog'
-import LandingPage from '../../components/landing-page'
 import OfflineScreen from '../../components/offline-screen'
 import { createSeller } from '../../http/api'
 import { useLoadingContext } from '../../providers/LoadingProvider'
@@ -23,10 +22,15 @@ export default function NewSeller() {
   const navigate = useNavigate()
   const network = useNetworkState()
 
+  useEffect(() => {
+    if (!user) {
+      navigate('/login', { replace: true })
+    }
+  }, [user, navigate])
   if (!network.online) {
     return <OfflineScreen />
   }
-  if (!user) return <LandingPage />
+  if (!user) return null // redirect to login
 
   const onSubmit = async (seller: {
     name: string

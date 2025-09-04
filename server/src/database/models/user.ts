@@ -1,14 +1,14 @@
-import bcryptjs from 'bcryptjs'
-
 import {
-  BeforeCreate,
   BelongsToMany,
   Column,
   DataType,
   HasMany,
+  HasOne,
   Model,
   Table,
 } from 'sequelize-typescript'
+import GoogleUser from './google-user'
+import LocalUser from './local-user'
 import Notes from './note'
 import Seller from './seller'
 import UserFavoriteSellers from './user-favorite-sellers'
@@ -28,22 +28,11 @@ export default class User extends Model {
   declare id: string
 
   @Column({
+    type: DataType.ENUM('local', 'google'),
     allowNull: false,
-    type: DataType.STRING,
-    unique: true,
+    defaultValue: 'local',
   })
-  declare username: string
-
-  @Column({
-    type: DataType.VIRTUAL, // 💡 campo que não fica salvo no BD.
-    allowNull: false,
-  })
-  declare password: string
-
-  @Column({
-    type: DataType.STRING,
-  })
-  declare password_hash: string
+  declare type: string
 
   @BelongsToMany(
     () => Seller,
@@ -57,15 +46,12 @@ export default class User extends Model {
   )
   declare sellers_notes: Seller[]
 
+  @HasOne(() => LocalUser, { onDelete: 'CASCADE' })
+  declare localUser: LocalUser
+
+  @HasOne(() => GoogleUser, { onDelete: 'CASCADE' })
+  declare googleUser: GoogleUser
+
   @HasMany(() => Notes, { onDelete: 'CASCADE' })
   declare notes: Notes[]
-
-  @BeforeCreate
-  static async hashPassword(user: User) {
-    user.password_hash = await bcryptjs.hash(user.password, 8)
-  }
-
-  passwordIsCorrect(password: string): Promise<boolean> {
-    return bcryptjs.compare(password, this.password_hash)
-  }
 }

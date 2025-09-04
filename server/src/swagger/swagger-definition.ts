@@ -1,6 +1,7 @@
 import type { OpenAPIV3 } from 'openapi-types'
 import { serverUrl } from '../env'
 import authPaths from './paths/authPaths'
+import oAuthPaths from './paths/oAuthPaths'
 import productCategoriesPaths from './paths/productCategoriesPaths'
 import sellerPaths from './paths/sellerPaths'
 import userPaths from './paths/userPaths'
@@ -12,7 +13,7 @@ const swaggerDefinition: OpenAPIV3.Document = {
     title: 'Moda Center Map API',
     description:
       'This is the API documentation for the Moda Center Map platform',
-    version: '1.0.0',
+    version: '1.1.0',
   },
   servers: [
     {
@@ -23,6 +24,7 @@ const swaggerDefinition: OpenAPIV3.Document = {
   paths: {
     ...userPaths,
     ...authPaths,
+    ...oAuthPaths,
     ...sellerPaths,
     ...productCategoriesPaths,
   },

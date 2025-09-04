@@ -11,6 +11,8 @@ const envSchema = z.object({
   TOKEN_SECRET: z.string().default('secret'),
   TOKEN_EXPIRATION: z.string().default('14d'),
   WEB_URL: z.string().url().default('http://localhost:5173'),
+  GOOGLE_CLIENT_ID: z.string().optional(),
+  GOOGLE_CLIENT_SECRET: z.string().optional(),
 })
 
 export const env = envSchema.parse(process.env)

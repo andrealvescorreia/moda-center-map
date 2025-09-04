@@ -1,9 +1,9 @@
 import { useNetworkState } from '@uidotdev/usehooks'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { useUserContext } from '../../providers/UserProvider'
 import type { BoxeSchema } from '../../schemas/box'
 import type { StoreSchema } from '../../schemas/store'
-import LandingPage from '../landing-page'
 import OfflineScreen from '../offline-screen'
 import SellerFormStepOne from './step-one'
 import SellerFormStepTwo from './step-two'
@@ -44,13 +44,20 @@ export default function SellerForm({
     defaultSeller?.product_categories || []
   )
   const { user } = useUserContext()
+  const navigate = useNavigate()
 
   const network = useNetworkState()
+
+  useEffect(() => {
+    if (!user) {
+      navigate('/login', { replace: true })
+    }
+  }, [user, navigate])
 
   if (!network.online) {
     return <OfflineScreen />
   }
-  if (!user) return <LandingPage />
+  if (!user) return null // redirect to login
 
   interface StepOne {
     name: string
