@@ -6,7 +6,6 @@ import { useNavigate, useParams } from 'react-router-dom'
 import errorsCode from '../../../../shared/operation-errors'
 import SellerForm from '../../components/SellerForm'
 import AlertDialog from '../../components/alert-dialog'
-import LandingPage from '../../components/landing-page'
 import OfflineScreen from '../../components/offline-screen'
 import { updateSeller } from '../../http/api'
 import { getSeller } from '../../http/api'
@@ -57,10 +56,16 @@ export default function EditSeller() {
       })
   }, [id, seller, setLoading])
 
+  useEffect(() => {
+    if (!user) {
+      navigate('/login', { replace: true })
+    }
+  }, [user, navigate])
+
   if (!network.online) {
     return <OfflineScreen />
   }
-  if (!user) return <LandingPage />
+  if (!user) return null // redirect to login
 
   if (!seller && doneFetching) {
     return (

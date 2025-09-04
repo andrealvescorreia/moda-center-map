@@ -10,8 +10,8 @@ export default function Login() {
   }
 
   return (
-    <div className="flex md:justify-center md:items-center h-screen flex-col">
-      <NavLink className="flex items-center p-2 gap-1" to={'/'}>
+    <div className="flex md:justify-center items-center h-screen flex-col">
+      <NavLink className="flex items-center p-4 gap-1" to={'/'}>
         <img src={Logo} alt="Logo" className="w-6" />
         <h1 className="text-2xl font-bold text-green-secondary italic font-plus-jakarta-sans">
           ModaCenterMap

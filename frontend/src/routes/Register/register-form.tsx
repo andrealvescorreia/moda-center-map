@@ -7,6 +7,7 @@ import { useNavigate } from 'react-router-dom'
 import { z } from 'zod'
 import errorsCode from '../../../../shared/operation-errors'
 import { Button } from '../../components/button'
+import GoogleOAuthButton from '../../components/google-oauth-bttn'
 import { InputField, InputIcon, InputRoot } from '../../components/input'
 import { registerUser } from '../../http/api'
 import { useLoadingContext } from '../../providers/LoadingProvider'
@@ -71,7 +72,9 @@ export default function RegistrationForm() {
       <h2 className="font-heading text-gray04 font-semibold text-xl">
         CRIAR CONTA
       </h2>
+      <GoogleOAuthButton />
 
+      <p className="flex w-full items-center justify-center">ou</p>
       <div className="space-y-3">
         <div className="space-y-2">
           <InputRoot>
@@ -81,7 +84,6 @@ export default function RegistrationForm() {
             <InputField
               placeholder="Nome de usuário"
               type="text"
-              autoFocus
               {...register('username')}
             />
           </InputRoot>
@@ -122,7 +124,7 @@ export default function RegistrationForm() {
         </div>
       </div>
       <Button disabled={isFetching} type="submit">
-        Confirmar
+        Criar Conta
         <ArrowRight />
       </Button>
     </form>
