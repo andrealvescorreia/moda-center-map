@@ -70,11 +70,8 @@ export default function Sellers() {
       <NavBar />
 
       <div className="w-full">
-        <div className="flex justify-center items-center h-18">
-          <h1 className="text-2xl font-semibold">Vendedores</h1>
-        </div>
-        <div className="pb-4 md:absolute md:mt-0 mt-2 w-full px-2 md:max-w-125 md:top-0 ml-[50%] transform -translate-x-1/2">
-          <InputRoot>
+        <div className="py-4 md:py-3 md:mt-0 w-[100%] px-2 ml-[50%] transform -translate-x-1/2 sticky top-0 z-100 bg-white border-b border-gray-200 flex justify-center">
+          <InputRoot className="w-full md:max-w-125">
             <InputIcon>
               <Search />
             </InputIcon>
