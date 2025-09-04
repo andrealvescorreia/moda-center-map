@@ -3,11 +3,10 @@ import GoogleLogo from '../assets/google-g-logo.svg'
 import { Button } from './button'
 
 export default function GoogleOAuthButton() {
+  const API_URL = import.meta.env.VITE_API_URL
   async function googleOAuth() {
     try {
-      const response = await axios.post(
-        'http://localhost:3001/request-oauth/google'
-      )
+      const response = await axios.post(`${API_URL}/request-oauth/google`)
       window.location.href = response.data.url
     } catch (error) {
       console.log(error)
