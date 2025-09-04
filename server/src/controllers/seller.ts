@@ -139,7 +139,7 @@ export async function destroy(req: Request, res: Response, next: NextFunction) {
       res.status(statusCode).json({ errors: deletion.errors })
       return
     }
-    res.status(204).send({ message: 'Seller deleted' })
+    res.status(200).json({ message: 'Seller deleted' })
     return
   } catch (error) {
     return next(error)
