@@ -99,7 +99,7 @@ export class RouteCalculator {
     }
     const result = this.#tspSolver.getPath(distancias, {
       twoOpt: true,
-      threeOpt: destinos.length <= 28,
+      threeOpt: destinos.length < 30,
     })
     const indicesMelhorCaminho = result.route
     const destiniesBestOrder = indicesMelhorCaminho.map(
