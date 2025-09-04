@@ -1,4 +1,7 @@
 export default interface User {
-  username: string
   id: string
+  type: 'local' | 'google'
+  username?: string // local
+  name?: string // google
+  sub?: string // google
 }

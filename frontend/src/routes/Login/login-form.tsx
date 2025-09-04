@@ -1,15 +1,18 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { AxiosError } from 'axios'
+import axios, { AxiosError } from 'axios'
 import { ArrowRight, Eye, EyeOff, KeyRound, User } from 'lucide-react'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { useNavigate } from 'react-router-dom'
 import { z } from 'zod'
+import GoogleLogo from '../../assets/google-g-logo.svg'
 import { Button } from '../../components/button'
+import GoogleOAuthButton from '../../components/google-oauth-bttn'
 import { InputField, InputIcon, InputRoot } from '../../components/input'
 import { loginUser } from '../../http/api'
 import { useLoadingContext } from '../../providers/LoadingProvider'
 import { useUserContext } from '../../providers/UserProvider'
+
 const loginSchema = z.object({
   username: z.string(),
   password: z.string(),
@@ -74,8 +77,17 @@ export default function LoginForm() {
       onSubmit={handleSubmit(onLogin)}
       className="p-8 space-y-6 w-full md:max-w-[440px] md:border border-gray05 md:shadow-lg md:rounded-2xl"
     >
-      <h2 className="font-heading text-gray04 font-semibold text-xl">ENTRAR</h2>
+      <h2 className="font-heading text-gray04 font-semibold text-xl pb-3">
+        Entre no{' '}
+        <strong>
+          <i>ModaCenterMap</i>
+        </strong>{' '}
+        <br /> e salve seus vendedores favoritos.
+      </h2>
 
+      <GoogleOAuthButton />
+
+      <p className="flex w-full items-center justify-center">ou</p>
       <div className="space-y-3">
         <div className="space-y-2">
           <InputRoot>
@@ -126,7 +138,7 @@ export default function LoginForm() {
         </div>
       </div>
       <Button disabled={isFetching} type="submit">
-        Confirmar
+        Entrar
         <ArrowRight />
       </Button>
     </form>
