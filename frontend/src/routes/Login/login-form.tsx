@@ -96,7 +96,6 @@ export default function LoginForm() {
             <InputField
               placeholder="Nome de usuário"
               type="text"
-              autoFocus
               {...register('username')}
             />
           </InputRoot>
