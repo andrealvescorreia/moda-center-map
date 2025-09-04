@@ -101,7 +101,13 @@ PORT=3001
 TOKEN_EXPIRATION="14d"
 TOKEN_SECRET="domoarigatomrroboto"
 POSTGRES_URL="postgresql://docker:docker@localhost:5432/moda-center-map"
-WEB_URL="http://localhost:5173" # frontend
+WEB_URL="http://localhost:5173"
+
+# optional
+# for your google cloud console oauth2 project
+# the aplication can be used normally without these
+GOOGLE_CLIENT_ID="444-555"
+GOOGLE_CLIENT_SECRET="Goog-le-secre-t"
 ```
 Instale as dependências e inicie o servidor de desenvolvimento:
 ```sh
@@ -123,6 +129,7 @@ Com isso em mente, nasceu a proposta de criar uma aplicação que não apenas au
 
 ## Funcionalidades
 - **Registrar/logar como usuário**
+- **Login com Google**
 - **Buscar vendedores** 
 - **Rotas otimizadas** 
 - **Cadastro de vendedores** 
