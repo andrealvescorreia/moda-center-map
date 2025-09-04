@@ -27,7 +27,7 @@ export class RouteCalculator {
       startPos.position.x >= this.#grid[0].length ||
       startPos.position.y >= this.#grid.length ||
       this.#grid[startPos.position.y][startPos.position.x] !==
-        ModaCenterGridMap.CAMINHO
+      ModaCenterGridMap.CAMINHO
     ) {
       console.error(
         'Posição inicial inválida x: ',
@@ -46,7 +46,7 @@ export class RouteCalculator {
         (this.#grid[dest.position.y][dest.position.x] !==
           ModaCenterGridMap.BOXE &&
           this.#grid[dest.position.y][dest.position.x] !==
-            ModaCenterGridMap.LOJA)
+          ModaCenterGridMap.LOJA)
       ) {
         console.error(
           `Posição de destino inválida x: ${dest.position.x} y: ${dest.position.y}`
@@ -99,7 +99,7 @@ export class RouteCalculator {
     }
     const result = this.#tspSolver.getPath(distancias, {
       twoOpt: true,
-      threeOpt: true,
+      threeOpt: destinos.length <= 28,
     })
     const indicesMelhorCaminho = result.route
     const destiniesBestOrder = indicesMelhorCaminho.map(
