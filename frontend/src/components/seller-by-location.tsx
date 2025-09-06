@@ -15,7 +15,7 @@ import { useUserContext } from '../providers/UserProvider'
 import SellerCard from '../routes/SellerPage/seller-card'
 import type { BoxeSchema } from '../schemas/box'
 import type { StoreSchema } from '../schemas/store'
-import { formatPhoneNumber } from '../utils/utils'
+import { colorMap, formatPhoneNumber } from '../utils/utils'
 import SellerNote from './Note/seller-note'
 import { IconButton } from './icon-button'
 import LoadingOverlay from './loading-overlay'
@@ -143,7 +143,7 @@ export default function SellerByLocation({
     <div className="w-full flex flex-col px-5 items-center gap-3">
       {modalOpen && ModalComponent}
       <h2>
-        Setor {location.sector_color} -{' '}
+        Setor {colorMap[location.sector_color]} -{' '}
         {'box_number' in location
           ? `Rua ${location.street_letter} - Box ${location.box_number}`
           : `Bloco ${location.block_number} - Loja ${location.store_number}`}
