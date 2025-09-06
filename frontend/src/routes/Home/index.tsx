@@ -193,7 +193,7 @@ function Home() {
         maxZoom={6}
         minZoom={1}
         center={modaCenterGridMap.getCenter()}
-        zoom={2}
+        zoom={1}
       >
         <MapDrawer gridMap={modaCenterGridMap} />
         {isManagingRoute && (
