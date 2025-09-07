@@ -48,7 +48,6 @@ export default function App() {
   return (
     <BrowserRouter>
       {loading && <LoadingOverlay />}
-
       <NavBar />
       <Content />
     </BrowserRouter>
