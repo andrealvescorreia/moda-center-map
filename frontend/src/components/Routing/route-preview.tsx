@@ -19,7 +19,7 @@ export function RoutePreview({ route }: RoutePreviewProps) {
     }
   }, [])
 
-  let inicioName = 'Seu local - '
+  let inicioName = 'Seu local: '
   if (route.inicio?.sellingLocation) {
     if (
       'rua' in route.inicio.sellingLocation &&
