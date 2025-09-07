@@ -7,6 +7,36 @@
 a.active {
   color: #2f7e31;
   font-weight: bold;
+  transition: color 0.3s;
+}
+
+.fadeIn {
+  animation: 0.2s fadeIn forwards;
+}
+
+.fadeOut {
+  animation: 0.2s fadeOut forwards;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translate(-20px, 0);
+  } to {
+    opacity: 1;
+    transform: translate(0, 0);
+  }
+}
+
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+    transform: translate(0, 0);
+  }
+  to {
+    opacity: 0;
+    transform: translate(-20px, 0);
+  } 
 }
 
 .notistack-SnackbarContainer.z-alert {

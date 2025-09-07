@@ -141,7 +141,8 @@ export default function RouteContent() {
             const newRoute = removeDestiny(route, index)
             setRoute(newRoute)
           }}
-          onClickDestiny={(destiny) => {
+          onClickDestiny={(index) => {
+            const destiny = route.destinos[index]
             if (!destiny.sellingLocation) return
             setDestinyView(destiny.sellingLocation)
           }}

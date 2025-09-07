@@ -2,8 +2,8 @@ import { MapPinPlus, Navigation, PersonStanding, Trash } from 'lucide-react'
 import { enqueueSnackbar } from 'notistack'
 import { useEffect, useRef, useState } from 'react'
 import { Sheet, type SheetRef } from 'react-modal-sheet'
-import { DestinyList } from '../../../components/Routing/destiny-list'
 import { DialogAction } from '../../../components/Routing/dialog-action'
+import { RoutePreview } from '../../../components/Routing/route-preview'
 import ActionModal from '../../../components/action-modal'
 import { IconButton } from '../../../components/icon-button'
 import { SheetHeaderTitle } from '../../../components/sheet-header-title'
@@ -17,12 +17,7 @@ import { useRouteContext } from '../../../providers/RouteProvider'
 import { colorToEnglishMap } from '../../../utils/utils'
 import RouteContent from './RouteContent'
 import { SearchDestiny } from './SearchDestiny'
-import {
-  addDestiny,
-  changeStartingPoint,
-  getClearRoute,
-  removeDestiny,
-} from './route-service'
+import { addDestiny, changeStartingPoint, getClearRoute } from './route-service'
 
 interface RouteEditorProps {
   gridMap: ModaCenterGridMap
@@ -187,11 +182,6 @@ const RouteEditor = ({ gridMap, onCancel, onStart }: RouteEditorProps) => {
     setRoute(newRoute)
   }
 
-  const removeADestiny = (index: number) => {
-    const newRoute = removeDestiny(route, index)
-    setRoute(newRoute)
-  }
-
   const cancel = () => {
     setIsEditingMarcadorInicio(false)
     notAddingDestiny()
@@ -247,15 +237,9 @@ const RouteEditor = ({ gridMap, onCancel, onStart }: RouteEditorProps) => {
             onCancel={() => setModalOpen(false)}
           />
         )}
-
         <div className="ui ml-[50%] -translate-x-1/2 absolute w-[95%] flex justify-center items-center top-1 shadow max-h-45 overflow-auto md:size-0">
-          <DestinyList
-            route={{ ...route, inicio: route.inicio }}
-            onClickRemoveDestiny={removeADestiny}
-            reducedView={true}
-          />
+          <RoutePreview route={{ ...route, inicio: route.inicio }} />
         </div>
-
         <Sheet
           ref={ref}
           isOpen={bottomSheetOpen}

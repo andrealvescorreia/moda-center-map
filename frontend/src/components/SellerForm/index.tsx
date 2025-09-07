@@ -50,7 +50,9 @@ export default function SellerForm({
 
   useEffect(() => {
     if (!user) {
-      navigate('/login', { replace: true })
+      setTimeout(() => {
+        navigate('/login', { replace: true })
+      }, 500)
     }
   }, [user, navigate])
 

@@ -1,5 +1,5 @@
-import { useEffect } from 'react'
-import { Route, Routes } from 'react-router-dom'
+import { useEffect, useState } from 'react'
+import { BrowserRouter, Route, Routes, useLocation } from 'react-router-dom'
 import { getUser } from './http/api'
 import { useUserContext } from './providers/UserProvider'
 import Home from './routes/Home'
@@ -23,7 +23,6 @@ function NotFound() {
         404 Page Not Found
         <Frown size={35} />
       </h1>
-      <NavBar />
     </div>
   )
 }
@@ -39,7 +38,6 @@ export default function App() {
         setUser(response.data)
       } catch (error) {
         setUser(undefined)
-        //console.log(error)
       } finally {
         setLoading(false)
       }
@@ -48,9 +46,37 @@ export default function App() {
   }, [setUser, setLoading])
 
   return (
-    <>
+    <BrowserRouter>
       {loading && <LoadingOverlay />}
-      <Routes>
+      <NavBar />
+      <Content />
+    </BrowserRouter>
+  )
+}
+
+const Content = () => {
+  const location = useLocation()
+  const [displayLocation, setDisplayLocation] = useState(location)
+  const [transitionStage, setTransitionStage] = useState('fadeIn')
+
+  useEffect(() => {
+    if (location.search !== displayLocation.search) setDisplayLocation(location)
+
+    if (location.pathname !== displayLocation.pathname)
+      setTransitionStage('fadeOut')
+  }, [location, displayLocation])
+
+  return (
+    <div
+      className={`${transitionStage} w-[100dvw] h-[100dvh]`}
+      onAnimationEnd={() => {
+        if (transitionStage === 'fadeOut') {
+          setTransitionStage('fadeIn')
+          setDisplayLocation(location)
+        }
+      }}
+    >
+      <Routes location={displayLocation}>
         <Route path="" element={<Home />} />
         <Route path="register" element={<Register />} />
         <Route path="login" element={<Login />} />
@@ -62,6 +88,6 @@ export default function App() {
         <Route path="user" element={<UserProfile />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
-    </>
+    </div>
   )
 }

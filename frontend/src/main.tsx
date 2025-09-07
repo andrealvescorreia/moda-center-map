@@ -1,6 +1,5 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
-import { BrowserRouter } from 'react-router-dom'
 import './globals.css'
 import { SnackbarProvider } from 'notistack'
 import App from './App.tsx'
@@ -14,19 +13,17 @@ import UserProvider from './providers/UserProvider.tsx'
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <RouteProvider>
-      <BrowserRouter>
-        <SnackbarProvider classes={{ containerRoot: 'z-alert' }} maxSnack={2}>
-          <UserProvider>
-            <NavProvider>
-              <ClickProvider>
-                <LoadingProvider>
-                  <App />
-                </LoadingProvider>
-              </ClickProvider>
-            </NavProvider>
-          </UserProvider>
-        </SnackbarProvider>
-      </BrowserRouter>
+      <SnackbarProvider classes={{ containerRoot: 'z-alert' }} maxSnack={2}>
+        <UserProvider>
+          <NavProvider>
+            <ClickProvider>
+              <LoadingProvider>
+                <App />
+              </LoadingProvider>
+            </ClickProvider>
+          </NavProvider>
+        </UserProvider>
+      </SnackbarProvider>
     </RouteProvider>
   </StrictMode>
 )

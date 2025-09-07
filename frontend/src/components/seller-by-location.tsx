@@ -15,7 +15,7 @@ import { useUserContext } from '../providers/UserProvider'
 import SellerCard from '../routes/SellerPage/seller-card'
 import type { BoxeSchema } from '../schemas/box'
 import type { StoreSchema } from '../schemas/store'
-import { formatPhoneNumber } from '../utils/utils'
+import { colorMap, formatPhoneNumber } from '../utils/utils'
 import SellerNote from './Note/seller-note'
 import { IconButton } from './icon-button'
 import LoadingOverlay from './loading-overlay'
@@ -125,25 +125,35 @@ export default function SellerByLocation({
       }
     )
   }
-  if (!network.online) {
-    return <OfflineScreen />
-  }
-  if (!seller) {
+
+  if (!seller && !doneFetching) {
     return <LoadingOverlay />
   }
   if (!seller && doneFetching) {
     return (
       <div className="flex justify-center items-center h-full">
-        <p className="text-gray02 text-2xl pt-10">Vendedor não encontrado</p>
+        {network?.online === false ? (
+          <OfflineScreen />
+        ) : (
+          <div className="flex flex-col items-center">
+            <p className="text-gray02 text-2xl pt-10">
+              Não foi possível encontrar o vendedor.
+            </p>
+            <p className="text-gray03 text-base pt-2">
+              Verifique se o vendedor existe ou tente novamente mais tarde.
+            </p>
+          </div>
+        )}
       </div>
     )
   }
 
+  if (!seller) return null
   return (
     <div className="w-full flex flex-col px-5 items-center gap-3">
       {modalOpen && ModalComponent}
       <h2>
-        Setor {location.sector_color} -{' '}
+        Setor {colorMap[location.sector_color]} -{' '}
         {'box_number' in location
           ? `Rua ${location.street_letter} - Box ${location.box_number}`
           : `Bloco ${location.block_number} - Loja ${location.store_number}`}
@@ -198,7 +208,7 @@ export default function SellerByLocation({
         />
       </div>
 
-      {user && <SellerNote seller_id={seller.id} />}
+      {user && seller && <SellerNote seller_id={seller.id} />}
     </div>
   )
 }
