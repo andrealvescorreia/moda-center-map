@@ -125,20 +125,30 @@ export default function SellerByLocation({
       }
     )
   }
-  if (!network.online) {
-    return <OfflineScreen />
-  }
-  if (!seller) {
+
+  if (!seller && !doneFetching) {
     return <LoadingOverlay />
   }
   if (!seller && doneFetching) {
     return (
       <div className="flex justify-center items-center h-full">
-        <p className="text-gray02 text-2xl pt-10">Vendedor não encontrado</p>
+        {network?.online === false ? (
+          <OfflineScreen />
+        ) : (
+          <div className="flex flex-col items-center">
+            <p className="text-gray02 text-2xl pt-10">
+              Não foi possível encontrar o vendedor.
+            </p>
+            <p className="text-gray03 text-base pt-2">
+              Verifique se o vendedor existe ou tente novamente mais tarde.
+            </p>
+          </div>
+        )}
       </div>
     )
   }
 
+  if (!seller) return null
   return (
     <div className="w-full flex flex-col px-5 items-center gap-3">
       {modalOpen && ModalComponent}
@@ -198,7 +208,7 @@ export default function SellerByLocation({
         />
       </div>
 
-      {user && <SellerNote seller_id={seller.id} />}
+      {user && seller && <SellerNote seller_id={seller.id} />}
     </div>
   )
 }

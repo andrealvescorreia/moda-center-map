@@ -302,13 +302,21 @@ export default function SellerPage() {
     )
   }
 
-  if (!network.online) {
-    return <OfflineScreen />
-  }
   if (!seller && doneFetching) {
     return (
       <div className="flex justify-center items-center h-full">
-        <p className="text-gray02 text-2xl pt-10">Vendedor não encontrado</p>
+        {network?.online === false ? (
+          <OfflineScreen />
+        ) : (
+          <div className="flex flex-col items-center">
+            <p className="text-gray02 text-2xl pt-10">
+              Não foi possível encontrar o vendedor.
+            </p>
+            <p className="text-gray03 text-base pt-2">
+              Verifique se o vendedor existe ou tente novamente mais tarde.
+            </p>
+          </div>
+        )}
       </div>
     )
   }
