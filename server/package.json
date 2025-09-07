@@ -1,6 +1,6 @@
 {
   "name": "mcm-server",
-  "version": "1.0.0",
+  "version": "1.4.1",
   "description": "backend",
   "main": "server.ts",
   "scripts": {
