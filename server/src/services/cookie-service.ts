@@ -15,7 +15,7 @@ export function setAuthCookie(res: Response, userId: string) {
     secure: true, // Ensure the cookie is sent only over HTTPS
     sameSite: 'none',
     maxAge: ms(env.TOKEN_EXPIRATION as StringValue),
-    partitioned: true, // Use partitioned cookies for better security
+    //partitioned: true, // Use partitioned cookies for better security
   })
 
   return res
@@ -26,6 +26,6 @@ export function clearAuthCookie(res: Response) {
     httpOnly: true,
     secure: true,
     sameSite: 'none',
-    partitioned: true,
+    //partitioned: true,
   })
 }
