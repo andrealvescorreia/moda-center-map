@@ -28,7 +28,7 @@ function NotFound() {
 }
 export default function App() {
   const { setUser } = useUserContext()
-  const { setLoading } = useLoadingContext()
+  const { loading, setLoading } = useLoadingContext()
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -47,6 +47,8 @@ export default function App() {
 
   return (
     <BrowserRouter>
+      {loading && <LoadingOverlay />}
+
       <NavBar />
       <Content />
     </BrowserRouter>
@@ -54,8 +56,6 @@ export default function App() {
 }
 
 const Content = () => {
-  const { loading } = useLoadingContext()
-
   const location = useLocation()
   const [displayLocation, setDisplayLocation] = useState(location)
   const [transitionStage, setTransitionStage] = useState('fadeIn')
@@ -77,7 +77,6 @@ const Content = () => {
         }
       }}
     >
-      {loading && <LoadingOverlay />}
       <Routes location={displayLocation}>
         <Route path="" element={<Home />} />
         <Route path="register" element={<Register />} />
