@@ -38,7 +38,7 @@ const fetchUserRoute = new Route(
 )
 const fetchFavoriteSellersRoute = new Route(
   ({ request }) => {
-    return request.url === `${API_URL}/seller/favorite`
+    return request.url.includes(`${API_URL}/seller/favorite`)
   },
   new NetworkFirst({
     cacheName: 'api/fetch-favorite-sellers',
@@ -46,15 +46,42 @@ const fetchFavoriteSellersRoute = new Route(
 )
 const fetchSellersRoute = new Route(
   ({ request }) => {
-    return request.url === `${API_URL}/seller?order_by=name&order=asc`
+    return request.url.includes(`${API_URL}/seller`)
   },
   new NetworkFirst({
     cacheName: 'api/fetch-sellers',
   })
 )
+const fetchOneSellerRoute = new Route(
+  ({ request }) => {
+    return request.url.includes(`${API_URL}/seller/id`)
+  },
+  new NetworkFirst({
+    cacheName: 'api/fetch-one-seller',
+  })
+)
+const fetchSellerByBoxeRoute = new Route(
+  ({ request }) => {
+    return request.url.includes(`${API_URL}/seller/boxe`)
+  },
+  new NetworkFirst({
+    cacheName: 'api/fetch-seller-by-boxe',
+  })
+)
+const fetchSellerByStoreRoute = new Route(
+  ({ request }) => {
+    return request.url.includes(`${API_URL}/seller/store`)
+  },
+  new NetworkFirst({
+    cacheName: 'api/fetch-seller-by-store',
+  })
+)
 registerRoute(fetchUserRoute)
 registerRoute(fetchFavoriteSellersRoute)
 registerRoute(fetchSellersRoute)
+registerRoute(fetchOneSellerRoute)
+registerRoute(fetchSellerByBoxeRoute)
+registerRoute(fetchSellerByStoreRoute)
 
 // cache navigations
 const navigationRoute = new NavigationRoute(
