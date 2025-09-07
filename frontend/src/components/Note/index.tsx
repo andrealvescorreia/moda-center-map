@@ -24,8 +24,20 @@ export default function Note({
   const [searchParams, setSearchParams] = useSearchParams()
   const state = searchParams.get('edit-note')
 
-  const enterEditMode = () => setSearchParams({ 'edit-note': 'true' })
-  const clearState = () => setSearchParams({})
+  const enterEditMode = () => {
+    setSearchParams((prev) => {
+      const params = new URLSearchParams(prev)
+      params.set('edit-note', 'true')
+      return params
+    })
+  }
+  const clearState = () => {
+    setSearchParams((prev) => {
+      const params = new URLSearchParams(prev)
+      params.delete('edit-note')
+      return params
+    })
+  }
 
   useEffect(() => {
     if (state === 'true') {
