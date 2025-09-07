@@ -58,7 +58,9 @@ export default function EditSeller() {
 
   useEffect(() => {
     if (!user) {
-      navigate('/login', { replace: true })
+      setTimeout(() => {
+        navigate('/login', { replace: true })
+      }, 500)
     }
   }, [user, navigate])
 

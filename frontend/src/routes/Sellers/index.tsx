@@ -4,7 +4,6 @@ import { useEffect, useState } from 'react'
 import { NavLink, useNavigate, useSearchParams } from 'react-router-dom'
 import { IconButton } from '../../components/icon-button'
 import { InputField, InputIcon, InputRoot } from '../../components/input'
-import NavBar from '../../components/nav'
 import { getSellers } from '../../http/api'
 import type { SellerResponse } from '../../http/responses'
 import { useLoadingContext } from '../../providers/LoadingProvider'
@@ -67,8 +66,6 @@ export default function Sellers() {
   }
   return (
     <div className="h-[100dvh] w-[100dvw] fixed overflow-y-auto">
-      <NavBar />
-
       <div className="w-full">
         <div className="py-4 md:py-3 md:mt-0 w-[100%] px-2 ml-[50%] transform -translate-x-1/2 sticky top-0 z-100 bg-white border-b border-gray-200 flex justify-center">
           <InputRoot className="w-full md:max-w-125">

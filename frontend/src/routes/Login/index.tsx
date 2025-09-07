@@ -1,10 +1,16 @@
+import { useEffect } from 'react'
 import { NavLink, Navigate } from 'react-router-dom'
 import Logo from '../../assets/logo.png'
+import { useNavContext } from '../../providers/NavProvider'
 import { useUserContext } from '../../providers/UserProvider'
 import LoginForm from './login-form'
 
 export default function Login() {
   const { user } = useUserContext()
+  const { setShow } = useNavContext()
+  useEffect(() => {
+    setShow(false)
+  }, [setShow])
   if (user) {
     return <Navigate to="/user" replace />
   }
