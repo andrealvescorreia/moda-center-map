@@ -105,10 +105,10 @@ export default function RouteFollower({
       <Sheet
         ref={ref}
         isOpen={true}
-        snapPoints={[1, 360, 100]}
+        snapPoints={[0, 100, 360, 1]}
         onClose={() => snapTo(0)}
-        onOpenEnd={() => snapTo(2)}
-        initialSnap={2}
+        onOpenEnd={() => snapTo(1)}
+        initialSnap={1}
         className="md:max-w-95  md:ml-[50%] md:-translate-x-1/2"
       >
         <Sheet.Container>
@@ -140,9 +140,7 @@ export default function RouteFollower({
                 Editar rota
               </IconButton>
             </div>
-            <Sheet.Scroller>
-              <RouteContent />
-            </Sheet.Scroller>
+            <RouteContent />
           </Sheet.Content>
         </Sheet.Container>
       </Sheet>

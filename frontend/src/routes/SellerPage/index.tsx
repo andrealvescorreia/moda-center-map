@@ -328,13 +328,14 @@ export default function SellerPage() {
         isOpen={true}
         onClose={onClose}
         snapPoints={[
-          isMultiLocationSeller.current ? 1000 : 300,
-          isMultiLocationSeller.current ? 380 : 300,
+          0,
           130,
+          isMultiLocationSeller.current ? 380 : 300,
+          isMultiLocationSeller.current ? 1000 : 300,
         ]}
         onCloseEnd={onClose}
-        onOpenEnd={() => snapTo(1)}
-        initialSnap={1}
+        onOpenEnd={() => snapTo(3)}
+        initialSnap={3}
         className="md:max-w-100  md:ml-[50%] md:-translate-x-1/2"
       >
         <Sheet.Container>

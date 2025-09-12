@@ -14,6 +14,7 @@ import type { Loja } from '../../../interfaces/Loja'
 import { ModaCenterGridMap } from '../../../models/ModaCenterGridMap'
 import { useClickContext } from '../../../providers/ClickProvider'
 import { useRouteContext } from '../../../providers/RouteProvider'
+import { useSheetScrollerFix } from '../../../utils/useSheetScrollerFix'
 import { colorToEnglishMap } from '../../../utils/utils'
 import RouteContent from './RouteContent'
 import { SearchDestiny } from './SearchDestiny'
@@ -39,6 +40,7 @@ const RouteEditor = ({ gridMap, onCancel, onStart }: RouteEditorProps) => {
   const [modalOpen, setModalOpen] = useState(false)
 
   const ref = useRef<SheetRef>(null)
+  const sheetScrollRef = useSheetScrollerFix()
 
   useEffect(() => {
     if (!isAddingDestiny && !!route.inicio) {
@@ -244,16 +246,19 @@ const RouteEditor = ({ gridMap, onCancel, onStart }: RouteEditorProps) => {
           ref={ref}
           isOpen={bottomSheetOpen}
           onClose={() => snapTo(2)}
-          snapPoints={[1, 360, 85]}
-          onOpenEnd={() => snapTo(window.innerWidth > 768 ? 0 : 2)}
-          initialSnap={window.innerWidth > 768 ? 0 : 2} // Adjust initial snap based on screen size
+          snapPoints={[0, 85, 360, 1]}
+          onOpenEnd={() => snapTo(window.innerWidth > 768 ? 3 : 1)}
+          initialSnap={window.innerWidth > 768 ? 3 : 1} // Adjust initial snap based on screen size
           className="md:max-w-80"
         >
           <Sheet.Container>
             <SheetHeaderTitle onDismiss={cancel}>
               <h2 className="pl-4 text-[1.3rem] md:text-lg">Minha rota</h2>
             </SheetHeaderTitle>
-            <Sheet.Content className="flex gap-3 pl-5 pt-2.5 md:pl-2">
+            <Sheet.Content
+              scrollRef={sheetScrollRef}
+              className="flex gap-3 pl-5 pt-2.5 md:pl-2"
+            >
               <div className="flex gap-3 overflow-x-auto pb-2 md:flex-col md:pr-3 md:h-38 min-h-10 pr-5">
                 <IconButton
                   className="shrink-0 h-8 md:h-7 text-sm md:text-xs"
@@ -299,9 +304,8 @@ const RouteEditor = ({ gridMap, onCancel, onStart }: RouteEditorProps) => {
               {
                 // https://github.com/Temzasse/react-modal-sheet/issues/154
               }
-              <Sheet.Scroller>
-                <RouteContent />
-              </Sheet.Scroller>
+
+              <RouteContent />
             </Sheet.Content>
           </Sheet.Container>
         </Sheet>
