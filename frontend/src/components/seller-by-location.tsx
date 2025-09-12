@@ -155,7 +155,7 @@ export default function SellerByLocation({
       <h2>
         Setor {colorMap[location.sector_color]} -{' '}
         {'box_number' in location
-          ? `Rua ${location.street_letter} - Box ${location.box_number}`
+          ? `Rua ${location.street_letter} - Boxe ${location.box_number}`
           : `Bloco ${location.block_number} - Loja ${location.store_number}`}
       </h2>
 
